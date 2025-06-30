@@ -32,7 +32,9 @@ def get_request(endpoint, **kwargs):
 
 def analyze_review_sentiments(text):
     """Add code for retrieving sentiments"""
-    request_url = sentiment_analyzer_url + "analyze/" + text
+    import urllib.parse
+    encoded_text = urllib.parse.quote(text, safe='')
+    request_url = sentiment_analyzer_url + "analyze/" + encoded_text
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)

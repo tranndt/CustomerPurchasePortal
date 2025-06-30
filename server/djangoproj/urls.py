@@ -25,4 +25,6 @@ urlpatterns = [
     path('about/', TemplateView.as_view(template_name="About.html")),
     path('contact/', TemplateView.as_view(template_name="Contact.html")),
     path('', TemplateView.as_view(template_name="Home.html")),
+    path('login/', TemplateView.as_view(template_name="login.html")),
+    path('register/', TemplateView.as_view(template_name="register.html")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
