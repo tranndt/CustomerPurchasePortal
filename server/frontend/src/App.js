@@ -1,3 +1,5 @@
+import "./App.css";
+import "./styles/global.css";
 import LoginPanel from "./components/Login/Login"
 import Register from "./components/Register/Register"
 import { Routes, Route } from "react-router-dom";

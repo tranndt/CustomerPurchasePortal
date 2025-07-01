@@ -50,24 +50,28 @@ const TicketManager = () => {
 
   const getStatusBadge = (status) => {
     const statusColors = {
-      pending: { bg: '#ffc107', color: '#000' },
-      approved: { bg: '#28a745', color: '#fff' },
-      rejected: { bg: '#dc3545', color: '#fff' },
-      resolved: { bg: '#6c757d', color: '#fff' }
+      pending: { bg: 'linear-gradient(135deg, #ffc107, #ffb300)', color: '#000', shadow: 'rgba(255, 193, 7, 0.3)' },
+      approved: { bg: 'linear-gradient(135deg, #28a745, #20c997)', color: '#fff', shadow: 'rgba(40, 167, 69, 0.3)' },
+      rejected: { bg: 'linear-gradient(135deg, #dc3545, #e74c3c)', color: '#fff', shadow: 'rgba(220, 53, 69, 0.3)' },
+      resolved: { bg: 'linear-gradient(135deg, #6c757d, #495057)', color: '#fff', shadow: 'rgba(108, 117, 125, 0.3)' }
     };
     
-    const colors = statusColors[status] || { bg: '#6c757d', color: '#fff' };
+    const colors = statusColors[status] || statusColors.resolved;
     
     return (
       <span style={{
-        backgroundColor: colors.bg,
+        background: colors.bg,
         color: colors.color,
-        padding: '4px 8px',
-        borderRadius: '4px',
-        fontSize: '12px',
-        fontWeight: 'bold'
+        padding: '6px 12px',
+        borderRadius: '20px',
+        fontSize: '11px',
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px',
+        boxShadow: `0 2px 8px ${colors.shadow}`,
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        {status.toUpperCase()}
+        {status}
       </span>
     );
   };
@@ -76,8 +80,40 @@ const TicketManager = () => {
     return (
       <div>
         <SimpleNav />
-        <div style={{ padding: "20px", textAlign: "center" }}>
-          <p>Loading tickets...</p>
+        <div style={{ 
+          padding: "24px", 
+          backgroundColor: "#f8f9fa",
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center"
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "48px",
+            textAlign: "center",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
+            border: "1px solid #e9ecef"
+          }}>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              border: "4px solid #f3f3f3",
+              borderTop: "4px solid #007bff",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto 16px"
+            }}></div>
+            <p style={{ 
+              fontSize: "16px", 
+              color: "#6c757d",
+              margin: "0",
+              fontWeight: "500"
+            }}>
+              Loading tickets...
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -86,87 +122,187 @@ const TicketManager = () => {
   return (
     <div>
       <SimpleNav />
-      <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
-        <h2>🎫 Support Ticket Manager</h2>
-        
-        {tickets.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "40px" }}>
-            <p>No tickets found.</p>
-          </div>
-        ) : (
-          <div style={{ marginTop: "20px" }}>
-            <div style={{ 
-              display: "grid", 
-              gridTemplateColumns: "auto 1fr auto auto auto auto", 
-              gap: "10px", 
-              padding: "10px",
-              backgroundColor: "#f8f9fa",
-              fontWeight: "bold",
-              borderRadius: "4px"
+      <div style={{ 
+        padding: "24px", 
+        maxWidth: "1400px", 
+        margin: "0 auto",
+        backgroundColor: "#f8f9fa",
+        minHeight: "100vh"
+      }}>
+        <div style={{
+          backgroundColor: "white",
+          borderRadius: "12px",
+          padding: "32px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
+          border: "1px solid #e9ecef"
+        }}>
+          <div style={{ marginBottom: "32px" }}>
+            <h1 style={{ 
+              fontSize: "28px", 
+              fontWeight: "600", 
+              color: "#2c3e50", 
+              margin: "0 0 8px 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px"
             }}>
-              <div>ID</div>
-              <div>Customer & Product</div>
-              <div>Status</div>
-              <div>Submitted</div>
-              <div>Issue Preview</div>
-              <div>Actions</div>
+              🎫 Support Ticket Manager
+            </h1>
+            <p style={{ 
+              color: "#6c757d", 
+              fontSize: "16px", 
+              margin: "0",
+              fontWeight: "400"
+            }}>
+              View and manage all customer support tickets
+            </p>
+          </div>
+          
+          {tickets.length === 0 ? (
+            <div style={{ 
+              textAlign: "center", 
+              padding: "80px 20px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              border: "2px dashed #dee2e6"
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>📝</div>
+              <h3 style={{ color: "#6c757d", marginBottom: "8px" }}>No tickets found</h3>
+              <p style={{ color: "#adb5bd", margin: "0" }}>Support tickets will appear here when customers submit them.</p>
             </div>
-            
-            {tickets.map((ticket) => (
-              <div 
-                key={ticket.ticket_id} 
-                style={{ 
-                  display: "grid", 
-                  gridTemplateColumns: "auto 1fr auto auto auto auto", 
-                  gap: "10px", 
-                  padding: "15px",
-                  borderBottom: "1px solid #dee2e6",
-                  alignItems: "center"
-                }}
-              >
-                <div style={{ fontWeight: "bold", color: "#007bff" }}>
-                  #{ticket.ticket_id}
-                </div>
-                
-                <div>
-                  <div style={{ fontWeight: "bold" }}>{ticket.customer}</div>
-                  <div style={{ fontSize: "14px", color: "#666" }}>{ticket.product}</div>
-                </div>
-                
-                <div>
-                  {getStatusBadge(ticket.status)}
-                </div>
-                
-                <div style={{ fontSize: "14px" }}>
-                  {new Date(ticket.submitted).toLocaleDateString()}
-                </div>
-                
-                <div style={{ fontSize: "14px", maxWidth: "200px" }}>
-                  {ticket.issue.length > 50 
-                    ? ticket.issue.substring(0, 50) + "..." 
-                    : ticket.issue}
-                </div>
-                
-                <div>
-                  <button
-                    onClick={() => handleViewTicket(ticket.ticket_id)}
-                    style={{
-                      backgroundColor: "#007bff",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 12px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "14px"
+          ) : (
+            <div>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "80px 2fr 120px 120px 2fr 120px",
+                gap: "16px",
+                padding: "16px 20px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "8px",
+                fontWeight: "600",
+                fontSize: "14px",
+                color: "#495057",
+                marginBottom: "16px",
+                border: "1px solid #e9ecef"
+              }}>
+                <div>ID</div>
+                <div>Customer & Product</div>
+                <div>Status</div>
+                <div>Submitted</div>
+                <div>Issue Description</div>
+                <div style={{ textAlign: "center" }}>Actions</div>
+              </div>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {tickets.map((ticket, index) => (
+                  <div 
+                    key={ticket.ticket_id} 
+                    style={{ 
+                      display: "grid", 
+                      gridTemplateColumns: "80px 2fr 120px 120px 2fr 120px", 
+                      gap: "16px", 
+                      padding: "20px",
+                      backgroundColor: index % 2 === 0 ? "#fff" : "#f8f9fa",
+                      border: "1px solid #e9ecef",
+                      borderRadius: "8px",
+                      alignItems: "center",
+                      transition: "all 0.2s ease",
+                      cursor: "pointer"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#e3f2fd";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = index % 2 === 0 ? "#fff" : "#f8f9fa";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = "none";
                     }}
                   >
-                    View & Edit
-                  </button>
-                </div>
+                    <div style={{ 
+                      fontWeight: "700", 
+                      color: "#007bff",
+                      fontSize: "14px"
+                    }}>
+                      #{ticket.ticket_id}
+                    </div>
+                    
+                    <div>
+                      <div style={{ 
+                        fontWeight: "600", 
+                        color: "#2c3e50",
+                        fontSize: "15px",
+                        marginBottom: "4px"
+                      }}>
+                        {ticket.customer}
+                      </div>
+                      <div style={{ 
+                        fontSize: "13px", 
+                        color: "#6c757d",
+                        fontWeight: "500"
+                      }}>
+                        {ticket.product}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      {getStatusBadge(ticket.status)}
+                    </div>
+                    
+                    <div style={{ 
+                      fontSize: "13px",
+                      color: "#6c757d",
+                      fontWeight: "500"
+                    }}>
+                      {new Date(ticket.submitted).toLocaleDateString()}
+                    </div>
+                    
+                    <div style={{ 
+                      fontSize: "14px", 
+                      color: "#495057",
+                      lineHeight: "1.4"
+                    }}>
+                      {ticket.issue.length > 80 
+                        ? ticket.issue.substring(0, 80) + "..." 
+                        : ticket.issue}
+                    </div>
+                    
+                    <div style={{ textAlign: "center" }}>
+                      <button
+                        onClick={() => handleViewTicket(ticket.ticket_id)}
+                        style={{
+                          backgroundColor: "#007bff",
+                          color: "white",
+                          border: "none",
+                          padding: "8px 16px",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          transition: "all 0.2s ease",
+                          boxShadow: "0 2px 4px rgba(0, 123, 255, 0.2)"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.backgroundColor = "#0056b3";
+                          e.target.style.transform = "translateY(-1px)";
+                          e.target.style.boxShadow = "0 4px 8px rgba(0, 123, 255, 0.3)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.backgroundColor = "#007bff";
+                          e.target.style.transform = "translateY(0)";
+                          e.target.style.boxShadow = "0 2px 4px rgba(0, 123, 255, 0.2)";
+                        }}
+                      >
+                        View & Edit
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
