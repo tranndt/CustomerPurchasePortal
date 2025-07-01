@@ -32,7 +32,12 @@ from django.contrib.auth.models import User
 
 # Optional: Extend user with profile for role distinction
 class UserProfile(models.Model):
-    ROLE_CHOICES = [('customer', 'Customer'), ('manager', 'Manager')]
+    ROLE_CHOICES = [
+        ('customer', 'Customer'), 
+        ('manager', 'Manager'),
+        ('admin', 'Admin'),
+        ('support', 'Support')
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 

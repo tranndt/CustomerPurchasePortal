@@ -11,6 +11,7 @@ from datetime import datetime
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -37,7 +38,20 @@ def login_user(request):
             if user is not None:
                 # If user is valid, call login method to login current user
                 login(request, user)
-                return JsonResponse({"status": 200, "userName": username, "message": "Authenticated"})
+                
+                # Get user role from profile
+                try:
+                    profile = UserProfile.objects.get(user=user)
+                    user_role = profile.get_role_display()  # This returns the display value (e.g., "Manager")
+                except UserProfile.DoesNotExist:
+                    user_role = "Customer"
+                
+                return JsonResponse({
+                    "status": 200, 
+                    "userName": username, 
+                    "userRole": user_role,
+                    "message": "Authenticated"
+                })
             else:
                 return JsonResponse({"status": 401, "userName": username, "message": "Authentication failed"})
         except Exception as e:
@@ -68,8 +82,17 @@ def register_user(request):
                 last_name=data["lastName"],
                 email=data["email"]
             )
+            
+            # Create user profile with default Customer role
+            profile = UserProfile.objects.create(user=user, role="customer")
+            
             login(request, user)
-            return JsonResponse({"status": 201, "userName": user.username, "message": "User registered successfully"})
+            return JsonResponse({
+                "status": 201, 
+                "userName": user.username, 
+                "userRole": "customer",
+                "message": "User registered successfully"
+            })
         except Exception as e:
             return JsonResponse({"status": 400, "error": "Registration failed", "message": str(e)})
     else:
@@ -193,6 +216,20 @@ def get_my_orders(request):
     ]
     return JsonResponse({"status": 200, "orders": results})
 
+def get_customer_orders(request):
+    orders = Order.objects.filter(customer=request.user).select_related("product")
+    results = [
+        {
+            "order_id": order.id,
+            "transaction_id": order.transaction_id,
+            "product": order.product.name,
+            "category": order.product.category,
+            "price": str(order.product.price),
+            "date_purchased": order.date_purchased,
+        } for order in orders
+    ]
+    return JsonResponse({"status": 200, "orders": results})
+
 @csrf_exempt
 @login_required
 def post_review(request):
@@ -237,8 +274,11 @@ def submit_support_ticket(request):
 
 @login_required
 def get_all_orders(request):
-    profile = UserProfile.objects.get(user=request.user)
-    if profile.role.lower() != "manager":
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ["manager", "admin"]:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
         return JsonResponse({"status": 403, "message": "Access denied"})
 
     orders = Order.objects.select_related("customer", "product")
@@ -254,8 +294,11 @@ def get_all_orders(request):
 
 @login_required
 def get_support_tickets(request):
-    profile = UserProfile.objects.get(user=request.user)
-    if profile.role.lower() != "manager":
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ["manager", "admin", "support"]:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
         return JsonResponse({"status": 403, "message": "Access denied"})
 
     tickets = SupportTicket.objects.select_related("customer", "product")
@@ -276,8 +319,11 @@ def get_support_tickets(request):
 @csrf_exempt
 @login_required
 def update_ticket_status(request, ticket_id):
-    profile = UserProfile.objects.get(user=request.user)
-    if profile.role.lower() != "manager":
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ["manager", "admin", "support"]:
+            return JsonResponse({"status": 403})
+    except UserProfile.DoesNotExist:
         return JsonResponse({"status": 403})
 
     if request.method == "POST":
@@ -300,11 +346,13 @@ def get_demo_users(request):
             for user in users:
                 try:
                     profile = UserProfile.objects.get(user=user)
+                    # Convert database role to display format
+                    role_display = profile.get_role_display()
                     demo_users.append({
                         'username': user.username,
                         'first_name': user.first_name,
                         'last_name': user.last_name,
-                        'role': profile.role
+                        'role': role_display
                     })
                 except UserProfile.DoesNotExist:
                     demo_users.append({
@@ -330,3 +378,94 @@ def init_demo_data(request):
             return JsonResponse({"status": 500, "error": "Failed to initialize demo data", "message": str(e)})
     else:
         return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only GET method is supported"})
+
+@require_GET
+@login_required
+def get_customer_reviews(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "error": "Unauthorized"}, status=401)
+    reviews = Review.objects.filter(customer=request.user).select_related('product').order_by('-created_on')
+    review_list = [
+        {
+            'id': r.id,
+            'product_name': r.product.name,
+            'rating': r.rating,
+            'review_text': r.review_text,
+            'created_on': r.created_on,
+        }
+        for r in reviews
+    ]
+    return JsonResponse({"status": 200, "reviews": review_list})
+
+from .models import SupportTicket, Product
+
+from django.views.decorators.http import require_GET
+
+@require_GET
+def get_customer_tickets(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "error": "Unauthorized"}, status=401)
+    tickets = SupportTicket.objects.filter(customer=request.user).select_related('product').order_by('-submitted_on')
+    ticket_list = [
+        {
+            'id': t.id,
+            'product_name': t.product.name,
+            'status': t.status,
+            'issue_description': t.issue_description,
+            'submitted_on': t.submitted_on,
+            'resolution_note': t.resolution_note,
+        }
+        for t in tickets
+    ]
+    return JsonResponse({"status": 200, "tickets": ticket_list})
+
+from .models import Order
+
+@require_GET
+def get_order_by_transaction(request, transaction_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "error": "Unauthorized"}, status=401)
+    try:
+        order = Order.objects.select_related('product').get(transaction_id=transaction_id, customer=request.user)
+        return JsonResponse({
+            "status": 200,
+            "order": {
+                "id": order.id,
+                "product_id": order.product.id,
+                "product_name": order.product.name,
+                "category": order.product.category,
+                "price": str(order.product.price),
+                "date_purchased": order.date_purchased,
+            }
+        })
+    except Order.DoesNotExist:
+        return JsonResponse({"status": 404, "error": "Order not found"}, status=404)
+
+@require_GET
+def get_all_reviews(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "error": "Unauthorized"}, status=401)
+    
+    # Check if user has admin or manager role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "error": "Forbidden"}, status=403)
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "error": "Forbidden"}, status=403)
+    
+    # Get all reviews with related customer and product info
+    reviews = Review.objects.select_related('customer', 'product').order_by('-created_on')
+    review_list = [
+        {
+            'id': r.id,
+            'customer_name': f"{r.customer.first_name} {r.customer.last_name}".strip() or r.customer.username,
+            'product_name': r.product.name,
+            'rating': r.rating,
+            'review_text': r.review_text,
+            'sentiment': r.sentiment,
+            'created_on': r.created_on,
+        }
+        for r in reviews
+    ]
+    return JsonResponse({"status": 200, "reviews": review_list})

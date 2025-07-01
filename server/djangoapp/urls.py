@@ -22,13 +22,18 @@ urlpatterns = [
     # path(route='get_cars', view=views.get_cars, name='get_cars'),
     # path(route='add_review', view=views.add_review, name='add_review'),
 
-    path("api/myorders", views.get_my_orders),
+    path("api/customer/orders", views.get_customer_orders),
     path("api/review", views.post_review),
     path("api/support", views.submit_support_ticket),
     path("api/allorders", views.get_all_orders),
     path("api/tickets", views.get_support_tickets),
     path("api/tickets/<int:ticket_id>", views.update_ticket_status),
     path("api/demo-users", views.get_demo_users),
+    path("api/init-demo-data", views.init_demo_data),
+    path("api/customer/reviews", views.get_customer_reviews),
+    path("api/customer/tickets", views.get_customer_tickets),
+    path("api/order-by-transaction/<str:transaction_id>", views.get_order_by_transaction),
+    path("api/admin/reviews", views.get_all_reviews),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

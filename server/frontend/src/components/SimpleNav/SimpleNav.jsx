@@ -9,17 +9,28 @@ const SimpleNav = () => {
 
   useEffect(() => {
     const storedUsername = sessionStorage.getItem('username');
+    const storedRole = sessionStorage.getItem('userRole');
+    
     if (storedUsername) {
       setIsLoggedIn(true);
       setUsername(storedUsername);
-      // Get user role - for demo purposes, we'll determine based on username
-      // In a real app, this would come from the backend
-      if (storedUsername.includes('admin') || storedUsername === 'admin1') {
-        setUserRole('Admin');
-      } else if (storedUsername.includes('support')) {
-        setUserRole('Support');
+      
+      // Use the stored role from backend, with fallback logic for demo purposes
+      if (storedRole) {
+        setUserRole(storedRole);
       } else {
-        setUserRole('Customer');
+        // Fallback logic for existing sessions without role
+        let fallbackRole;
+        if (storedUsername.includes('admin') || storedUsername === 'admin1') {
+          fallbackRole = 'Admin';
+        } else if (storedUsername.includes('manager') || storedUsername === 'manager1') {
+          fallbackRole = 'Manager';
+        } else if (storedUsername.includes('support')) {
+          fallbackRole = 'Support';
+        } else {
+          fallbackRole = 'Customer';
+        }
+        setUserRole(fallbackRole);
       }
     }
   }, []);
@@ -33,13 +44,30 @@ const SimpleNav = () => {
       
       if (res.ok) {
         sessionStorage.removeItem('username');
+        sessionStorage.removeItem('userRole');
         setIsLoggedIn(false);
         setUsername('');
         setUserRole('Customer');
-        navigate('/');
+        navigate('/'); // Redirect to landing page
       }
     } catch (error) {
       console.error("Logout failed:", error);
+    }
+  };
+
+  const handleHomeNavigation = () => {
+    if (!isLoggedIn) {
+      navigate('/');
+      return;
+    }
+    
+    // Navigate to role-specific home page
+    if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
+      navigate('/admin/home');
+    } else if (userRole.toLowerCase() === 'support') {
+      navigate('/support/home');
+    } else {
+      navigate('/customer/home');
     }
   };
 
@@ -47,75 +75,76 @@ const SimpleNav = () => {
   const renderNavigationLinks = () => {
     if (!isLoggedIn) return null;
 
-    const baseLinks = (
-      <button 
-        onClick={() => navigate('/orders')}
-        style={{ 
-          background: 'none', 
-          border: 'none', 
-          color: '#007bff', 
-          cursor: 'pointer',
-          textDecoration: 'underline'
-        }}
-      >
-        My Orders
-      </button>
-    );
-
-    if (userRole === 'Admin') {
+    if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
-          {baseLinks}
           <button 
             onClick={() => navigate('/admin/orders')}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#dc3545', 
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              fontSize: '14px'
-            }}
+            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
-            Admin Orders
+            All Orders
+          </button>
+          <button 
+            onClick={() => navigate('/admin/reviews')}
+            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+          >
+            All Reviews
           </button>
           <button 
             onClick={() => navigate('/admin/tickets')}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#dc3545', 
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              fontSize: '14px'
-            }}
+            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
-            Admin Tickets
+            All Tickets
           </button>
         </div>
       );
-    } else if (userRole === 'Support') {
+    } else if (userRole.toLowerCase() === 'support') {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
-          {baseLinks}
+          <button 
+            onClick={() => navigate('/customer/orders')}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            My Orders
+          </button>
+          <button 
+            onClick={() => navigate('/customer/reviews')}
+            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+          >
+            My Reviews
+          </button>
           <button 
             onClick={() => navigate('/admin/tickets')}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#ffc107', 
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              fontSize: '14px'
-            }}
+            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
             Support Tickets
           </button>
         </div>
       );
     } else {
-      // Customer role - only show basic navigation
-      return <div style={{ display: 'flex', gap: '15px' }}>{baseLinks}</div>;
+      // Customer role - show all customer navigation
+      return (
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <button 
+            onClick={() => navigate('/customer/orders')}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            My Orders
+          </button>
+          <button 
+            onClick={() => navigate('/customer/reviews')}
+            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+          >
+            My Reviews
+          </button>
+          <button 
+            onClick={() => navigate('/customer/tickets')}
+            style={{ background: 'none', border: 'none', color: '#28a745', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+          >
+            My Tickets
+          </button>
+        </div>
+      );
     }
   };
 
@@ -130,7 +159,7 @@ const SimpleNav = () => {
       alignItems: 'center'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <h3 style={{ margin: 0, color: '#007bff', cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <h3 style={{ margin: 0, color: '#007bff', cursor: 'pointer' }} onClick={handleHomeNavigation}>
           🛍️ Customer Purchase Portal
         </h3>
         
@@ -142,9 +171,9 @@ const SimpleNav = () => {
           <>
             <span style={{ color: '#666' }}>
               Welcome, {username} 
-              {userRole !== 'Customer' && (
+              {userRole.toLowerCase() !== 'customer' && (
                 <span style={{ 
-                  color: userRole === 'Admin' ? '#dc3545' : '#ffc107', 
+                  color: userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager' ? '#dc3545' : '#ffc107', 
                   fontSize: '12px', 
                   fontWeight: 'bold',
                   marginLeft: '5px'

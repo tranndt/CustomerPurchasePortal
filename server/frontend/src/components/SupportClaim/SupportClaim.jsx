@@ -3,34 +3,42 @@ import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 
 const SupportClaim = () => {
-  const { order_id } = useParams();
+  const { transaction_id } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [issueDescription, setIssueDescription] = useState("");
   const [attachment, setAttachment] = useState(null);
 
   useEffect(() => {
-    // Optional: fetch order details
+    // Fetch order by transaction_id to get order details
     const fetchOrder = async () => {
-      const res = await fetch(`http://localhost:8000/djangoapp/api/myorders`);
-      const data = await res.json();
-      if (data.status === 200) {
-        const match = data.orders.find(o => o.order_id.toString() === order_id);
-        if (match) setOrder(match);
+      const orderRes = await fetch(`http://localhost:8000/djangoapp/api/order-by-transaction/${transaction_id}`, {
+        credentials: "include"
+      });
+      const orderData = await orderRes.json();
+      console.log(`Order lookup for support ticket, transaction_id ${transaction_id}:`, orderData);
+      if (orderData.status === 200 && orderData.order) {
+        setOrder(orderData.order);
       }
     };
     fetchOrder();
-  }, [order_id]);
+  }, [transaction_id]);
 
   const submitSupportTicket = async () => {
+    if (!order) {
+      alert("Order information not found.");
+      return;
+    }
+    
     const formData = new FormData();
-    formData.append("order_id", order_id);
-    formData.append("product_id", order?.product_id);
+    formData.append("order_id", order.id);
+    formData.append("product_id", order.product_id);
     formData.append("issue_description", issueDescription);
     if (attachment) {
       formData.append("attachment", attachment);
     }
 
+    console.log("Submitting support ticket for order:", order.id);
     const res = await fetch("http://localhost:8000/djangoapp/api/support", {
       method: "POST",
       body: formData,
@@ -38,11 +46,12 @@ const SupportClaim = () => {
     });
 
     const result = await res.json();
+    console.log("Support ticket submission result:", result);
     if (result.status === 200) {
       alert("Support ticket submitted!");
-      navigate("/orders");
+      navigate("/customer/orders");
     } else {
-      alert("Failed to submit ticket.");
+      alert("Failed to submit ticket: " + (result.message || result.error || "Unknown error"));
     }
   };
 
@@ -51,7 +60,7 @@ const SupportClaim = () => {
       <SimpleNav />
       <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
         <h2>🎧 Support Claim</h2>
-      {order && <h3>Product: {order.product}</h3>}
+        {order && <h3>Product: {order.product_name}</h3>}
       <div>
         <textarea
           value={issueDescription}

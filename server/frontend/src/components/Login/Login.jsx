@@ -53,7 +53,17 @@ const Login = () => {
       const json = await res.json();
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
-          navigate("/"); // Use React Router navigate instead of window.location.href        
+          sessionStorage.setItem('userRole', json.userRole || 'Customer');
+          
+          // Redirect to role-specific home page
+          const userRole = json.userRole || 'Customer';
+          if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
+            navigate("/admin/home");
+          } else if (userRole.toLowerCase() === 'support') {
+            navigate("/support/home");
+          } else {
+            navigate("/customer/home");
+          }        
       }
       else {
         alert("The user could not be authenticated.")
@@ -84,7 +94,17 @@ const Login = () => {
       const json = await res.json();
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
-          navigate("/");        
+          sessionStorage.setItem('userRole', json.userRole || 'Customer');
+          
+          // Redirect to role-specific home page
+          const userRole = json.userRole || 'Customer';
+          if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
+            navigate("/admin/home");
+          } else if (userRole.toLowerCase() === 'support') {
+            navigate("/support/home");
+          } else {
+            navigate("/customer/home");
+          }        
       }
       else {
         alert("Demo login failed. This user may not have the default password.");

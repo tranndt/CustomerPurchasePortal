@@ -7,7 +7,7 @@ const MyOrders = () => {
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
-    const response = await fetch("http://localhost:8000/djangoapp/api/myorders", {
+    const response = await fetch("http://localhost:8000/djangoapp/api/customer/orders", {
       method: "GET",
       credentials: "include"
     });
@@ -38,10 +38,10 @@ const MyOrders = () => {
             <p>Price: ${order.price}</p>
             <p>Transaction ID: {order.transaction_id}</p>
             <p>Date Purchased: {order.date_purchased}</p>
-            <button onClick={() => navigate(`/review/${order.order_id}`)} style={{ marginRight: "10px" }}>
+            <button onClick={() => navigate(`/customer/reviews/${order.transaction_id}`)} style={{ marginRight: "10px" }}>
               Leave Review
             </button>
-            <button onClick={() => navigate(`/support/${order.order_id}`)}>
+            <button onClick={() => navigate(`/customer/tickets/${order.transaction_id}`)}>
               Get Support
             </button>
           </div>

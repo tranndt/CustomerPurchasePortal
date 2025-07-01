@@ -12,7 +12,7 @@ def initiate():
             "last_name": "Doe", 
             "email": "john.doe@example.com",
             "password": "password123",
-            "role": "Customer"
+            "role": "customer"
         },
         {
             "username": "customer2", 
@@ -20,7 +20,7 @@ def initiate():
             "last_name": "Smith", 
             "email": "jane.smith@example.com",
             "password": "password123",
-            "role": "Customer"
+            "role": "customer"
         },
         {
             "username": "admin1", 
@@ -28,7 +28,15 @@ def initiate():
             "last_name": "User", 
             "email": "admin@example.com",
             "password": "password123",
-            "role": "Admin"
+            "role": "admin"
+        },
+        {
+            "username": "manager1", 
+            "first_name": "Manager", 
+            "last_name": "User", 
+            "email": "manager@example.com",
+            "password": "password123",
+            "role": "manager"
         },
         {
             "username": "customer3", 
@@ -36,7 +44,7 @@ def initiate():
             "last_name": "Johnson", 
             "email": "alice.johnson@example.com",
             "password": "password123",
-            "role": "Customer"
+            "role": "customer"
         },
         {
             "username": "support1", 
@@ -44,7 +52,7 @@ def initiate():
             "last_name": "Agent", 
             "email": "support@example.com",
             "password": "password123",
-            "role": "Support"
+            "role": "support"
         }
     ]
     
@@ -87,13 +95,12 @@ def initiate():
         for i, user in enumerate(users):
             # Create 2-3 orders per user
             for j in range(2 + (i % 2)):  # 2-3 orders
-                if not Order.objects.filter(user=user, product=products[j % len(products)]).exists():
+                if not Order.objects.filter(customer=user, product=products[j % len(products)]).exists():
                     Order.objects.create(
-                        user=user,
+                        customer=user,
                         product=products[j % len(products)],
-                        quantity=1 + (j % 3),
-                        total_price=products[j % len(products)].price * (1 + (j % 3)),
-                        order_date=datetime.now() - timedelta(days=10 + j * 5)
+                        date_purchased=(datetime.now() - timedelta(days=10 + j * 5)).date(),
+                        transaction_id=f"TXN{user.id}{j:03d}{products[j % len(products)].id:03d}"
                     )
 
     # # Old car data (keeping for compatibility)

@@ -40,8 +40,18 @@ const Register = () => {
       
       if (json.status === 201) {
         sessionStorage.setItem('username', json.userName);
+        sessionStorage.setItem('userRole', json.userRole || 'Customer');
         alert("Registration successful! You are now logged in.");
-        navigate("/");
+        
+        // Redirect to role-specific home page
+        const userRole = json.userRole || 'Customer';
+        if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
+          navigate("/admin/home");
+        } else if (userRole.toLowerCase() === 'support') {
+          navigate("/support/home");
+        } else {
+          navigate("/customer/home");
+        }
       } else if (json.status === 409) {
         alert("User already exists. Please choose a different username.");
       } else {
