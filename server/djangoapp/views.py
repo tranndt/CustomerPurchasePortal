@@ -152,22 +152,29 @@ def add_review(request):
     elif request.method == "POST":
         try:
             data = json.loads(request.body)
+            print(f"DEBUG: Received data: {data}")
             
-            # Extract review data - the actual review data is nested under "review" key
-            review_data = data.get("review", {})
-            review_text = review_data.get("review", "")
+            # Extract review text for sentiment analysis
+            review_text = data.get("review", "")
+            print(f"DEBUG: Review text: {review_text}")
             
             # Analyze sentiment
             sentiment_response = analyze_review_sentiments(review_text)
+            print(f"DEBUG: Sentiment response: {sentiment_response}")
             
             # Add sentiment to the review data
             if sentiment_response:
-                review_data["sentiment"] = sentiment_response
+                data["sentiment"] = sentiment_response
             
             # Post review with the review data
-            response = post_review(review_data)
-            return JsonResponse({"status": "success", "review": response})
+            print(f"DEBUG: About to call post_review with data: {data}")
+            response = post_review(data)
+            print(f"DEBUG: Post review response: {response}")
+            return JsonResponse({"status": 200, "review": response})
         except Exception as e:
+            print(f"DEBUG: Exception occurred: {e}")
+            import traceback
+            traceback.print_exc()
             return JsonResponse({"status": "error", "message": str(e)})
     else:
         return JsonResponse({"status": "error", "message": "Invalid request method"})

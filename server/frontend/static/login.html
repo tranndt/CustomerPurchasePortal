@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Car Dealership - Login</title>
     <link rel="stylesheet" href="{% load static %}{% static 'bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
@@ -55,7 +58,7 @@
             .then(response => response.json())
             .then(data => {
                 const messageDiv = document.getElementById('message');
-                if (data.status === 'Authenticated') {
+                if (data.status === 200) {
                     messageDiv.innerHTML = '<div class="alert alert-success">Login successful! Welcome ' + data.userName + '</div>';
                     // Store username in session storage
                     sessionStorage.setItem("username", data.userName);
