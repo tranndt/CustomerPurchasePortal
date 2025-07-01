@@ -27,4 +27,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="Home.html")),
     path('login/', TemplateView.as_view(template_name="login.html")),
     path('register/', TemplateView.as_view(template_name="register.html")),
+    path('dealers/', TemplateView.as_view(template_name="react-index.html")),
+    path('dealer/<int:dealer_id>', TemplateView.as_view(template_name="react-index.html")),
+    path('postreview/<int:dealer_id>', TemplateView.as_view(template_name="react-index.html")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

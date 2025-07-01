@@ -34,13 +34,18 @@ def analyze_review_sentiments(text):
     """Add code for retrieving sentiments"""
     import urllib.parse
     encoded_text = urllib.parse.quote(text, safe='')
-    request_url = sentiment_analyzer_url + "analyze/" + encoded_text
+    # Use the environment variable or fallback to localhost
+    base_url = sentiment_analyzer_url if sentiment_analyzer_url else "http://localhost:5002/"
+    if not base_url.endswith('/'):
+        base_url += '/'
+    request_url = base_url + "analyze/" + encoded_text
     try:
         # Call get method of requests library with URL and parameters
         response = requests.get(request_url)
-        return response.json()
+        result = response.json()
+        return result
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Sentiment analysis error: {e}")
         return None
 
 def post_review(data_dict):

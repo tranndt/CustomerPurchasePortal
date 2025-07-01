@@ -28,23 +28,29 @@ logger = logging.getLogger(__name__)
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
 def login_user(request):
-    # Get username and password from request.POST dictionary
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    # Try to check if provide credential can be authenticated
-    user = authenticate(username=username, password=password)
-    data = {"userName": username}
-    if user is not None:
-        # If user is valid, call login method to login current user
-        login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
-    return JsonResponse(data)
+    if request.method == "POST":
+        try:
+            # Get username and password from request.POST dictionary
+            data = json.loads(request.body)
+            username = data['userName']
+            password = data['password']
+            # Try to check if provide credential can be authenticated
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                # If user is valid, call login method to login current user
+                login(request, user)
+                return JsonResponse({"status": 200, "userName": username, "message": "Authenticated"})
+            else:
+                return JsonResponse({"status": 401, "userName": username, "message": "Authentication failed"})
+        except Exception as e:
+            return JsonResponse({"status": 400, "error": "Login failed", "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only POST method is supported"})
 
 # Create a `logout_request` view to handle sign out request
 def logout_user(request):
     logout(request)
-    return JsonResponse({"userName": ""})
+    return JsonResponse({"status": 200, "userName": "", "message": "Logged out successfully"})
 
 
 # Create a `registration` view to handle sign up request
@@ -52,19 +58,24 @@ def logout_user(request):
 @csrf_exempt
 def register_user(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        if User.objects.filter(username=data["userName"]).exists():
-            return JsonResponse({"status": False, "error": "Already Registered"})
+        try:
+            data = json.loads(request.body)
+            if User.objects.filter(username=data["userName"]).exists():
+                return JsonResponse({"status": 409, "error": "Already Registered", "message": "User already exists"})
 
-        user = User.objects.create_user(
-            username=data["userName"],
-            password=data["password"],
-            first_name=data["firstName"],
-            last_name=data["lastName"],
-            email=data["email"]
-        )
-        login(request, user)
-        return JsonResponse({"status": True, "userName": user.username})
+            user = User.objects.create_user(
+                username=data["userName"],
+                password=data["password"],
+                first_name=data["firstName"],
+                last_name=data["lastName"],
+                email=data["email"]
+            )
+            login(request, user)
+            return JsonResponse({"status": 201, "userName": user.username, "message": "User registered successfully"})
+        except Exception as e:
+            return JsonResponse({"status": 400, "error": "Registration failed", "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only POST method is supported"})
 
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
@@ -77,7 +88,12 @@ def get_dealerships(request, state=None):
         else:
             dealerships = get_request("/fetchDealers")
         context["dealership_list"] = dealerships
-        return JsonResponse({"dealerships": dealerships})
+        
+        # Return data in format expected by React app
+        if dealerships:
+            return JsonResponse({"status": 200, "dealers": dealerships})
+        else:
+            return JsonResponse({"status": 404, "dealers": [], "message": "No dealerships found"})
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 def get_dealer_reviews(request, dealer_id):
@@ -86,7 +102,24 @@ def get_dealer_reviews(request, dealer_id):
         # Get dealer reviews from the URL
         reviews = get_request("/fetchReviews/dealer/" + str(dealer_id))
         context["review_list"] = reviews
-        return JsonResponse({"reviews": reviews})
+        if reviews is not None:
+            # Add sentiment analysis to reviews that don't have it
+            for review in reviews:
+                # Check if sentiment is missing, null, or empty
+                if not review.get('sentiment') or review.get('sentiment') in [None, '', 'null']:
+                    # Analyze sentiment for this review
+                    review_text = review.get('review', '')
+                    sentiment_response = analyze_review_sentiments(review_text)
+                    if sentiment_response and 'label' in sentiment_response:
+                        # Convert the label to lowercase to match the React component expectations
+                        sentiment_label = sentiment_response['label'].lower()
+                        review['sentiment'] = sentiment_label
+                    else:
+                        review['sentiment'] = 'neutral'
+            
+            return JsonResponse({"status": 200, "reviews": reviews})
+        else:
+            return JsonResponse({"status": 404, "reviews": [], "message": "No reviews found or service unavailable"})
 
 # Create a `get_dealer_details` view to render the dealer details
 def get_dealer_details(request, dealer_id):
@@ -95,7 +128,10 @@ def get_dealer_details(request, dealer_id):
         # Get dealer details from the URL
         dealer = get_request("/fetchDealer/" + str(dealer_id))
         context["dealer"] = dealer
-        return JsonResponse({"dealer": dealer})
+        if dealer is not None:
+            return JsonResponse({"status": 200, "dealer": dealer})
+        else:
+            return JsonResponse({"status": 404, "dealer": None, "message": "Dealer not found or service unavailable"})
     
 
 def get_cars(request):
@@ -105,7 +141,7 @@ def get_cars(request):
         initiate()
     car_models = CarModel.objects.select_related('car_make')
     cars = [{"CarModel": c.name, "CarMake": c.car_make.name} for c in car_models]
-    return JsonResponse({"CarModels": cars})
+    return JsonResponse({"status": 200, "CarModels": cars})
 
 
 # Create a `add_review` view to submit a review
@@ -135,3 +171,4 @@ def add_review(request):
             return JsonResponse({"status": "error", "message": str(e)})
     else:
         return JsonResponse({"status": "error", "message": "Invalid request method"})
+
