@@ -1,0 +1,34 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  express:
+    build: ./server/database
+    ports:
+      - "3030:3030"
+    depends_on:
+      - mongo
+
+  flask:
+    build: ./sentiment_service
+    ports:
+      - "5002:5002"
+
+  django:
+    build: ./server
+    ports:
+      - "8000:8000"
+    depends_on:
+      - express
+      - flask
+    environment:
+      - backend_url=http://express:3030
+      - sentiment_analyzer_url=http://flask:5002/
+
+volumes:
+  mongodata:

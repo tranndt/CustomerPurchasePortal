@@ -43,13 +43,13 @@ def sentiment_analyzer_vader(text_to_analyze):
     # Determine sentiment based on compound score
     compound = scores['compound']
     if compound >= 0.05:
-        label = "POSITIVE"
+        label = "positive"
         score = compound
     elif compound <= -0.05:
-        label = "NEGATIVE"
+        label = "negative"
         score = abs(compound)
     else:
-        label = "NEUTRAL"
+        label = "neutral"
         score = 0.5
     
     return {"label": label, "score": round(score, 2)}
@@ -100,11 +100,11 @@ def sentiment_analyzer(text_to_analyze):
             
             # Simple sentiment mapping
             if "positive" in generated_text:
-                return {"label": "POSITIVE", "score": 0.8}
+                return {"label": "positive", "score": 0.8}
             elif "negative" in generated_text:
-                return {"label": "NEGATIVE", "score": 0.8}
+                return {"label": "negative", "score": 0.8}
             elif "neutral" in generated_text:
-                return {"label": "NEUTRAL", "score": 0.5}
+                return {"label": "neutral", "score": 0.5}
             else:
                 return sentiment_analyzer_vader(text_to_analyze)
         else:
