@@ -5,9 +5,10 @@ import "../assets/bootstrap.min.css";
 const Header = () => {
     const logout = async (e) => {
     e.preventDefault();
-    let logout_url = window.location.origin+"/djangoapp/logout";
+    let logout_url = "http://localhost:8000/djangoapp/logout";
     const res = await fetch(logout_url, {
       method: "GET",
+      credentials: "include",
     });
   
     const json = await res.json();
@@ -40,7 +41,7 @@ if ( curr_user !== null &&  curr_user !== "") {
         <div>
           <nav class="navbar navbar-expand-lg navbar-light" style={{backgroundColor:"darkturquoise",height:"1in"}}>
             <div class="container-fluid">
-              <h2 style={{paddingRight: "5%"}}>Dealerships</h2>
+              <h2 style={{paddingRight: "5%"}}>Customer Portal</h2>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -50,10 +51,10 @@ if ( curr_user !== null &&  curr_user !== "") {
                     <a class="nav-link active" style={{fontSize: "larger"}} aria-current="page" href="/">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" style={{fontSize: "larger"}} href="/about">About Us</a>
+                    <a class="nav-link" style={{fontSize: "larger"}} href="/orders">My Orders</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" style={{fontSize: "larger"}} href="/contact">Contact Us</a>
+                    <a class="nav-link" style={{fontSize: "larger"}} href="/login">Login</a>
                   </li>
                 </ul>
                 <span class="navbar-text">

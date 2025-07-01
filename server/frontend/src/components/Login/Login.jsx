@@ -1,72 +1,267 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import "./Login.css";
-import Header from '../Header/Header';
 
-const Login = ({ onClose }) => {
-
+const Login = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  const [open,setOpen] = useState(true)
+  const [demoUsers, setDemoUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  let login_url = window.location.origin+"/djangoapp/login";
+  let login_url = "http://localhost:8000/djangoapp/login";
+  let demo_users_url = "http://localhost:8000/djangoapp/api/demo-users";
+
+  // Fetch demo users on component mount
+  useEffect(() => {
+    const fetchDemoUsers = async () => {
+      try {
+        const res = await fetch(demo_users_url, {
+          method: "GET",
+          credentials: "include",
+        });
+        const json = await res.json();
+        if (json.status === 200) {
+          setDemoUsers(json.users || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch demo users:", error);
+      }
+    };
+
+    fetchDemoUsers();
+  }, [demo_users_url]);
 
   const login = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const res = await fetch(login_url, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            "userName": userName,
-            "password": password
-        }),
-    });
-    
-    const json = await res.json();
-    if (json.status != null && json.status === 200) {
-        sessionStorage.setItem('username', json.userName);
-        setOpen(false);        
+    try {
+      const res = await fetch(login_url, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+              "userName": userName,
+              "password": password
+          }),
+      });
+      
+      const json = await res.json();
+      if (json.status != null && json.status === 200) {
+          sessionStorage.setItem('username', json.userName);
+          navigate("/"); // Use React Router navigate instead of window.location.href        
+      }
+      else {
+        alert("The user could not be authenticated.")
+      }
+    } catch (error) {
+      alert("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    else {
-      alert("The user could not be authenticated.")
-    }
-};
+  };
 
-  if (!open) {
-    window.location.href = "/";
+  const loginAsDemo = async (username) => {
+    setLoading(true);
+    try {
+      // For demo purposes, we'll use a default password
+      const res = await fetch(login_url, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+              "userName": username,
+              "password": "password123" // Default demo password
+          }),
+      });
+      
+      const json = await res.json();
+      if (json.status != null && json.status === 200) {
+          sessionStorage.setItem('username', json.userName);
+          navigate("/");        
+      }
+      else {
+        alert("Demo login failed. This user may not have the default password.");
+      }
+    } catch (error) {
+      alert("Demo login failed. Please try manual login.");
+    } finally {
+      setLoading(false);
+    }
   };
   
 
   return (
-    <div>
-      <Header/>
-    <div onClick={onClose}>
-      <div
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        className='modalContainer'
-      >
-          <form className="login_panel" style={{}} onSubmit={login}>
-              <div>
-              <span className="input_field">Username </span>
-              <input type="text"  name="username" placeholder="Username" className="input_field" onChange={(e) => setUserName(e.target.value)}/>
-              </div>
-              <div>
-              <span className="input_field">Password </span>
-              <input name="psw" type="password"  placeholder="Password" className="input_field" onChange={(e) => setPassword(e.target.value)}/>            
-              </div>
-              <div>
-              <input className="action_button" type="submit" value="Login"/>
-              <input className="action_button" type="button" value="Cancel" onClick={()=>setOpen(false)}/>
-              </div>
-              <a className="loginlink" href="/register">Register Now</a>
-          </form>
+    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Simple navigation breadcrumb */}
+      <div style={{ marginBottom: '20px' }}>
+        <button 
+          onClick={() => navigate('/')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#007bff',
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            fontSize: '14px'
+          }}
+        >
+          ← Back to Home
+        </button>
       </div>
-    </div>
+      
+      <header style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <h1>🛍️ Customer Purchase Portal</h1>
+        <p>Access your orders, reviews, and support tickets</p>
+      </header>
+
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+        gap: '30px', 
+        alignItems: 'start' 
+      }}>
+        {/* Login Form */}
+        <div style={{ backgroundColor: '#f8f9fa', padding: '30px', borderRadius: '8px' }}>
+          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Login</h2>
+          <form onSubmit={login}>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Username:</label>
+              <input 
+                type="text" 
+                value={userName}
+                placeholder="Enter your username" 
+                onChange={(e) => setUserName(e.target.value)}
+                required
+                style={{ 
+                  width: '100%', 
+                  padding: '10px', 
+                  borderRadius: '4px', 
+                  border: '1px solid #ddd',
+                  fontSize: '16px'
+                }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password:</label>
+              <input 
+                type="password" 
+                value={password}
+                placeholder="Enter your password" 
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ 
+                  width: '100%', 
+                  padding: '10px', 
+                  borderRadius: '4px', 
+                  border: '1px solid #ddd',
+                  fontSize: '16px'
+                }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  backgroundColor: loading ? '#6c757d' : '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '4px',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  fontSize: '16px',
+                  flex: 1
+                }}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                style={{
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  flex: 1
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+          
+          <div style={{ textAlign: 'center', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ddd' }}>
+            <p>Don't have an account? <a href="/register" style={{ color: '#007bff', textDecoration: 'none' }}>Register here</a></p>
+          </div>
+        </div>
+
+        {/* Demo Users Section */}
+        <div style={{ backgroundColor: '#f0f8ff', padding: '30px', borderRadius: '8px' }}>
+          <h2 style={{ marginTop: 0, marginBottom: '15px' }}>🚀 Demo Profiles</h2>
+          <p style={{ color: '#666', marginBottom: '20px' }}>Click on any profile to login instantly (demo purposes)</p>
+          
+          {demoUsers.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {demoUsers.map((user, index) => (
+                <div 
+                  key={index}
+                  onClick={() => loginAsDemo(user.username)}
+                  style={{
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                    padding: '15px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    ':hover': {
+                      backgroundColor: '#e9ecef'
+                    }
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+                >
+                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                    {user.first_name && user.last_name 
+                      ? `${user.first_name} ${user.last_name}` 
+                      : user.username}
+                  </div>
+                  <div style={{ color: '#666', fontSize: '14px' }}>@{user.username}</div>
+                  <div style={{ 
+                    color: user.role === 'Admin' ? '#dc3545' : '#28a745', 
+                    fontSize: '12px', 
+                    fontWeight: 'bold',
+                    marginTop: '5px'
+                  }}>
+                    {user.role || 'Customer'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: '#666' }}>
+              <p>Loading demo profiles...</p>
+            </div>
+          )}
+          
+          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '4px', fontSize: '14px' }}>
+            <strong>Note:</strong> These are demo accounts. All demo users use the password: <code>password123</code>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
