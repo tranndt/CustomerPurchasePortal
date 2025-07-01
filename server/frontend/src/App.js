@@ -6,6 +6,7 @@ import ProductReview from './components/ProductReview/ProductReview';
 import SupportClaim from './components/SupportClaim/SupportClaim';
 import AllOrders from './components/AllOrders/AllOrders';
 import TicketManager from './components/TicketManager/TicketManager';
+import TicketDetail from './components/TicketDetail/TicketDetail';
 import Landing from './components/Landing/Landing';
 import CustomerHome from './components/CustomerHome/CustomerHome';
 import AdminHome from './components/AdminHome/AdminHome';
@@ -32,7 +33,10 @@ function App() {
       <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
       <Route path="/admin/orders" element={<ProtectedRoute><AllOrders /></ProtectedRoute>} />
       <Route path="/admin/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
+      <Route path="/admin/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
       <Route path="/admin/reviews" element={<ProtectedRoute><AllReviews /></ProtectedRoute>} />
+      <Route path="/support/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
+      <Route path="/support/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
 
     </Routes>
   );

@@ -102,20 +102,8 @@ const SimpleNav = () => {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
-            onClick={() => navigate('/customer/orders')}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            My Orders
-          </button>
-          <button 
-            onClick={() => navigate('/customer/reviews')}
-            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            My Reviews
-          </button>
-          <button 
-            onClick={() => navigate('/admin/tickets')}
-            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+            onClick={() => navigate('/support/tickets')}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
             Support Tickets
           </button>

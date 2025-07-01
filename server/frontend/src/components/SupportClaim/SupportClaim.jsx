@@ -16,7 +16,6 @@ const SupportClaim = () => {
         credentials: "include"
       });
       const orderData = await orderRes.json();
-      console.log(`Order lookup for support ticket, transaction_id ${transaction_id}:`, orderData);
       if (orderData.status === 200 && orderData.order) {
         setOrder(orderData.order);
       }
@@ -38,15 +37,13 @@ const SupportClaim = () => {
       formData.append("attachment", attachment);
     }
 
-    console.log("Submitting support ticket for order:", order.id);
-    const res = await fetch("http://localhost:8000/djangoapp/api/support", {
+    const res = await fetch("http://localhost:8000/djangoapp/api/customer/support/new", {
       method: "POST",
       body: formData,
       credentials: "include"
     });
 
     const result = await res.json();
-    console.log("Support ticket submission result:", result);
     if (result.status === 200) {
       alert("Support ticket submitted!");
       navigate("/customer/orders");

@@ -256,6 +256,7 @@ def post_review(request):
 @csrf_exempt
 @login_required
 def submit_support_ticket(request):
+    # Accept POST to /api/support/new only
     if request.method == "POST":
         data = request.POST
         product_id = data.get("product_id")
@@ -271,6 +272,8 @@ def submit_support_ticket(request):
             attachment=file
         )
         return JsonResponse({"status": 200, "message": "Support ticket submitted."})
+    else:
+        return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only POST method is supported"})
 
 @login_required
 def get_all_orders(request):
@@ -469,3 +472,58 @@ def get_all_reviews(request):
         for r in reviews
     ]
     return JsonResponse({"status": 200, "reviews": review_list})
+
+@require_GET
+@login_required
+def get_ticket_detail(request, ticket_id):
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ["manager", "admin", "support"]:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+
+    try:
+        ticket = SupportTicket.objects.select_related("customer", "product").get(id=ticket_id)
+        ticket_data = {
+            "ticket_id": ticket.id,
+            "customer": ticket.customer.username,
+            "product": ticket.product.name,
+            "status": ticket.status,
+            "submitted": ticket.submitted_on,
+            "issue": ticket.issue_description,
+            "attachment": ticket.attachment.url if ticket.attachment else None,
+            "resolution_note": ticket.resolution_note or ""
+        }
+        return JsonResponse({"status": 200, "ticket": ticket_data})
+    except SupportTicket.DoesNotExist:
+        return JsonResponse({"status": 404, "message": "Ticket not found"})
+
+@csrf_exempt
+@login_required
+def update_ticket_detail(request, ticket_id):
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role.lower() not in ["manager", "admin", "support"]:
+            return JsonResponse({"status": 403})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403})
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            status = data.get("status")
+            note = data.get("resolution_note", "")
+
+            ticket = SupportTicket.objects.get(id=ticket_id)
+            ticket.status = status
+            ticket.resolution_note = note
+            ticket.save()
+            
+            return JsonResponse({"status": 200, "message": "Ticket updated successfully"})
+        except SupportTicket.DoesNotExist:
+            return JsonResponse({"status": 404, "message": "Ticket not found"})
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})

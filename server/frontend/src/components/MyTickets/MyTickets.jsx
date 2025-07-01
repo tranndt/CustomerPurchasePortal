@@ -18,7 +18,6 @@ const MyTickets = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('Tickets fetch result:', data);
         setTickets(data.tickets || []);
         setLoading(false);
       })

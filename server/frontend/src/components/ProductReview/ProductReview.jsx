@@ -17,7 +17,6 @@ const ProductReview = () => {
         credentials: "include"
       });
       const orderData = await orderRes.json();
-      console.log(`Order lookup for transaction_id ${transaction_id}:`, orderData);
       if (orderData.status === 200 && orderData.order) {
         setProductId(orderData.order.product_id);
         // We already have product info from the order, so we can set it directly
@@ -36,8 +35,7 @@ const ProductReview = () => {
       alert("Product not found for this order.");
       return;
     }
-    console.log("Submitting review with productId:", productId);
-    const response = await fetch("http://localhost:8000/djangoapp/api/review", {
+    const response = await fetch("http://localhost:8000/djangoapp/api/customer/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -49,7 +47,6 @@ const ProductReview = () => {
     });
 
     const result = await response.json();
-    console.log("Review submission result:", result);
     if (result.status === 200) {
       alert("Review submitted!");
       navigate("/customer/orders");

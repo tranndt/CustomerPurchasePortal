@@ -28,7 +28,6 @@ const AllReviews = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('All reviews fetch result:', data);
         setReviews(data.reviews || []);
         setLoading(false);
       })

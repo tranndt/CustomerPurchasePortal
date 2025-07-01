@@ -18,7 +18,6 @@ const MyReviews = () => {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('Reviews fetch result:', data);
         setReviews(data.reviews || []);
         setLoading(false);
       })

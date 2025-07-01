@@ -5,7 +5,7 @@ const AllOrders = () => {
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
-    const res = await fetch("http://localhost:8000/djangoapp/api/allorders", {
+    const res = await fetch("http://localhost:8000/djangoapp/api/admin/orders", {
       method: "GET",
       credentials: "include"
     });
