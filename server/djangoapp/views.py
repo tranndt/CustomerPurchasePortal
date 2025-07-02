@@ -44,8 +44,6 @@ def login_user(request):
                     "status": 200, 
                     "userName": username, 
                     "userRole": user_role,
-                    "firstName": user.first_name,
-                    "lastName": user.last_name,
                     "message": "Authenticated"
                 })
             else:
@@ -87,8 +85,6 @@ def register_user(request):
                 "status": 201, 
                 "userName": user.username, 
                 "userRole": "customer",
-                "firstName": user.first_name,
-                "lastName": user.last_name,
                 "message": "User registered successfully"
             })
         except Exception as e:
@@ -514,6 +510,29 @@ def get_product_categories(request):
     try:
         categories = Product.objects.filter(is_active=True).values_list('category', flat=True).distinct()
         return JsonResponse({"status": 200, "categories": list(categories)})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@require_GET
+def get_product_detail(request, product_id):
+    """Get a single product by ID"""
+    try:
+        product = get_object_or_404(Product, id=product_id, is_active=True)
+        product_data = {
+            "id": product.id,
+            "name": product.name,
+            "category": product.category,
+            "price": float(product.price),
+            "description": product.description,
+            "stock_quantity": product.stock_quantity,
+            "is_in_stock": product.is_in_stock,
+            "image_url": product.image_url,
+            "created_at": product.created_at.isoformat()
+        }
+        
+        return JsonResponse({"status": 200, "product": product_data})
+    except Product.DoesNotExist:
+        return JsonResponse({"status": 404, "message": "Product not found"})
     except Exception as e:
         return JsonResponse({"status": 500, "message": str(e)})
 

@@ -16,7 +16,8 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import MyReviews from './components/MyReviews/MyReviews';
 import MyTickets from './components/MyTickets/MyTickets';
 import AllReviews from './components/AllReviews/AllReviews';
-import Shop from './components/Shop/Shop';
+import Shop from './components/Shop/Shop_enhanced';
+import ProductDetail from './components/ProductDetail/ProductDetail';
 import Cart from './components/Cart/Cart';
 import OrderFulfillment from './components/OrderFulfillment/OrderFulfillment';
 import InventoryManagement from './components/InventoryManagement/InventoryManagement';
@@ -26,6 +27,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/shop" element={<Shop />} />
+      <Route path="/product/:productId" element={<ProductDetail />} />
       <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
 
       <Route path="/admin/home" element={<AdminHome />} />

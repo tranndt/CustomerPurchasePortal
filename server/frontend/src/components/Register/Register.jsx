@@ -41,12 +41,6 @@ const Register = () => {
       if (json.status === 201) {
         sessionStorage.setItem('username', json.userName);
         sessionStorage.setItem('userRole', json.userRole || 'Customer');
-        sessionStorage.setItem('firstName', json.firstName || '');
-        sessionStorage.setItem('lastName', json.lastName || '');
-        
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(new Event('sessionStorageChange'));
-        
         alert("Registration successful! You are now logged in.");
         
         // Redirect to role-specific home page

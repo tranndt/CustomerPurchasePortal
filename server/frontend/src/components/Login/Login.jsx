@@ -102,11 +102,6 @@ const Login = () => {
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
           sessionStorage.setItem('userRole', json.userRole || 'Customer');
-          sessionStorage.setItem('firstName', json.firstName || '');
-          sessionStorage.setItem('lastName', json.lastName || '');
-          
-          // Dispatch custom event to notify other components
-          window.dispatchEvent(new Event('sessionStorageChange'));
           
           // Redirect to role-specific home page
           const userRole = json.userRole || 'Customer';
@@ -148,11 +143,6 @@ const Login = () => {
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
           sessionStorage.setItem('userRole', json.userRole || 'Customer');
-          sessionStorage.setItem('firstName', json.firstName || '');
-          sessionStorage.setItem('lastName', json.lastName || '');
-          
-          // Dispatch custom event to notify other components
-          window.dispatchEvent(new Event('sessionStorageChange'));
           
           // Redirect to role-specific home page
           const userRole = json.userRole || 'Customer';

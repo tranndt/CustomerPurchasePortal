@@ -40,6 +40,7 @@ urlpatterns = [
     
     # Product endpoints
     path("api/products", views.get_products, name='get_products'),
+    path("api/products/<int:product_id>", views.get_product_detail, name='get_product_detail'),
     path("api/products/categories", views.get_product_categories, name='get_categories'),
     
     # Cart endpoints
