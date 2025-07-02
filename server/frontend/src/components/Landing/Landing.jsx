@@ -22,7 +22,7 @@ const Landing = () => {
           marginBottom: '20px',
           textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
         }}>
-          🛍️ Customer Purchase Portal
+          � ElectronicsRetail
         </h1>
         
         <p style={{ 
@@ -31,7 +31,7 @@ const Landing = () => {
           opacity: 0.9,
           lineHeight: '1.6'
         }}>
-          Your comprehensive solution for managing orders, product reviews, and support tickets. 
+          Your premier destination for electronics and technology products. 
           Experience seamless shopping with our intuitive platform designed for customers, 
           administrators, and support teams.
         </p>
@@ -42,6 +42,33 @@ const Landing = () => {
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
+          <button 
+            onClick={() => navigate('/shop')}
+            style={{
+              backgroundColor: '#ffc107',
+              color: '#212529',
+              border: 'none',
+              padding: '15px 30px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+              transition: 'all 0.3s ease',
+              minWidth: '140px'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor = '#e0a800';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor = '#ffc107';
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            🛍️ Browse Store
+          </button>
+          
           <button 
             onClick={() => navigate('/login')}
             style={{

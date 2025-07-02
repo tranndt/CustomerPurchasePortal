@@ -44,6 +44,8 @@ def login_user(request):
                     "status": 200, 
                     "userName": username, 
                     "userRole": user_role,
+                    "firstName": user.first_name,
+                    "lastName": user.last_name,
                     "message": "Authenticated"
                 })
             else:
@@ -85,6 +87,8 @@ def register_user(request):
                 "status": 201, 
                 "userName": user.username, 
                 "userRole": "customer",
+                "firstName": user.first_name,
+                "lastName": user.last_name,
                 "message": "User registered successfully"
             })
         except Exception as e:
@@ -931,5 +935,79 @@ def get_inventory_overview(request):
             })
         
         return JsonResponse({"status": 200, "inventory": inventory_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@require_GET
+def get_reviews_for_management(request):
+    """Get all reviews for management overview"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    # Check if user has manager/admin role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+    
+    try:
+        reviews = Review.objects.all().select_related('customer', 'product').order_by('-created_on')
+        reviews_data = []
+        
+        for review in reviews:
+            reviews_data.append({
+                "id": review.id,
+                "customer_name": f"{review.customer.first_name} {review.customer.last_name}".strip() or review.customer.username,
+                "customer_username": review.customer.username,
+                "product_name": review.product.name,
+                "product_category": review.product.category,
+                "review_text": review.review_text,
+                "rating": review.rating,
+                "sentiment": review.sentiment,
+                "created_on": review.created_on.isoformat(),
+                "moderated": False  # Since the model doesn't have this field, we'll default to False for now
+            })
+        
+        return JsonResponse({"status": 200, "reviews": reviews_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@require_GET
+def get_tickets_for_management(request):
+    """Get all support tickets for management overview"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    # Check if user has manager/admin role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+    
+    try:
+        tickets = SupportTicket.objects.all().select_related('customer', 'product', 'order').order_by('-submitted_on')
+        tickets_data = []
+        
+        for ticket in tickets:
+            tickets_data.append({
+                "id": ticket.id,
+                "customer_name": f"{ticket.customer.first_name} {ticket.customer.last_name}".strip() or ticket.customer.username,
+                "customer_username": ticket.customer.username,
+                "product_name": ticket.product.name,
+                "product_category": ticket.product.category,
+                "order_id": ticket.order.id,
+                "transaction_id": ticket.order.transaction_id,
+                "issue_description": ticket.issue_description,
+                "status": ticket.status,
+                "submitted_on": ticket.submitted_on.isoformat(),
+                "resolution_note": ticket.resolution_note,
+                "has_attachment": bool(ticket.attachment)
+            })
+        
+        return JsonResponse({"status": 200, "tickets": tickets_data})
     except Exception as e:
         return JsonResponse({"status": 500, "message": str(e)})

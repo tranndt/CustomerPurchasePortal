@@ -41,6 +41,12 @@ const Register = () => {
       if (json.status === 201) {
         sessionStorage.setItem('username', json.userName);
         sessionStorage.setItem('userRole', json.userRole || 'Customer');
+        sessionStorage.setItem('firstName', json.firstName || '');
+        sessionStorage.setItem('lastName', json.lastName || '');
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('sessionStorageChange'));
+        
         alert("Registration successful! You are now logged in.");
         
         // Redirect to role-specific home page
@@ -83,7 +89,7 @@ const Register = () => {
       </div>
       
       <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1>🔐 Register for Customer Purchase Portal</h1>
+        <h1>🔐 Register for ElectronicsRetail</h1>
         <p>Create your account to access orders, reviews, and support</p>
       </header>
       

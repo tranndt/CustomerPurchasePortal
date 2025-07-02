@@ -54,6 +54,8 @@ urlpatterns = [
     path("api/manager/orders/all", views.get_all_orders_for_management, name='get_all_orders_management'),
     path("api/manager/orders/process", views.process_order, name='process_order'),
     path("api/manager/inventory", views.get_inventory_overview, name='get_inventory'),
+    path("api/manager/reviews", views.get_reviews_for_management, name='get_reviews_management'),
+    path("api/manager/tickets", views.get_tickets_for_management, name='get_tickets_management'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

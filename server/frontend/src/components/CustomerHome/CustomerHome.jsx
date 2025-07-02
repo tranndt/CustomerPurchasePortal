@@ -100,20 +100,20 @@ const CustomerHome = () => {
               cursor: "pointer"
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
             }}>
               <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛍️</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Browse Products</h3>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shop Electronics</h3>
               <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Explore our complete product catalog and add items to your cart
+                Browse our complete electronics catalog and manage your shopping cart
               </p>
               <button 
-                onClick={() => navigate('/products')}
+                onClick={() => navigate('/shop')}
                 style={{
                   background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
                   color: "white",
@@ -129,7 +129,7 @@ const CustomerHome = () => {
                 onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
-                Shop Now
+                Visit Store
               </button>
             </div>
 
@@ -144,12 +144,12 @@ const CustomerHome = () => {
               cursor: "pointer"
             }}
             onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
             }}
             onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
             }}>
               <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛒</div>
               <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shopping Cart</h3>
@@ -157,7 +157,7 @@ const CustomerHome = () => {
                 Review items in your cart and proceed to checkout
               </p>
               <button 
-                onClick={() => navigate('/cart')}
+                onClick={() => navigate('/shop')}
                 style={{
                   background: "linear-gradient(135deg, #28a745 0%, #218838 100%)",
                   color: "white",
@@ -173,7 +173,7 @@ const CustomerHome = () => {
                 onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
-                View Cart
+                Visit Store
               </button>
             </div>
 

@@ -127,7 +127,7 @@ const Products = () => {
           ← Back to Dashboard
         </button>
         <button 
-          onClick={() => navigate('/cart')}
+          onClick={() => navigate('/shop')}
           className="nav-btn cart-btn"
         >
           🛒 View Cart

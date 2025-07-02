@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SimpleNav from '../SimpleNav/SimpleNav';
 import './Cart.css';
 
 const Cart = () => {
@@ -67,6 +68,8 @@ const Cart = () => {
             ? { ...item, quantity: newQuantity, total_price: data.cart_item.total_price }
             : item
         ));
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
         alert(data.message || 'Failed to update item');
       }
@@ -95,6 +98,8 @@ const Cart = () => {
       const data = await response.json();
       if (data.status === 200) {
         setCartItems(prev => prev.filter(item => item.id !== cartItemId));
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
         alert(data.message || 'Failed to remove item');
       }
@@ -121,6 +126,8 @@ const Cart = () => {
       if (data.status === 200) {
         alert(`Purchase completed successfully! Transaction ID: ${data.transaction_id}`);
         setCartItems([]); // Clear cart
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
         // Redirect to orders page to see the new purchase
         setTimeout(() => {
           navigate('/customer/orders');
@@ -165,7 +172,9 @@ const Cart = () => {
   }
 
   return (
-    <div className="cart-container">
+    <div>
+      <SimpleNav />
+      <div className="cart-container">
       {/* Navigation Bar */}
       <div className="cart-nav">
         <button 
@@ -175,7 +184,7 @@ const Cart = () => {
           ← Back to Dashboard
         </button>
         <button 
-          onClick={() => navigate('/products')}
+          onClick={() => navigate('/shop')}
           className="nav-btn shop-btn"
         >
           🛍️ Continue Shopping
@@ -191,7 +200,7 @@ const Cart = () => {
         <div className="empty-cart">
           <h3>Your cart is empty</h3>
           <p>Browse our products and add items to your cart.</p>
-          <a href="/products" className="browse-products-btn">
+          <a href="/shop" className="browse-products-btn">
             Browse Products
           </a>
         </div>
@@ -291,6 +300,7 @@ const Cart = () => {
           </div>
         </>
       )}
+      </div>
     </div>
   );
 };

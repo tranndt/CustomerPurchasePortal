@@ -4,195 +4,131 @@ import { useNavigate } from 'react-router-dom';
 const SimpleNav = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [userRole, setUserRole] = useState('Customer');
+  const [userFullName, setUserFullName] = useState('');
 
   useEffect(() => {
-    const storedUsername = sessionStorage.getItem('username');
-    const storedRole = sessionStorage.getItem('userRole');
-    
-    if (storedUsername) {
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
+    // Function to check authentication state
+    const checkAuthState = () => {
+      const username = sessionStorage.getItem('username');
+      const firstName = sessionStorage.getItem('firstName');
+      const lastName = sessionStorage.getItem('lastName');
       
-      // Use the stored role from backend, with fallback logic for demo purposes
-      if (storedRole) {
-        setUserRole(storedRole);
-      } else {
-        // Fallback logic for existing sessions without role
-        let fallbackRole;
-        if (storedUsername.includes('admin') || storedUsername === 'admin1') {
-          fallbackRole = 'Admin';
-        } else if (storedUsername.includes('manager') || storedUsername === 'manager1') {
-          fallbackRole = 'Manager';
-        } else if (storedUsername.includes('support')) {
-          fallbackRole = 'Support';
+      if (username) {
+        setIsLoggedIn(true);
+        // Create full name from first and last name, fallback to username
+        if (firstName && lastName) {
+          setUserFullName(`${firstName} ${lastName}`);
+        } else if (firstName) {
+          setUserFullName(firstName);
         } else {
-          fallbackRole = 'Customer';
+          setUserFullName(username);
         }
-        setUserRole(fallbackRole);
+      } else {
+        setIsLoggedIn(false);
+        setUserFullName('');
       }
-    }
+    };
+
+    // Check initial state
+    checkAuthState();
+
+    // Listen for storage events (when sessionStorage changes in other tabs/windows)
+    const handleStorageChange = (e) => {
+      if (e.key === 'username' || e.key === 'firstName' || e.key === 'lastName') {
+        checkAuthState();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Custom event listener for same-tab sessionStorage changes
+    const handleCustomStorageChange = () => {
+      checkAuthState();
+    };
+
+    window.addEventListener('sessionStorageChange', handleCustomStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sessionStorageChange', handleCustomStorageChange);
+    };
   }, []);
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:8000/djangoapp/logout", {
-        method: "GET",
-        credentials: "include",
+      // Call logout API
+      const response = await fetch('http://localhost:8000/djangoapp/logout', {
+        method: 'GET',
+        credentials: 'include',
       });
       
-      if (res.ok) {
+      if (response.ok) {
+        // Clear session storage
         sessionStorage.removeItem('username');
         sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('firstName');
+        sessionStorage.removeItem('lastName');
+        
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new Event('sessionStorageChange'));
+        
+        // Update state
         setIsLoggedIn(false);
-        setUsername('');
-        setUserRole('Customer');
-        navigate('/'); // Redirect to landing page
+        setUserFullName('');
+        
+        // Redirect to home
+        navigate('/');
+      } else {
+        console.error('Logout failed');
       }
     } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
-  const handleHomeNavigation = () => {
-    if (!isLoggedIn) {
+      console.error('Logout error:', error);
+      // Even if API call fails, clear session storage
+      sessionStorage.removeItem('username');
+      sessionStorage.removeItem('userRole');
+      sessionStorage.removeItem('firstName');
+      sessionStorage.removeItem('lastName');
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('sessionStorageChange'));
+      
+      setIsLoggedIn(false);
+      setUserFullName('');
       navigate('/');
-      return;
-    }
-    
-    // Navigate to role-specific home page
-    if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
-      navigate('/admin/home');
-    } else if (userRole.toLowerCase() === 'support') {
-      navigate('/support/home');
-    } else {
-      navigate('/customer/home');
-    }
-  };
-
-  // Helper function to render navigation links based on user role
-  const renderNavigationLinks = () => {
-    if (!isLoggedIn) return null;
-
-    if (userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager') {
-      return (
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <button 
-            onClick={handleHomeNavigation}
-            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
-          >
-            🏠 Home
-          </button>
-          <button 
-            onClick={() => navigate('/admin/fulfillment')}
-            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            Order Fulfillment
-          </button>
-          <button 
-            onClick={() => navigate('/admin/inventory')}
-            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            Inventory
-          </button>
-          <button 
-            onClick={() => navigate('/admin/reviews')}
-            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            All Reviews
-          </button>
-          <button 
-            onClick={() => navigate('/admin/tickets')}
-            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            All Tickets
-          </button>
-        </div>
-      );
-    } else if (userRole.toLowerCase() === 'support') {
-      return (
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <button 
-            onClick={handleHomeNavigation}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
-          >
-            🏠 Home
-          </button>
-          <button 
-            onClick={() => navigate('/support/tickets')}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            Support Tickets
-          </button>
-        </div>
-      );
-    } else {
-      // Customer role - show all customer navigation
-      return (
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <button 
-            onClick={handleHomeNavigation}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
-          >
-            🏠 Home
-          </button>
-          <button 
-            onClick={() => navigate('/customer/orders')}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            My Orders
-          </button>
-          <button 
-            onClick={() => navigate('/customer/reviews')}
-            style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            My Reviews
-          </button>
-          <button 
-            onClick={() => navigate('/customer/tickets')}
-            style={{ background: 'none', border: 'none', color: '#28a745', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
-          >
-            My Tickets
-          </button>
-        </div>
-      );
     }
   };
 
   return (
-    <nav style={{
-      backgroundColor: '#f8f9fa',
-      padding: '10px 20px',
+    <nav style={{ 
+      padding: '10px 20px', 
+      backgroundColor: '#f8f9fa', 
       borderBottom: '1px solid #ddd',
-      marginBottom: '20px',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <h3 style={{ margin: 0, color: '#007bff', cursor: 'pointer' }} onClick={handleHomeNavigation}>
-          🛍️ Customer Purchase Portal
-        </h3>
-        
-        {renderNavigationLinks()}
+        <h3 style={{ margin: 0, color: '#007bff' }}>ElectronicsRetail</h3>
+        <button 
+          onClick={() => navigate('/shop')}
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            color: '#28a745', 
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            fontSize: '14px',
+            fontWeight: 'bold'
+          }}
+        >
+          Store
+        </button>
       </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {isLoggedIn ? (
           <>
-            <span style={{ color: '#666' }}>
-              Welcome, {username} 
-              {userRole.toLowerCase() !== 'customer' && (
-                <span style={{ 
-                  color: userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager' ? '#dc3545' : '#ffc107', 
-                  fontSize: '12px', 
-                  fontWeight: 'bold',
-                  marginLeft: '5px'
-                }}>
-                  ({userRole})
-                </span>
-              )}
+            <span style={{ fontSize: '14px', marginRight: '10px' }}>
+              Welcome, {userFullName}
             </span>
             <button 
               onClick={handleLogout}
@@ -220,7 +156,8 @@ const SimpleNav = () => {
                 padding: '6px 12px',
                 borderRadius: '4px',
                 cursor: 'pointer',
-                fontSize: '14px'
+                fontSize: '14px',
+                marginRight: '10px'
               }}
             >
               Login

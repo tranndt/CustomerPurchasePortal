@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import './TicketManager.css';
 
 const TicketManager = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('all');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTickets();
-  }, []);
-
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
+    setLoading(true);
     try {
       // Determine the correct endpoint based on user role
       const userRole = sessionStorage.getItem('userRole');
@@ -26,18 +26,33 @@ const TicketManager = () => {
         credentials: "include"
       });
       const data = await res.json();
-      if (data.status === 200) {
-        setTickets(data.tickets);
-      } else {
-        alert("Failed to load tickets or unauthorized.");
+      
+      if (data.status === 403) {
+        setError('Access denied. Admin/Support privileges required.');
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching tickets:", error);
-      alert("Error loading tickets.");
+      
+      if (data.status !== 200) {
+        throw new Error('Failed to fetch tickets');
+      }
+      
+      setTickets(data.tickets || []);
+    } catch (err) {
+      setError('Failed to load tickets: ' + err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTickets();
+  }, [fetchTickets]);
+
+  // Filter tickets by status
+  const openTickets = tickets.filter(ticket => ticket.status === 'open' || ticket.status === 'pending');
+  const inProgressTickets = tickets.filter(ticket => ticket.status === 'in_progress');
+  const resolvedTickets = tickets.filter(ticket => ticket.status === 'resolved');
+  const closedTickets = tickets.filter(ticket => ticket.status === 'closed');
 
   const handleViewTicket = (ticketId) => {
     const userRole = sessionStorage.getItem('userRole');
@@ -49,30 +64,68 @@ const TicketManager = () => {
   };
 
   const getStatusBadge = (status) => {
-    const statusColors = {
-      pending: { bg: 'linear-gradient(135deg, #ffc107, #ffb300)', color: '#000', shadow: 'rgba(255, 193, 7, 0.3)' },
-      approved: { bg: 'linear-gradient(135deg, #28a745, #20c997)', color: '#fff', shadow: 'rgba(40, 167, 69, 0.3)' },
-      rejected: { bg: 'linear-gradient(135deg, #dc3545, #e74c3c)', color: '#fff', shadow: 'rgba(220, 53, 69, 0.3)' },
-      resolved: { bg: 'linear-gradient(135deg, #6c757d, #495057)', color: '#fff', shadow: 'rgba(108, 117, 125, 0.3)' }
-    };
-    
-    const colors = statusColors[status] || statusColors.resolved;
-    
     return (
-      <span style={{
-        background: colors.bg,
-        color: colors.color,
-        padding: '6px 12px',
-        borderRadius: '20px',
-        fontSize: '11px',
-        fontWeight: '700',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-        boxShadow: `0 2px 8px ${colors.shadow}`,
-        border: '1px solid rgba(255, 255, 255, 0.2)'
-      }}>
-        {status}
+      <span className={`ticket-status status-${status}`}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
+    );
+  };
+
+  const renderTicketCards = (ticketsToShow) => {
+    if (ticketsToShow.length === 0) {
+      return (
+        <div className="no-tickets">
+          <h3>No tickets in this category</h3>
+          <p>Tickets will appear here when they match this status.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="tickets-grid">
+        {ticketsToShow.map((ticket) => (
+          <div key={ticket.ticket_id} className="ticket-card">
+            <div className="ticket-header">
+              <div className="ticket-id">Ticket #{ticket.ticket_id}</div>
+              {getStatusBadge(ticket.status)}
+            </div>
+            
+            <div className="ticket-details">
+              <div className="ticket-detail-row">
+                <span className="ticket-detail-label">Customer:</span>
+                <span className="ticket-detail-value">{ticket.customer}</span>
+              </div>
+              <div className="ticket-detail-row">
+                <span className="ticket-detail-label">Product:</span>
+                <span className="ticket-detail-value">{ticket.product}</span>
+              </div>
+              <div className="ticket-detail-row">
+                <span className="ticket-detail-label">Submitted:</span>
+                <span className="ticket-detail-value">{new Date(ticket.submitted).toLocaleDateString()}</span>
+              </div>
+              <div className="ticket-detail-row">
+                <span className="ticket-detail-label">Issue:</span>
+                <span className="ticket-detail-value ticket-issue">{ticket.issue}</span>
+              </div>
+              {ticket.assigned_to && (
+                <div className="ticket-detail-row">
+                  <span className="ticket-detail-label">Assigned To:</span>
+                  <span className="ticket-detail-value">{ticket.assigned_to}</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="ticket-actions">
+              <button
+                className="action-button view-button"
+                onClick={() => handleViewTicket(ticket.ticket_id)}
+              >
+                View & Edit
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     );
   };
 
@@ -80,39 +133,28 @@ const TicketManager = () => {
     return (
       <div>
         <SimpleNav />
-        <div style={{ 
-          padding: "24px", 
-          backgroundColor: "#f8f9fa",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            borderRadius: "12px",
-            padding: "48px",
-            textAlign: "center",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-            border: "1px solid #e9ecef"
-          }}>
-            <div style={{
-              width: "48px",
-              height: "48px",
-              border: "4px solid #f3f3f3",
-              borderTop: "4px solid #007bff",
-              borderRadius: "50%",
-              animation: "spin 1s linear infinite",
-              margin: "0 auto 16px"
-            }}></div>
-            <p style={{ 
-              fontSize: "16px", 
-              color: "#6c757d",
-              margin: "0",
-              fontWeight: "500"
-            }}>
-              Loading tickets...
-            </p>
+        <div className="tickets-management">
+          <div className="tickets-container">
+            <div className="loading">
+              <h2>Loading tickets...</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <SimpleNav />
+        <div className="tickets-management">
+          <div className="tickets-container">
+            <div className="error">
+              <h2>Error</h2>
+              <p>{error}</p>
+              <button onClick={fetchTickets}>Retry</button>
+            </div>
           </div>
         </div>
       </div>
@@ -122,186 +164,99 @@ const TicketManager = () => {
   return (
     <div>
       <SimpleNav />
-      <div style={{ 
-        padding: "24px", 
-        maxWidth: "1400px", 
-        margin: "0 auto",
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh"
-      }}>
-        <div style={{
-          backgroundColor: "white",
-          borderRadius: "12px",
-          padding: "32px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-          border: "1px solid #e9ecef"
-        }}>
-          <div style={{ marginBottom: "32px" }}>
-            <h1 style={{ 
-              fontSize: "28px", 
-              fontWeight: "600", 
-              color: "#2c3e50", 
-              margin: "0 0 8px 0",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px"
-            }}>
-              🎫 Support Ticket Manager
-            </h1>
-            <p style={{ 
-              color: "#6c757d", 
-              fontSize: "16px", 
-              margin: "0",
-              fontWeight: "400"
-            }}>
-              View and manage all customer support tickets
+      <div className="tickets-management">
+        <div className="tickets-container">
+          {/* Header */}
+          <div className="tickets-header">
+            <h1 className="tickets-title">Ticket Management</h1>
+            <p className="tickets-subtitle">
+              Oversee, assign, and resolve all customer support tickets and inquiries
             </p>
           </div>
-          
-          {tickets.length === 0 ? (
-            <div style={{ 
-              textAlign: "center", 
-              padding: "80px 20px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "8px",
-              border: "2px dashed #dee2e6"
-            }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>📝</div>
-              <h3 style={{ color: "#6c757d", marginBottom: "8px" }}>No tickets found</h3>
-              <p style={{ color: "#adb5bd", margin: "0" }}>Support tickets will appear here when customers submit them.</p>
+
+          {/* Statistics Dashboard */}
+          <div className="stats-cards">
+            <div className="stats-card">
+              <div className="stats-number">{openTickets.length}</div>
+              <div className="stats-label">Open</div>
             </div>
-          ) : (
-            <div>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "80px 2fr 120px 120px 2fr 120px",
-                gap: "16px",
-                padding: "16px 20px",
-                backgroundColor: "#f8f9fa",
-                borderRadius: "8px",
-                fontWeight: "600",
-                fontSize: "14px",
-                color: "#495057",
-                marginBottom: "16px",
-                border: "1px solid #e9ecef"
-              }}>
-                <div>ID</div>
-                <div>Customer & Product</div>
-                <div>Status</div>
-                <div>Submitted</div>
-                <div>Issue Description</div>
-                <div style={{ textAlign: "center" }}>Actions</div>
-              </div>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {tickets.map((ticket, index) => (
-                  <div 
-                    key={ticket.ticket_id} 
-                    style={{ 
-                      display: "grid", 
-                      gridTemplateColumns: "80px 2fr 120px 120px 2fr 120px", 
-                      gap: "16px", 
-                      padding: "20px",
-                      backgroundColor: index % 2 === 0 ? "#fff" : "#f8f9fa",
-                      border: "1px solid #e9ecef",
-                      borderRadius: "8px",
-                      alignItems: "center",
-                      transition: "all 0.2s ease",
-                      cursor: "pointer"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#e3f2fd";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = index % 2 === 0 ? "#fff" : "#f8f9fa";
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    <div style={{ 
-                      fontWeight: "700", 
-                      color: "#007bff",
-                      fontSize: "14px"
-                    }}>
-                      #{ticket.ticket_id}
-                    </div>
-                    
-                    <div>
-                      <div style={{ 
-                        fontWeight: "600", 
-                        color: "#2c3e50",
-                        fontSize: "15px",
-                        marginBottom: "4px"
-                      }}>
-                        {ticket.customer}
-                      </div>
-                      <div style={{ 
-                        fontSize: "13px", 
-                        color: "#6c757d",
-                        fontWeight: "500"
-                      }}>
-                        {ticket.product}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      {getStatusBadge(ticket.status)}
-                    </div>
-                    
-                    <div style={{ 
-                      fontSize: "13px",
-                      color: "#6c757d",
-                      fontWeight: "500"
-                    }}>
-                      {new Date(ticket.submitted).toLocaleDateString()}
-                    </div>
-                    
-                    <div style={{ 
-                      fontSize: "14px", 
-                      color: "#495057",
-                      lineHeight: "1.4"
-                    }}>
-                      {ticket.issue.length > 80 
-                        ? ticket.issue.substring(0, 80) + "..." 
-                        : ticket.issue}
-                    </div>
-                    
-                    <div style={{ textAlign: "center" }}>
-                      <button
-                        onClick={() => handleViewTicket(ticket.ticket_id)}
-                        style={{
-                          backgroundColor: "#007bff",
-                          color: "white",
-                          border: "none",
-                          padding: "8px 16px",
-                          borderRadius: "6px",
-                          cursor: "pointer",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          transition: "all 0.2s ease",
-                          boxShadow: "0 2px 4px rgba(0, 123, 255, 0.2)"
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.backgroundColor = "#0056b3";
-                          e.target.style.transform = "translateY(-1px)";
-                          e.target.style.boxShadow = "0 4px 8px rgba(0, 123, 255, 0.3)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.backgroundColor = "#007bff";
-                          e.target.style.transform = "translateY(0)";
-                          e.target.style.boxShadow = "0 2px 4px rgba(0, 123, 255, 0.2)";
-                        }}
-                      >
-                        View & Edit
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="stats-card">
+              <div className="stats-number">{inProgressTickets.length}</div>
+              <div className="stats-label">In Progress</div>
             </div>
-          )}
+            <div className="stats-card">
+              <div className="stats-number">{resolvedTickets.length}</div>
+              <div className="stats-label">Resolved</div>
+            </div>
+            <div className="stats-card">
+              <div className="stats-number">{closedTickets.length}</div>
+              <div className="stats-label">Closed</div>
+            </div>
+            <div className="stats-card">
+              <div className="stats-number">{tickets.length}</div>
+              <div className="stats-label">Total Tickets</div>
+            </div>
+            <div className="stats-card">
+              <div className="stats-number">
+                {tickets.length > 0 ? ((resolvedTickets.length / tickets.length) * 100).toFixed(1) : 0}%
+              </div>
+              <div className="stats-label">Resolution Rate</div>
+            </div>
+          </div>
+
+          {/* Tabs Container */}
+          <div className="tabs-container">
+            <div className="tabs">
+              <button 
+                className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+                onClick={() => setActiveTab('all')}
+              >
+                All Tickets ({tickets.length})
+              </button>
+              <button 
+                className={`tab ${activeTab === 'open' ? 'active' : ''}`}
+                onClick={() => setActiveTab('open')}
+              >
+                Open ({openTickets.length})
+              </button>
+              <button 
+                className={`tab ${activeTab === 'progress' ? 'active' : ''}`}
+                onClick={() => setActiveTab('progress')}
+              >
+                In Progress ({inProgressTickets.length})
+              </button>
+              <button 
+                className={`tab ${activeTab === 'resolved' ? 'active' : ''}`}
+                onClick={() => setActiveTab('resolved')}
+              >
+                Resolved ({resolvedTickets.length})
+              </button>
+              <button 
+                className={`tab ${activeTab === 'closed' ? 'active' : ''}`}
+                onClick={() => setActiveTab('closed')}
+              >
+                Closed ({closedTickets.length})
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="tab-content">
+              {activeTab === 'all' && renderTicketCards(tickets)}
+              {activeTab === 'open' && renderTicketCards(openTickets)}
+              {activeTab === 'progress' && renderTicketCards(inProgressTickets)}
+              {activeTab === 'resolved' && renderTicketCards(resolvedTickets)}
+              {activeTab === 'closed' && renderTicketCards(closedTickets)}
+            </div>
+          </div>
+
+          {/* Refresh Button */}
+          <button 
+            className="refresh-button"
+            onClick={fetchTickets}
+            title="Refresh Tickets"
+          >
+            ↻
+          </button>
         </div>
       </div>
     </div>

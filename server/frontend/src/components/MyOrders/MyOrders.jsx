@@ -78,7 +78,7 @@ const MyOrders = () => {
               <h3 style={{ color: "#6c757d", marginBottom: "12px", fontSize: "24px" }}>No orders found</h3>
               <p style={{ color: "#adb5bd", margin: "0 0 24px 0", fontSize: "16px" }}>Your order history will appear here once you make a purchase.</p>
               <button 
-                onClick={() => navigate('/products')}
+                onClick={() => navigate('/shop')}
                 style={{
                   background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
                   color: "white",
