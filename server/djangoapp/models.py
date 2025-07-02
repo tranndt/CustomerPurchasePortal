@@ -21,6 +21,14 @@ class Product(models.Model):
     category = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
+    stock_quantity = models.IntegerField(default=0)
+    image_url = models.URLField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def is_in_stock(self):
+        return self.stock_quantity > 0
 
     def __str__(self):
         return f"{self.name} - {self.category}"
@@ -28,11 +36,29 @@ class Product(models.Model):
 class Order(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
     date_purchased = models.DateField()
     transaction_id = models.CharField(max_length=100)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f"Order {self.transaction_id} by {self.customer.username}"
+
+class CartItem(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('customer', 'product')  # One cart item per product per customer
+
+    @property
+    def total_price(self):
+        return self.product.price * self.quantity
+
+    def __str__(self):
+        return f"{self.customer.username}'s cart: {self.quantity}x {self.product.name}"
 
 class Review(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)

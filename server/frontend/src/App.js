@@ -17,11 +17,15 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import MyReviews from './components/MyReviews/MyReviews';
 import MyTickets from './components/MyTickets/MyTickets';
 import AllReviews from './components/AllReviews/AllReviews';
+import Products from './components/Products/Products';
+import Cart from './components/Cart/Cart';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/cart" element={<Cart />} />
 
       <Route path="/admin/home" element={<AdminHome />} />
       <Route path="/support/home" element={<SupportHome />} />

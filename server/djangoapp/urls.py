@@ -37,6 +37,17 @@ urlpatterns = [
     path("api/order-by-transaction/<str:transaction_id>", views.get_order_by_transaction),
     path("api/demo-users", views.get_demo_users),
     path("api/init-demo-data", views.init_demo_data),
+    
+    # Product endpoints
+    path("api/products", views.get_products, name='get_products'),
+    path("api/products/categories", views.get_product_categories, name='get_categories'),
+    
+    # Cart endpoints
+    path("api/cart", views.get_cart, name='get_cart'),
+    path("api/cart/add", views.cart_add_item, name='cart_add'),
+    path("api/cart/update", views.cart_update_item, name='cart_update'),
+    path("api/cart/remove", views.cart_remove_item, name='cart_remove'),
+    path("api/cart/checkout", views.cart_checkout, name='cart_checkout'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

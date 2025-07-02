@@ -52,14 +52,102 @@ def initiate():
     
     # Create demo products (general e-commerce products and services)
     products_data = [
-        {"name": "Premium Membership", "description": "Annual premium membership with exclusive benefits", "price": 299.99},
-        {"name": "Extended Warranty", "description": "3-year extended warranty package", "price": 199.99},
-        {"name": "Express Shipping", "description": "Next-day delivery service", "price": 19.99},
-        {"name": "Gift Card $50", "description": "Digital gift card worth $50", "price": 50.00},
-        {"name": "Customer Support Priority", "description": "Priority customer support service", "price": 79.99},
-        {"name": "Product Protection Plan", "description": "Comprehensive product protection coverage", "price": 149.99},
-        {"name": "Installation Service", "description": "Professional installation and setup service", "price": 99.99},
-        {"name": "Maintenance Package", "description": "Annual maintenance and service plan", "price": 129.99}
+        {
+            "name": "Premium Membership", 
+            "category": "Membership",
+            "description": "Annual premium membership with exclusive benefits and priority support", 
+            "price": 299.99,
+            "stock_quantity": 100,
+            "image_url": "https://via.placeholder.com/300x200/007bff/ffffff?text=Premium+Membership"
+        },
+        {
+            "name": "Extended Warranty", 
+            "category": "Warranty",
+            "description": "3-year extended warranty package with comprehensive coverage", 
+            "price": 199.99,
+            "stock_quantity": 50,
+            "image_url": "https://via.placeholder.com/300x200/28a745/ffffff?text=Extended+Warranty"
+        },
+        {
+            "name": "Express Shipping", 
+            "category": "Shipping",
+            "description": "Next-day delivery service available nationwide", 
+            "price": 19.99,
+            "stock_quantity": 1000,
+            "image_url": "https://via.placeholder.com/300x200/ffc107/000000?text=Express+Shipping"
+        },
+        {
+            "name": "Gift Card $50", 
+            "category": "Gift Cards",
+            "description": "Digital gift card worth $50 - perfect for any occasion", 
+            "price": 50.00,
+            "stock_quantity": 200,
+            "image_url": "https://via.placeholder.com/300x200/dc3545/ffffff?text=Gift+Card+$50"
+        },
+        {
+            "name": "Customer Support Priority", 
+            "category": "Support",
+            "description": "Priority customer support service with dedicated agent", 
+            "price": 79.99,
+            "stock_quantity": 30,
+            "image_url": "https://via.placeholder.com/300x200/17a2b8/ffffff?text=Priority+Support"
+        },
+        {
+            "name": "Product Protection Plan", 
+            "category": "Protection",
+            "description": "Comprehensive product protection coverage against damage", 
+            "price": 149.99,
+            "stock_quantity": 75,
+            "image_url": "https://via.placeholder.com/300x200/6f42c1/ffffff?text=Protection+Plan"
+        },
+        {
+            "name": "Installation Service", 
+            "category": "Services",
+            "description": "Professional installation and setup service by certified technicians", 
+            "price": 99.99,
+            "stock_quantity": 25,
+            "image_url": "https://via.placeholder.com/300x200/fd7e14/ffffff?text=Installation+Service"
+        },
+        {
+            "name": "Maintenance Package", 
+            "category": "Services",
+            "description": "Annual maintenance and service plan with regular check-ups", 
+            "price": 129.99,
+            "stock_quantity": 40,
+            "image_url": "https://via.placeholder.com/300x200/20c997/ffffff?text=Maintenance+Package"
+        },
+        {
+            "name": "Digital Security Suite", 
+            "category": "Software",
+            "description": "Complete digital security package with antivirus and firewall", 
+            "price": 89.99,
+            "stock_quantity": 150,
+            "image_url": "https://via.placeholder.com/300x200/e83e8c/ffffff?text=Security+Suite"
+        },
+        {
+            "name": "Cloud Storage 1TB", 
+            "category": "Storage",
+            "description": "1TB cloud storage with automatic backup and sync", 
+            "price": 120.00,
+            "stock_quantity": 80,
+            "image_url": "https://via.placeholder.com/300x200/6c757d/ffffff?text=Cloud+Storage"
+        },
+        {
+            "name": "Training Course Access", 
+            "category": "Education",
+            "description": "Access to premium online training courses and certifications", 
+            "price": 249.99,
+            "stock_quantity": 60,
+            "image_url": "https://via.placeholder.com/300x200/343a40/ffffff?text=Training+Course"
+        },
+        {
+            "name": "Mobile App Premium", 
+            "category": "Software",
+            "description": "Premium mobile app features with advanced analytics", 
+            "price": 49.99,
+            "stock_quantity": 300,
+            "image_url": "https://via.placeholder.com/300x200/007bff/ffffff?text=Mobile+App+Pro"
+        }
     ]
     
     for product_data in products_data:
@@ -83,8 +171,10 @@ def initiate():
                         Order.objects.create(
                             customer=demo_customer,
                             product=products[product_idx],
+                            quantity=1,
                             date_purchased=(datetime.now() - timedelta(days=days_ago)).date(),
-                            transaction_id=f"TXN{demo_customer.id}{product_idx:03d}{products[product_idx].id:03d}"
+                            transaction_id=f"TXN{demo_customer.id}{product_idx:03d}{products[product_idx].id:03d}",
+                            total_amount=products[product_idx].price
                         )
     
     # Create rich demo data for the three demo users
@@ -144,8 +234,10 @@ def initiate():
                     Order.objects.create(
                         customer=demo_customer,
                         product=products[product_idx],
+                        quantity=1,
                         date_purchased=(datetime.now() - timedelta(days=days_ago)).date(),
-                        transaction_id=f"TXN{demo_customer.id}{product_idx:03d}{products[product_idx].id:03d}"
+                        transaction_id=f"TXN{demo_customer.id}{product_idx:03d}{products[product_idx].id:03d}",
+                        total_amount=products[product_idx].price
                     )
 
 

@@ -13,7 +13,7 @@ import logging
 import json
 
 from .restapis import get_request, analyze_review_sentiments, post_review
-from .models import UserProfile, Product, Order, Review, SupportTicket
+from .models import UserProfile, Product, Order, Review, SupportTicket, CartItem, CartItem
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -472,6 +472,261 @@ def update_ticket_detail(request, ticket_id):
             return JsonResponse({"status": 200, "message": "Ticket updated successfully"})
         except SupportTicket.DoesNotExist:
             return JsonResponse({"status": 404, "message": "Ticket not found"})
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+# Product API Views
+@require_GET
+def get_products(request):
+    """Get all active products with inventory information"""
+    try:
+        products = Product.objects.filter(is_active=True).order_by('name')
+        products_data = []
+        
+        for product in products:
+            products_data.append({
+                "id": product.id,
+                "name": product.name,
+                "category": product.category,
+                "price": float(product.price),
+                "description": product.description,
+                "stock_quantity": product.stock_quantity,
+                "is_in_stock": product.is_in_stock,
+                "image_url": product.image_url,
+                "created_at": product.created_at.isoformat()
+            })
+        
+        return JsonResponse({"status": 200, "products": products_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@require_GET
+def get_product_categories(request):
+    """Get all unique product categories"""
+    try:
+        categories = Product.objects.filter(is_active=True).values_list('category', flat=True).distinct()
+        return JsonResponse({"status": 200, "categories": list(categories)})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+# Cart API Views
+@csrf_exempt
+def cart_add_item(request):
+    """Add item to shopping cart"""
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": 401, "message": "Authentication required"})
+        
+        try:
+            data = json.loads(request.body)
+            product_id = data.get('product_id')
+            quantity = data.get('quantity', 1)
+            
+            # Validate product exists and is available
+            try:
+                product = Product.objects.get(id=product_id, is_active=True)
+            except Product.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Product not found"})
+            
+            # Check stock availability
+            if quantity > product.stock_quantity:
+                return JsonResponse({
+                    "status": 400, 
+                    "message": f"Only {product.stock_quantity} items available in stock"
+                })
+            
+            # Add or update cart item
+            cart_item, created = CartItem.objects.get_or_create(
+                customer=request.user,
+                product=product,
+                defaults={'quantity': quantity}
+            )
+            
+            if not created:
+                # Update existing cart item
+                new_quantity = cart_item.quantity + quantity
+                if new_quantity > product.stock_quantity:
+                    return JsonResponse({
+                        "status": 400, 
+                        "message": f"Cannot add {quantity} more. Only {product.stock_quantity - cart_item.quantity} more available"
+                    })
+                cart_item.quantity = new_quantity
+                cart_item.save()
+            
+            return JsonResponse({
+                "status": 200, 
+                "message": "Item added to cart successfully",
+                "cart_item": {
+                    "id": cart_item.id,
+                    "product_name": product.name,
+                    "quantity": cart_item.quantity,
+                    "total_price": float(cart_item.total_price)
+                }
+            })
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+@csrf_exempt
+def cart_update_item(request):
+    """Update cart item quantity"""
+    if request.method == "PUT":
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": 401, "message": "Authentication required"})
+        
+        try:
+            data = json.loads(request.body)
+            cart_item_id = data.get('cart_item_id')
+            quantity = data.get('quantity')
+            
+            try:
+                cart_item = CartItem.objects.get(id=cart_item_id, customer=request.user)
+            except CartItem.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Cart item not found"})
+            
+            # Check stock availability
+            if quantity > cart_item.product.stock_quantity:
+                return JsonResponse({
+                    "status": 400, 
+                    "message": f"Only {cart_item.product.stock_quantity} items available in stock"
+                })
+            
+            cart_item.quantity = quantity
+            cart_item.save()
+            
+            return JsonResponse({
+                "status": 200, 
+                "message": "Cart updated successfully",
+                "cart_item": {
+                    "id": cart_item.id,
+                    "quantity": cart_item.quantity,
+                    "total_price": float(cart_item.total_price)
+                }
+            })
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+@csrf_exempt
+def cart_remove_item(request):
+    """Remove item from cart"""
+    if request.method == "DELETE":
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": 401, "message": "Authentication required"})
+        
+        try:
+            data = json.loads(request.body)
+            cart_item_id = data.get('cart_item_id')
+            
+            try:
+                cart_item = CartItem.objects.get(id=cart_item_id, customer=request.user)
+                cart_item.delete()
+                return JsonResponse({"status": 200, "message": "Item removed from cart"})
+            except CartItem.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Cart item not found"})
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+@require_GET
+def get_cart(request):
+    """Get user's shopping cart"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    try:
+        cart_items = CartItem.objects.filter(customer=request.user).order_by('-added_at')
+        cart_data = []
+        total_amount = 0
+        
+        for item in cart_items:
+            item_data = {
+                "id": item.id,
+                "product": {
+                    "id": item.product.id,
+                    "name": item.product.name,
+                    "price": float(item.product.price),
+                    "image_url": item.product.image_url,
+                    "stock_quantity": item.product.stock_quantity,
+                    "is_in_stock": item.product.is_in_stock
+                },
+                "quantity": item.quantity,
+                "total_price": float(item.total_price),
+                "added_at": item.added_at.isoformat()
+            }
+            cart_data.append(item_data)
+            total_amount += item.total_price
+        
+        return JsonResponse({
+            "status": 200, 
+            "cart_items": cart_data,
+            "total_amount": float(total_amount),
+            "item_count": len(cart_data)
+        })
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@csrf_exempt
+def cart_checkout(request):
+    """Mock checkout process - convert cart to orders"""
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": 401, "message": "Authentication required"})
+        
+        try:
+            cart_items = CartItem.objects.filter(customer=request.user)
+            
+            if not cart_items.exists():
+                return JsonResponse({"status": 400, "message": "Cart is empty"})
+            
+            # Check stock availability for all items
+            for item in cart_items:
+                if item.quantity > item.product.stock_quantity:
+                    return JsonResponse({
+                        "status": 400, 
+                        "message": f"Insufficient stock for {item.product.name}"
+                    })
+            
+            # Generate transaction ID
+            transaction_id = f"TXN{datetime.now().strftime('%Y%m%d%H%M%S')}{request.user.id}"
+            orders_created = []
+            
+            # Create orders and update stock
+            for item in cart_items:
+                order = Order.objects.create(
+                    customer=request.user,
+                    product=item.product,
+                    quantity=item.quantity,
+                    date_purchased=datetime.now().date(),
+                    transaction_id=transaction_id,
+                    total_amount=item.total_price
+                )
+                
+                # Update stock quantity
+                item.product.stock_quantity -= item.quantity
+                item.product.save()
+                
+                orders_created.append({
+                    "id": order.id,
+                    "product_name": item.product.name,
+                    "quantity": item.quantity,
+                    "total_amount": float(order.total_amount)
+                })
+            
+            # Clear cart
+            cart_items.delete()
+            
+            return JsonResponse({
+                "status": 200, 
+                "message": "Purchase completed successfully",
+                "transaction_id": transaction_id,
+                "orders": orders_created
+            })
         except Exception as e:
             return JsonResponse({"status": 500, "message": str(e)})
     else:
