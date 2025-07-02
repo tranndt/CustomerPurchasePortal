@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import SimpleNav from '../SimpleNav/SimpleNav';
 import './OrderFulfillment.css';
 
 const OrderFulfillment = () => {
-  const [pendingOrders, setPendingOrders] = useState([]);
   const [allOrders, setAllOrders] = useState([]);
-  const [inventory, setInventory] = useState([]);
   const [activeTab, setActiveTab] = useState('pending');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,73 +11,60 @@ const OrderFulfillment = () => {
 
   const pending_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/pending";
   const all_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/all";
-  const inventory_url = "http://localhost:8000/djangoapp/api/manager/inventory";
   const process_order_url = "http://localhost:8000/djangoapp/api/manager/orders/process";
 
-  const fetchPendingOrders = async () => {
-    try {
-      const response = await fetch(pending_orders_url, {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (data.status === 200) {
-        setPendingOrders(data.orders);
-      } else if (data.status === 403) {
-        setError('Access denied. Manager/Admin privileges required.');
-      } else {
-        throw new Error(data.message);
-      }
-    } catch (err) {
-      throw new Error('Failed to fetch pending orders');
-    }
-  };
-
-  const fetchAllOrders = async () => {
-    try {
-      const response = await fetch(all_orders_url, {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (data.status === 200) {
-        setAllOrders(data.orders);
-      }
-    } catch (err) {
-      throw new Error('Failed to fetch all orders');
-    }
-  };
-
-  const fetchInventory = async () => {
-    try {
-      const response = await fetch(inventory_url, {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      if (data.status === 200) {
-        setInventory(data.inventory);
-      }
-    } catch (err) {
-      throw new Error('Failed to fetch inventory');
-    }
-  };
-
-  const fetchData = useCallback(async () => {
+  const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
-      await Promise.all([
-        fetchPendingOrders(),
-        fetchAllOrders(),
-        fetchInventory()
+      const [pendingResponse, allResponse] = await Promise.all([
+        fetch(pending_orders_url, { credentials: 'include' }),
+        fetch(all_orders_url, { credentials: 'include' })
       ]);
+
+      const pendingData = await pendingResponse.json();
+      const allData = await allResponse.json();
+
+      if (pendingData.status === 403 || allData.status === 403) {
+        setError('Access denied. Manager/Admin privileges required.');
+        return;
+      }
+
+      if (pendingData.status !== 200 || allData.status !== 200) {
+        throw new Error('Failed to fetch orders');
+      }
+
+      // Combine and deduplicate orders (pending orders might be subset of all orders)
+      const pendingOrders = pendingData.orders || [];
+      const allOrdersData = allData.orders || [];
+      
+      // Merge orders, prioritizing pending data for pending orders
+      const mergedOrders = [...allOrdersData];
+      pendingOrders.forEach(pendingOrder => {
+        const existingIndex = mergedOrders.findIndex(order => order.id === pendingOrder.id);
+        if (existingIndex >= 0) {
+          mergedOrders[existingIndex] = pendingOrder; // Use pending data (more detailed)
+        } else {
+          mergedOrders.push(pendingOrder);
+        }
+      });
+
+      setAllOrders(mergedOrders);
     } catch (err) {
-      setError('Failed to load data: ' + err.message);
+      setError('Failed to load orders: ' + err.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pending_orders_url, all_orders_url]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchAllData();
+  }, [fetchAllData]);
+
+  // Filter orders by status
+  const pendingOrders = allOrders.filter(order => order.status === 'pending');
+  const awaitingDeliveryOrders = allOrders.filter(order => order.status === 'approved');
+  const cancelledOrders = allOrders.filter(order => order.status === 'rejected' || order.status === 'cancelled');
+  const fulfilledOrders = allOrders.filter(order => order.status === 'fulfilled');
 
   const processOrder = async (orderId, action, notes = '') => {
     setProcessingOrders(prev => ({ ...prev, [orderId]: true }));
@@ -100,8 +86,8 @@ const OrderFulfillment = () => {
       const data = await response.json();
       if (data.status === 200) {
         alert(data.message);
-        // Refresh data
-        await fetchData();
+        // Refresh all data
+        await fetchAllData();
       } else {
         alert(data.message || `Failed to ${action} order`);
       }
@@ -141,7 +127,7 @@ const OrderFulfillment = () => {
       <div className="order-fulfillment">
         <div className="order-fulfillment-container">
           <div className="loading">
-            <h2>Loading order fulfillment data...</h2>
+            <h2>Loading pending orders...</h2>
           </div>
         </div>
       </div>
@@ -155,270 +141,224 @@ const OrderFulfillment = () => {
           <div className="error">
             <h2>Error</h2>
             <p>{error}</p>
-            <button onClick={() => window.location.reload()}>Retry</button>
+            <button onClick={fetchAllData}>Retry</button>
           </div>
         </div>
       </div>
     );
   }
 
+  const renderOrderCards = (orders, showActions = false) => {
+    if (orders.length === 0) {
+      return (
+        <div className="no-orders">
+          <h3>No orders in this category</h3>
+          <p>Orders will appear here when they match this status.</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="orders-grid">
+        {orders.map(order => (
+          <div key={order.id} className="order-card">
+            <div className="order-header">
+              <div className="order-id">Order #{order.id}</div>
+              {getStatusBadge(order.status)}
+            </div>
+
+            <div className="order-details">
+              <div className="order-detail-row">
+                <span className="order-detail-label">Product:</span>
+                <span className="order-detail-value">{order.product_name}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Customer:</span>
+                <span className="order-detail-value">{order.customer_name}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Username:</span>
+                <span className="order-detail-value">@{order.customer_username}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Category:</span>
+                <span className="order-detail-value">{order.product_category}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Quantity:</span>
+                <span className="order-detail-value">{order.quantity}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Unit Price:</span>
+                <span className="order-detail-value">${order.unit_price.toFixed(2)}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Total:</span>
+                <span className="order-detail-value total-amount">${order.total_amount.toFixed(2)}</span>
+              </div>
+              <div className="order-detail-row">
+                <span className="order-detail-label">Date:</span>
+                <span className="order-detail-value">{new Date(order.date_purchased).toLocaleDateString()}</span>
+              </div>
+              {order.stock_available !== undefined && (
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Stock Available:</span>
+                  <span className={`order-detail-value ${order.stock_available >= order.quantity ? 'stock-sufficient' : 'stock-insufficient'}`}>
+                    {order.stock_available} units
+                  </span>
+                </div>
+              )}
+              <div className="order-detail-row">
+                <span className="order-detail-label">Transaction ID:</span>
+                <span className="order-detail-value transaction-id">{order.transaction_id}</span>
+              </div>
+              {order.processed_by && (
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Processed By:</span>
+                  <span className="order-detail-value">{order.processed_by}</span>
+                </div>
+              )}
+              {order.processed_at && (
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Processed Date:</span>
+                  <span className="order-detail-value">{new Date(order.processed_at).toLocaleDateString()}</span>
+                </div>
+              )}
+              {order.notes && (
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Notes:</span>
+                  <span className="order-detail-value">{order.notes}</span>
+                </div>
+              )}
+            </div>
+
+            {showActions && (
+              <div className="order-actions">
+                <button
+                  className="action-button approve-button"
+                  onClick={() => handleApprove(order.id)}
+                  disabled={processingOrders[order.id] || (order.stock_available !== undefined && order.stock_available < order.quantity)}
+                >
+                  {processingOrders[order.id] ? 'Processing...' : 'Approve'}
+                </button>
+                <button
+                  className="action-button reject-button"
+                  onClick={() => handleReject(order.id)}
+                  disabled={processingOrders[order.id]}
+                >
+                  {processingOrders[order.id] ? 'Processing...' : 'Reject'}
+                </button>
+              </div>
+            )}
+
+            {showActions && order.stock_available !== undefined && order.stock_available < order.quantity && (
+              <div className="stock-warning">
+                ⚠️ Insufficient stock available. Cannot approve until restocked.
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
-    <div className="order-fulfillment">
-      <div className="order-fulfillment-container">
+    <div>
+      <SimpleNav />
+      <div className="order-fulfillment">
+        <div className="order-fulfillment-container">
         {/* Header */}
         <div className="order-fulfillment-header">
-          <h1 className="order-fulfillment-title">Order Fulfillment & Inventory</h1>
+          <h1 className="order-fulfillment-title">Order Fulfillment & Management</h1>
           <p className="order-fulfillment-subtitle">
-            Manage pending orders, approve or reject purchases, and monitor inventory levels
+            Comprehensive order management system for all order statuses
           </p>
         </div>
 
-        {/* Tabs */}
+        {/* Statistics Dashboard */}
+        <div className="stats-cards">
+          <div className="stats-card">
+            <div className="stats-number">{pendingOrders.length}</div>
+            <div className="stats-label">Pending</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-number">{awaitingDeliveryOrders.length}</div>
+            <div className="stats-label">Awaiting Delivery</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-number">{cancelledOrders.length}</div>
+            <div className="stats-label">Cancelled</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-number">{fulfilledOrders.length}</div>
+            <div className="stats-label">Fulfilled</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-number">{allOrders.length}</div>
+            <div className="stats-label">Total Orders</div>
+          </div>
+          <div className="stats-card">
+            <div className="stats-number">
+              ${allOrders.reduce((total, order) => total + order.total_amount, 0).toFixed(2)}
+            </div>
+            <div className="stats-label">Total Value</div>
+          </div>
+        </div>
+
+        {/* Tabs Container */}
         <div className="tabs-container">
           <div className="tabs">
             <button 
               className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
               onClick={() => setActiveTab('pending')}
             >
-              Pending Orders ({pendingOrders.length})
+              Pending ({pendingOrders.length})
             </button>
             <button 
-              className={`tab ${activeTab === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveTab('all')}
+              className={`tab ${activeTab === 'awaiting' ? 'active' : ''}`}
+              onClick={() => setActiveTab('awaiting')}
             >
-              All Orders ({allOrders.length})
+              Awaiting Delivery ({awaitingDeliveryOrders.length})
             </button>
             <button 
-              className={`tab ${activeTab === 'inventory' ? 'active' : ''}`}
-              onClick={() => setActiveTab('inventory')}
+              className={`tab ${activeTab === 'cancelled' ? 'active' : ''}`}
+              onClick={() => setActiveTab('cancelled')}
             >
-              Inventory Overview
+              Cancelled ({cancelledOrders.length})
+            </button>
+            <button 
+              className={`tab ${activeTab === 'fulfilled' ? 'active' : ''}`}
+              onClick={() => setActiveTab('fulfilled')}
+            >
+              Fulfilled ({fulfilledOrders.length})
+            </button>
+            <button 
+              className={`tab ${activeTab === 'history' ? 'active' : ''}`}
+              onClick={() => setActiveTab('history')}
+            >
+              Order History ({allOrders.length})
             </button>
           </div>
 
-          {/* Pending Orders Tab */}
-          {activeTab === 'pending' && (
-            <div>
-              {pendingOrders.length === 0 ? (
-                <div className="no-orders">
-                  <h3>No pending orders</h3>
-                  <p>All orders have been processed</p>
-                </div>
-              ) : (
-                <div className="orders-grid">
-                  {pendingOrders.map(order => (
-                    <div key={order.id} className="order-card">
-                      <div className="order-header">
-                        <div className="order-id">Order #{order.id}</div>
-                        {getStatusBadge(order.status)}
-                      </div>
-
-                      <div className="order-details">
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Product:</span>
-                          <span className="order-detail-value">{order.product_name}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Customer:</span>
-                          <span className="order-detail-value">{order.customer_name}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Category:</span>
-                          <span className="order-detail-value">{order.product_category}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Quantity:</span>
-                          <span className="order-detail-value">{order.quantity}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Unit Price:</span>
-                          <span className="order-detail-value">${order.unit_price.toFixed(2)}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Total:</span>
-                          <span className="order-detail-value">${order.total_amount.toFixed(2)}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Date:</span>
-                          <span className="order-detail-value">{new Date(order.date_purchased).toLocaleDateString()}</span>
-                        </div>
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Stock Available:</span>
-                          <span className="order-detail-value">{order.stock_available} units</span>
-                        </div>
-                      </div>
-
-                      <div className="order-actions">
-                        <button
-                          className="action-button approve-button"
-                          onClick={() => handleApprove(order.id)}
-                          disabled={processingOrders[order.id] || order.stock_available < order.quantity}
-                        >
-                          {processingOrders[order.id] ? 'Processing...' : 'Approve'}
-                        </button>
-                        <button
-                          className="action-button reject-button"
-                          onClick={() => handleReject(order.id)}
-                          disabled={processingOrders[order.id]}
-                        >
-                          {processingOrders[order.id] ? 'Processing...' : 'Reject'}
-                        </button>
-                      </div>
-
-                      {order.stock_available < order.quantity && (
-                        <div style={{ color: '#dc3545', marginTop: '12px', fontSize: '14px', fontWeight: '500' }}>
-                          ⚠️ Insufficient stock available
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* All Orders Tab */}
-          {activeTab === 'all' && (
-            <div>
-              <div className="stats-cards">
-                <div className="stats-card">
-                  <div className="stats-number">{allOrders.length}</div>
-                  <div className="stats-label">Total Orders</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{allOrders.filter(o => o.status === 'pending').length}</div>
-                  <div className="stats-label">Pending</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{allOrders.filter(o => o.status === 'approved').length}</div>
-                  <div className="stats-label">Approved</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{allOrders.filter(o => o.status === 'fulfilled').length}</div>
-                  <div className="stats-label">Fulfilled</div>
-                </div>
-              </div>
-              
-              <div className="orders-grid">
-                {allOrders.map(order => (
-                  <div key={order.id} className="order-card">
-                    <div className="order-header">
-                      <div className="order-id">Order #{order.id}</div>
-                      {getStatusBadge(order.status)}
-                    </div>
-
-                    <div className="order-details">
-                      <div className="order-detail-row">
-                        <span className="order-detail-label">Product:</span>
-                        <span className="order-detail-value">{order.product_name}</span>
-                      </div>
-                      <div className="order-detail-row">
-                        <span className="order-detail-label">Customer:</span>
-                        <span className="order-detail-value">{order.customer_name}</span>
-                      </div>
-                      <div className="order-detail-row">
-                        <span className="order-detail-label">Quantity:</span>
-                        <span className="order-detail-value">{order.quantity}</span>
-                      </div>
-                      <div className="order-detail-row">
-                        <span className="order-detail-label">Total:</span>
-                        <span className="order-detail-value">${order.total_amount.toFixed(2)}</span>
-                      </div>
-                      <div className="order-detail-row">
-                        <span className="order-detail-label">Date:</span>
-                        <span className="order-detail-value">{new Date(order.date_purchased).toLocaleDateString()}</span>
-                      </div>
-                      {order.processed_by && (
-                        <div className="order-detail-row">
-                          <span className="order-detail-label">Processed By:</span>
-                          <span className="order-detail-value">{order.processed_by}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Inventory Tab */}
-          {activeTab === 'inventory' && (
-            <div>
-              <div className="stats-cards">
-                <div className="stats-card">
-                  <div className="stats-number">{inventory.length}</div>
-                  <div className="stats-label">Total Products</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{inventory.filter(item => item.is_out_of_stock).length}</div>
-                  <div className="stats-label">Out of Stock</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{inventory.filter(item => item.is_low_stock && !item.is_out_of_stock).length}</div>
-                  <div className="stats-label">Low Stock</div>
-                </div>
-                <div className="stats-card">
-                  <div className="stats-number">{inventory.reduce((total, item) => total + item.pending_orders, 0)}</div>
-                  <div className="stats-label">Pending Orders</div>
-                </div>
-              </div>
-
-              <div className="inventory-grid">
-                {inventory.map(item => (
-                  <div key={item.id} className="inventory-card">
-                    <div className="inventory-name">{item.name}</div>
-                    <div className="inventory-details">
-                      <div className="inventory-detail-row">
-                        <span className="inventory-detail-label">Category:</span>
-                        <span className="inventory-detail-value">{item.category}</span>
-                      </div>
-                      <div className="inventory-detail-row">
-                        <span className="inventory-detail-label">Price:</span>
-                        <span className="inventory-detail-value">${item.price.toFixed(2)}</span>
-                      </div>
-                      <div className="inventory-detail-row">
-                        <span className="inventory-detail-label">Current Stock:</span>
-                        <span className={`inventory-detail-value ${item.is_out_of_stock ? 'stock-out' : item.is_low_stock ? 'stock-low' : 'stock-good'}`}>
-                          {item.current_stock} units
-                        </span>
-                      </div>
-                      <div className="inventory-detail-row">
-                        <span className="inventory-detail-label">Pending Orders:</span>
-                        <span className="inventory-detail-value">{item.pending_orders} units</span>
-                      </div>
-                      <div className="inventory-detail-row">
-                        <span className="inventory-detail-label">Available After Pending:</span>
-                        <span className={`inventory-detail-value ${item.available_after_pending <= 0 ? 'stock-out' : item.available_after_pending <= 5 ? 'stock-low' : 'stock-good'}`}>
-                          {item.available_after_pending} units
-                        </span>
-                      </div>
-                    </div>
-
-                    {item.is_out_of_stock && (
-                      <div className="stock-indicator stock-out">
-                        🚨 Out of Stock
-                      </div>
-                    )}
-                    {item.is_low_stock && !item.is_out_of_stock && (
-                      <div className="stock-indicator stock-low">
-                        ⚠️ Low Stock
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Tab Content */}
+          <div className="tab-content">
+            {activeTab === 'pending' && renderOrderCards(pendingOrders, true)}
+            {activeTab === 'awaiting' && renderOrderCards(awaitingDeliveryOrders, false)}
+            {activeTab === 'cancelled' && renderOrderCards(cancelledOrders, false)}
+            {activeTab === 'fulfilled' && renderOrderCards(fulfilledOrders, false)}
+            {activeTab === 'history' && renderOrderCards(allOrders, false)}
+          </div>
         </div>
 
         {/* Refresh Button */}
         <button 
           className="refresh-button"
-          onClick={fetchData}
-          title="Refresh Data"
+          onClick={fetchAllData}
+          title="Refresh All Orders"
         >
           ↻
         </button>
+        </div>
       </div>
     </div>
   );

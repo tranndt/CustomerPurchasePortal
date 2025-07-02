@@ -6,7 +6,6 @@ import { Routes, Route } from "react-router-dom";
 import MyOrders from './components/MyOrders/MyOrders';
 import ProductReview from './components/ProductReview/ProductReview';
 import SupportClaim from './components/SupportClaim/SupportClaim';
-import AllOrders from './components/AllOrders/AllOrders';
 import TicketManager from './components/TicketManager/TicketManager';
 import TicketDetail from './components/TicketDetail/TicketDetail';
 import Landing from './components/Landing/Landing';
@@ -20,6 +19,7 @@ import AllReviews from './components/AllReviews/AllReviews';
 import Products from './components/Products/Products';
 import Cart from './components/Cart/Cart';
 import OrderFulfillment from './components/OrderFulfillment/OrderFulfillment';
+import InventoryManagement from './components/InventoryManagement/InventoryManagement';
 
 function App() {
   return (
@@ -38,8 +38,8 @@ function App() {
       <Route path="/customer/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
       <Route path="/customer/reviews/:transaction_id" element={<ProtectedRoute><ProductReview /></ProtectedRoute>} />
       <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
-      <Route path="/admin/orders" element={<ProtectedRoute><AllOrders /></ProtectedRoute>} />
       <Route path="/admin/fulfillment" element={<ProtectedRoute><OrderFulfillment /></ProtectedRoute>} />
+      <Route path="/admin/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
       <Route path="/admin/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
       <Route path="/admin/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
       <Route path="/admin/reviews" element={<ProtectedRoute><AllReviews /></ProtectedRoute>} />

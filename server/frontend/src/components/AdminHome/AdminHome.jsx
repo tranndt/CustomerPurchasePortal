@@ -90,15 +90,15 @@ const AdminHome = () => {
               e.target.style.transform = "translateY(0)";
               e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
             }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>📦</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>All Orders</h3>
+              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⚡</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Order Fulfillment</h3>
               <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Monitor, review, and process all customer orders across the system
+                Comprehensive order management with all statuses: pending, approved, cancelled, and fulfilled orders
               </p>
               <button
-                onClick={() => navigate('/admin/orders')}
+                onClick={() => navigate('/admin/fulfillment')}
                 style={{
-                  background: "linear-gradient(135deg, #dc3545 0%, #c82333 100%)",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   color: "white",
                   border: "none",
                   padding: "12px 24px",
@@ -106,13 +106,13 @@ const AdminHome = () => {
                   cursor: "pointer",
                   fontWeight: "600",
                   fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(220, 53, 69, 0.3)",
+                  boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)",
                   transition: "all 0.2s ease"
                 }}
                 onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
-                All Orders
+                Order Fulfillment
               </button>
             </div>
 
@@ -133,15 +133,15 @@ const AdminHome = () => {
               e.target.style.transform = "translateY(0)";
               e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
             }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⚡</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Order Fulfillment</h3>
+              <div style={{ fontSize: "36px", marginBottom: "16px" }}>📊</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Inventory Management</h3>
               <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Approve or reject pending orders and manage inventory levels
+                Monitor stock levels, track pending orders, and manage product inventory
               </p>
               <button
-                onClick={() => navigate('/admin/fulfillment')}
+                onClick={() => navigate('/admin/inventory')}
                 style={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
                   color: "white",
                   border: "none",
                   padding: "12px 24px",
@@ -149,13 +149,13 @@ const AdminHome = () => {
                   cursor: "pointer",
                   fontWeight: "600",
                   fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)",
+                  boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
                   transition: "all 0.2s ease"
                 }}
                 onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
-                Order Fulfillment
+                Manage Inventory
               </button>
             </div>
 

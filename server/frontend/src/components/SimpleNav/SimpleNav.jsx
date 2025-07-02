@@ -79,10 +79,22 @@ const SimpleNav = () => {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
-            onClick={() => navigate('/admin/orders')}
+            onClick={handleHomeNavigation}
+            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
+          >
+            🏠 Home
+          </button>
+          <button 
+            onClick={() => navigate('/admin/fulfillment')}
             style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
-            All Orders
+            Order Fulfillment
+          </button>
+          <button 
+            onClick={() => navigate('/admin/inventory')}
+            style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
+          >
+            Inventory
           </button>
           <button 
             onClick={() => navigate('/admin/reviews')}
@@ -102,6 +114,12 @@ const SimpleNav = () => {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
+            onClick={handleHomeNavigation}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
+          >
+            🏠 Home
+          </button>
+          <button 
             onClick={() => navigate('/support/tickets')}
             style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
@@ -114,8 +132,14 @@ const SimpleNav = () => {
       return (
         <div style={{ display: 'flex', gap: '15px' }}>
           <button 
+            onClick={handleHomeNavigation}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', fontWeight: 'bold' }}
+          >
+            🏠 Home
+          </button>
+          <button 
             onClick={() => navigate('/customer/orders')}
-            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+            style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', textDecoration: 'underline', fontSize: '14px' }}
           >
             My Orders
           </button>
