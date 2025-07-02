@@ -1,25 +1,23 @@
-# Car Dealership Application - Deployment Status
+# Customer Purchase Portal - Deployment Status
 
 ## ✅ Successfully Deployed Services
 
 ### 1. MongoDB Database (Port 27017)
 
 - **Status**: Running and healthy
-- **Purpose**: Data storage for dealerships and reviews
+- **Purpose**: Data storage for products and reviews
 - **Container**: `mongo`
 
 ### 2. Express.js API Server (Port 3030)
 
 - **Status**: Running and connected to MongoDB
-- **Purpose**: RESTful API for dealership and review data
+- **Purpose**: RESTful API for product and review data
 - **Container**: `xrwvm-fullstack_developer_capstone-express-1`
 - **Key Endpoints**:
   - `GET /` - Welcome message
-  - `GET /fetchDealers` - Get all dealerships
-  - `GET /fetchDealers/:state` - Get dealerships by state
-  - `GET /fetchDealer/:id` - Get specific dealership
+  - `GET /fetchProducts` - Get all products
+  - `GET /fetchProduct/:id` - Get specific product
   - `GET /fetchReviews` - Get all reviews
-  - `GET /fetchReviews/dealer/:id` - Get reviews for specific dealer
   - `POST /insert_review` - Add new review
 
 ### 3. Flask Sentiment Analysis Service (Port 5002)
@@ -33,9 +31,9 @@
 ### 4. Django Web Application (Port 8000)
 
 - **Status**: Running with Gunicorn
-- **Purpose**: Main web interface for the car dealership application
+- **Purpose**: Main web interface for the customer purchase portal
 - **Container**: `xrwvm-fullstack_developer_capstone-django-1`
-- **Features**: User authentication, dealership browsing, review management
+- **Features**: User authentication, product browsing, order management, review management
 
 ## 🔧 Configuration Details
 

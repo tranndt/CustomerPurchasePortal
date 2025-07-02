@@ -1,26 +1,20 @@
-# Uncomment the required imports before adding the code
+# Required imports for the views
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.auth.models import User
-from django.contrib.auth import login, logout
-from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib import messages
-from datetime import datetime
-
-from django.http import JsonResponse
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from datetime import datetime
 import logging
 import json
-from django.views.decorators.csrf import csrf_exempt
-from .restapis import get_request, analyze_review_sentiments, post_review
-from .models import CarMake, CarModel
-from django.http import JsonResponse
-# from .populate import initiate
 
+from .restapis import get_request, analyze_review_sentiments, post_review
 from .models import UserProfile, Product, Order, Review, SupportTicket
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -97,109 +91,6 @@ def register_user(request):
             return JsonResponse({"status": 400, "error": "Registration failed", "message": str(e)})
     else:
         return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only POST method is supported"})
-
-# # # Update the `get_dealerships` view to render the index page with
-# # a list of dealerships
-# def get_dealerships(request, state=None):
-#     if request.method == "GET":
-#         context = {}
-#         # Get dealers from the URL
-#         if state:
-#             dealerships = get_request("/fetchDealers/" + state)
-#         else:
-#             dealerships = get_request("/fetchDealers")
-#         context["dealership_list"] = dealerships
-        
-#         # Return data in format expected by React app
-#         if dealerships:
-#             return JsonResponse({"status": 200, "dealers": dealerships})
-#         else:
-#             return JsonResponse({"status": 404, "dealers": [], "message": "No dealerships found"})
-
-# # Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request, dealer_id):
-#     if request.method == "GET":
-#         context = {}
-#         # Get dealer reviews from the URL
-#         reviews = get_request("/fetchReviews/dealer/" + str(dealer_id))
-#         context["review_list"] = reviews
-#         if reviews is not None:
-#             # Add sentiment analysis to reviews that don't have it
-#             for review in reviews:
-#                 # Check if sentiment is missing, null, or empty
-#                 if not review.get('sentiment') or review.get('sentiment') in [None, '', 'null']:
-#                     # Analyze sentiment for this review
-#                     review_text = review.get('review', '')
-#                     sentiment_response = analyze_review_sentiments(review_text)
-#                     if sentiment_response and 'label' in sentiment_response:
-#                         # Convert the label to lowercase to match the React component expectations
-#                         sentiment_label = sentiment_response['label'].lower()
-#                         review['sentiment'] = sentiment_label
-#                     else:
-#                         review['sentiment'] = 'neutral'
-            
-#             return JsonResponse({"status": 200, "reviews": reviews})
-#         else:
-#             return JsonResponse({"status": 404, "reviews": [], "message": "No reviews found or service unavailable"})
-
-# # Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-#     if request.method == "GET":
-#         context = {}
-#         # Get dealer details from the URL
-#         dealer = get_request("/fetchDealer/" + str(dealer_id))
-#         context["dealer"] = dealer
-#         if dealer is not None:
-#             return JsonResponse({"status": 200, "dealer": dealer})
-#         else:
-#             return JsonResponse({"status": 404, "dealer": None, "message": "Dealer not found or service unavailable"})
-    
-
-# def get_cars(request):
-#     count = CarMake.objects.count()
-#     if count == 0:
-#         from .populate import initiate
-#         initiate()
-#     car_models = CarModel.objects.select_related('car_make')
-#     cars = [{"CarModel": c.name, "CarMake": c.car_make.name} for c in car_models]
-#     return JsonResponse({"status": 200, "CarModels": cars})
-
-
-# # Create a `add_review` view to submit a review
-# @csrf_exempt
-# def add_review(request):
-#     if request.method == "GET":
-#         return JsonResponse({"status": "error", "message": "GET not supported"})
-#     elif request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             print(f"DEBUG: Received data: {data}")
-            
-#             # Extract review text for sentiment analysis
-#             review_text = data.get("review", "")
-#             print(f"DEBUG: Review text: {review_text}")
-            
-#             # Analyze sentiment
-#             sentiment_response = analyze_review_sentiments(review_text)
-#             print(f"DEBUG: Sentiment response: {sentiment_response}")
-            
-#             # Add sentiment to the review data
-#             if sentiment_response:
-#                 data["sentiment"] = sentiment_response
-            
-#             # Post review with the review data
-#             print(f"DEBUG: About to call post_review with data: {data}")
-#             response = post_review(data)
-#             print(f"DEBUG: Post review response: {response}")
-#             return JsonResponse({"status": 200, "review": response})
-#         except Exception as e:
-#             print(f"DEBUG: Exception occurred: {e}")
-#             import traceback
-#             traceback.print_exc()
-#             return JsonResponse({"status": "error", "message": str(e)})
-#     else:
-#         return JsonResponse({"status": "error", "message": "Invalid request method"})
-
 
 @login_required
 def get_my_orders(request):
@@ -343,8 +234,43 @@ def update_ticket_status(request, ticket_id):
 def get_demo_users(request):
     if request.method == "GET":
         try:
-            # Get all users for demo purposes (limit to first 10 for safety)
-            users = User.objects.all()[:10]
+            # Get only the 3 specific demo users
+            demo_usernames = ['demo_customer', 'demo_admin', 'demo_support']
+            users = User.objects.filter(username__in=demo_usernames)
+            
+            # If no demo users exist, create them
+            if not users.exists():
+                try:
+                    from .populate import initiate
+                    initiate()
+                    # Re-fetch users after initialization
+                    users = User.objects.filter(username__in=demo_usernames)
+                except Exception as init_error:
+                    # If initialization fails, return default demo users
+                    return JsonResponse({
+                        "status": 200, 
+                        "users": [
+                            {
+                                'username': 'demo_customer',
+                                'first_name': 'Demo',
+                                'last_name': 'Customer',
+                                'role': 'Customer'
+                            },
+                            {
+                                'username': 'demo_admin',
+                                'first_name': 'Demo',
+                                'last_name': 'Admin', 
+                                'role': 'Admin'
+                            },
+                            {
+                                'username': 'demo_support',
+                                'first_name': 'Demo',
+                                'last_name': 'Support',
+                                'role': 'Support'
+                            }
+                        ]
+                    })
+            
             demo_users = []
             for user in users:
                 try:
@@ -366,7 +292,30 @@ def get_demo_users(request):
                     })
             return JsonResponse({"status": 200, "users": demo_users})
         except Exception as e:
-            return JsonResponse({"status": 500, "error": "Failed to fetch demo users", "message": str(e)})
+            # Return default demo users if anything fails
+            return JsonResponse({
+                "status": 200, 
+                "users": [
+                    {
+                        'username': 'demo_customer',
+                        'first_name': 'Demo',
+                        'last_name': 'Customer',
+                        'role': 'Customer'
+                    },
+                    {
+                        'username': 'demo_admin',
+                        'first_name': 'Demo',
+                        'last_name': 'Admin',
+                        'role': 'Admin'
+                    },
+                    {
+                        'username': 'demo_support',
+                        'first_name': 'Demo',
+                        'last_name': 'Support',
+                        'role': 'Support'
+                    }
+                ]
+            })
     else:
         return JsonResponse({"status": 405, "error": "Method not allowed", "message": "Only GET method is supported"})
 

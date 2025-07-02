@@ -1,13 +1,14 @@
-# Customer Purchase Portal - Full Stack Car Dealership Application
+# Customer Purchase Portal - Full Stack E-Commerce Application
 
-A comprehensive full-stack web application for car dealership management with customer reviews, sentiment analysis, and user authentication.
+A comprehensive full-stack web application for customer purchase management with product reviews, sentiment analysis, and user authentication.
 
 ## 🚀 Features
 
 - **User Authentication**: Secure login and registration system
-- **Dealership Management**: Browse and view car dealership information
-- **Car Inventory**: View available cars by dealership
+- **Product Management**: Browse and view product information
+- **Order Management**: Track customer orders and purchase history
 - **Review System**: Submit and view customer reviews with sentiment analysis
+- **Support Tickets**: Customer support ticket system
 - **Sentiment Analysis**: AI-powered sentiment analysis using IBM Watson or VADER
 - **Responsive Design**: Mobile-friendly React frontend with Bootstrap styling
 
@@ -17,9 +18,9 @@ This application follows a microservices architecture with the following compone
 
 ### Backend Services
 - **Django Backend** (Port 8000): Main application server and API
-- **Express.js API** (Port 3030): Node.js microservice for dealership and car data
+- **Express.js API** (Port 3030): Node.js microservice for data management
 - **Flask Sentiment Service** (Port 5002): Python microservice for sentiment analysis
-- **MongoDB** (Port 27017): NoSQL database for storing dealership and review data
+- **MongoDB** (Port 27017): NoSQL database for storing product and review data
 
 ### Frontend
 - **React Application**: Modern, responsive user interface
@@ -124,23 +125,23 @@ The application uses MongoDB for data storage. Sample data is automatically load
 1. Register a new account or login with existing credentials
 2. Navigate through the application as an authenticated user
 
-### Browsing Dealerships
-1. View the list of available dealerships
-2. Click on a dealership to see details and reviews
+### Browsing Products
+1. View the list of available products
+2. Click on a product to see details and reviews
 
 ### Submitting Reviews
 1. Login to your account
-2. Navigate to a dealership page
+2. Navigate to a product page
 3. Fill out the review form with:
    - Review text
-   - Car make and model
+   - Product rating
    - Purchase information
    - Purchase date
 4. Submit the review for automatic sentiment analysis
 
 ### Viewing Reviews
 - Reviews are displayed with sentiment indicators (positive, negative, neutral)
-- Each review shows car information and purchase details
+- Each review shows product information and purchase details
 
 ## 🤖 Sentiment Analysis
 
@@ -156,25 +157,24 @@ Reviews are automatically analyzed when submitted, and results are stored and di
 The application runs in four Docker containers:
 
 - **Django**: Main web application and API
-- **Express**: Node.js microservice for dealership data
+- **Express**: Node.js microservice for product data
 - **Flask**: Python sentiment analysis service
 - **MongoDB**: Database server
 
 ## 🔄 API Endpoints
 
 ### Django API
-- `GET /djangoapp/get_cars/` - Get all cars
-- `GET /djangoapp/get_dealers/` - Get all dealers
-- `GET /djangoapp/get_dealer/{id}` - Get specific dealer
-- `GET /djangoapp/reviews/dealer/{id}` - Get dealer reviews
-- `POST /djangoapp/add_review` - Submit a review
+- `GET /djangoapp/api/customer/orders/` - Get customer orders
+- `GET /djangoapp/api/customer/reviews/` - Get customer reviews
+- `GET /djangoapp/api/customer/tickets/` - Get customer support tickets
+- `POST /djangoapp/api/customer/review` - Submit a review
+- `POST /djangoapp/api/customer/support/new` - Submit a support ticket
 - `POST /djangoapp/login` - User login
 - `POST /djangoapp/register` - User registration
 
 ### Express API
-- `GET /fetchCars` - Get cars data
-- `GET /fetchDealers` - Get dealers data
-- `GET /fetchDealer/{id}` - Get specific dealer
+- `GET /fetchProducts` - Get products data
+- `GET /fetchProduct/{id}` - Get specific product
 - `POST /insert_review` - Insert new review
 
 ### Flask Sentiment API
@@ -191,17 +191,15 @@ curl "http://localhost:5002/analyze/This car is amazing"
 
 Test review submission:
 ```bash
-curl -X POST "http://localhost:8000/djangoapp/add_review" \
+curl -X POST "http://localhost:8000/djangoapp/api/customer/review" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Test User",
-    "review": "Great service!",
-    "car_make": "Toyota",
-    "car_model": "Camry",
-    "car_year": 2023,
+    "review": "Great service and excellent product!",
+    "product": "Premium Membership",
+    "rating": 5,
     "purchase": true,
-    "purchase_date": "2024-01-15",
-    "dealership": 1
+    "purchase_date": "2024-01-15"
   }'
 ```
 

@@ -11,13 +11,23 @@ const reviews = new Schema({
     type: String,
     required: true
   },
-  dealership: {
+  product_id: {
     type: Number,
     required: true,
+  },
+  product_name: {
+    type: String,
+    required: true
   },
   review: {
     type: String,
     required: true
+  },
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 5
   },
   purchase: {
     type: Boolean,
@@ -27,18 +37,11 @@ const reviews = new Schema({
     type: String,
     required: true
   },
-  car_make: {
+  sentiment: {
     type: String,
-    required: true
-  },
-  car_model: {
-    type: String,
-    required: true
-  },
-  car_year: {
-    type: Number,
-    required: true
-  },
+    required: false,
+    default: "neutral"
+  }
 });
 
 module.exports = mongoose.model('reviews', reviews);

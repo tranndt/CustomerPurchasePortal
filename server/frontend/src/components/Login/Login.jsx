@@ -16,17 +16,65 @@ const Login = () => {
   // Fetch demo users on component mount
   useEffect(() => {
     const fetchDemoUsers = async () => {
+      console.log("Attempting to fetch demo users from:", demo_users_url);
       try {
         const res = await fetch(demo_users_url, {
           method: "GET",
           credentials: "include",
         });
+        console.log("Response status:", res.status);
         const json = await res.json();
+        console.log("Response data:", json);
         if (json.status === 200) {
           setDemoUsers(json.users || []);
+        } else {
+          console.log("API returned non-200 status, using fallback users");
+          // Fallback to default demo users if API fails
+          setDemoUsers([
+            {
+              username: 'demo_customer',
+              first_name: 'Demo',
+              last_name: 'Customer',
+              role: 'Customer'
+            },
+            {
+              username: 'demo_admin',
+              first_name: 'Demo',
+              last_name: 'Admin',
+              role: 'Admin'
+            },
+            {
+              username: 'demo_support',
+              first_name: 'Demo',
+              last_name: 'Support',
+              role: 'Support'
+            }
+          ]);
         }
       } catch (error) {
         console.error("Failed to fetch demo users:", error);
+        console.log("Using fallback demo users due to fetch error");
+        // Fallback to default demo users if fetch fails
+        setDemoUsers([
+          {
+            username: 'demo_customer',
+            first_name: 'Demo',
+            last_name: 'Customer',
+            role: 'Customer'
+          },
+          {
+            username: 'demo_admin',
+            first_name: 'Demo',
+            last_name: 'Admin',
+            role: 'Admin'
+          },
+          {
+            username: 'demo_support',
+            first_name: 'Demo',
+            last_name: 'Support',
+            role: 'Support'
+          }
+        ]);
       }
     };
 
