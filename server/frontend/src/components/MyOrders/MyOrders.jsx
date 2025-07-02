@@ -76,7 +76,26 @@ const MyOrders = () => {
             }}>
               <div style={{ fontSize: "64px", marginBottom: "20px" }}>📦</div>
               <h3 style={{ color: "#6c757d", marginBottom: "12px", fontSize: "24px" }}>No orders found</h3>
-              <p style={{ color: "#adb5bd", margin: "0", fontSize: "16px" }}>Your order history will appear here once you make a purchase.</p>
+              <p style={{ color: "#adb5bd", margin: "0 0 24px 0", fontSize: "16px" }}>Your order history will appear here once you make a purchase.</p>
+              <button 
+                onClick={() => navigate('/products')}
+                style={{
+                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "16px",
+                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
+                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+              >
+                🛍️ Start Shopping
+              </button>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -103,11 +122,19 @@ const MyOrders = () => {
                       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "20px" }}>
                         <div>
                           <span style={{ fontWeight: "600", color: "#495057" }}>Category:</span>
-                          <span style={{ marginLeft: "8px", color: "#6c757d" }}>{order.category}</span>
+                          <span style={{ marginLeft: "8px", color: "#6c757d" }}>{order.category || 'General'}</span>
                         </div>
                         <div>
-                          <span style={{ fontWeight: "600", color: "#495057" }}>Price:</span>
+                          <span style={{ fontWeight: "600", color: "#495057" }}>Unit Price:</span>
                           <span style={{ marginLeft: "8px", color: "#28a745", fontWeight: "600" }}>${order.price}</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#495057" }}>Quantity:</span>
+                          <span style={{ marginLeft: "8px", color: "#6c757d", fontWeight: "600" }}>{order.quantity || 1}</span>
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: "600", color: "#495057" }}>Total Amount:</span>
+                          <span style={{ marginLeft: "8px", color: "#28a745", fontWeight: "700", fontSize: "16px" }}>${order.total_amount || order.price}</span>
                         </div>
                         <div>
                           <span style={{ fontWeight: "600", color: "#495057" }}>Transaction ID:</span>

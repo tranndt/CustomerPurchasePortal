@@ -108,7 +108,7 @@ def get_my_orders(request):
     return JsonResponse({"status": 200, "orders": results})
 
 def get_customer_orders(request):
-    orders = Order.objects.filter(customer=request.user).select_related("product")
+    orders = Order.objects.filter(customer=request.user).select_related("product").order_by('-date_purchased')
     results = [
         {
             "order_id": order.id,
@@ -116,6 +116,8 @@ def get_customer_orders(request):
             "product": order.product.name,
             "category": order.product.category,
             "price": str(order.product.price),
+            "quantity": order.quantity,
+            "total_amount": str(order.total_amount),
             "date_purchased": order.date_purchased,
         } for order in orders
     ]

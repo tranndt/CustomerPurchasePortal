@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Products.css';
 
 const Products = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,6 +118,22 @@ const Products = () => {
 
   return (
     <div className="products-container">
+      {/* Navigation Bar */}
+      <div className="products-nav">
+        <button 
+          onClick={() => navigate('/customer/home')}
+          className="nav-btn back-btn"
+        >
+          ← Back to Dashboard
+        </button>
+        <button 
+          onClick={() => navigate('/cart')}
+          className="nav-btn cart-btn"
+        >
+          🛒 View Cart
+        </button>
+      </div>
+
       <div className="products-header">
         <h1>All Products</h1>
         <p>Browse our complete product catalog</p>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 
 const Cart = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -119,6 +121,10 @@ const Cart = () => {
       if (data.status === 200) {
         alert(`Purchase completed successfully! Transaction ID: ${data.transaction_id}`);
         setCartItems([]); // Clear cart
+        // Redirect to orders page to see the new purchase
+        setTimeout(() => {
+          navigate('/customer/orders');
+        }, 2000);
       } else {
         alert(data.message || 'Checkout failed');
       }
@@ -160,6 +166,22 @@ const Cart = () => {
 
   return (
     <div className="cart-container">
+      {/* Navigation Bar */}
+      <div className="cart-nav">
+        <button 
+          onClick={() => navigate('/customer/home')}
+          className="nav-btn back-btn"
+        >
+          ← Back to Dashboard
+        </button>
+        <button 
+          onClick={() => navigate('/products')}
+          className="nav-btn shop-btn"
+        >
+          🛍️ Continue Shopping
+        </button>
+      </div>
+
       <div className="cart-header">
         <h1>Shopping Cart</h1>
         <p>{cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart</p>
