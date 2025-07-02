@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from '../Notification/Notification';
+import BackButton from '../BackButton/BackButton';
 import "./Register.css";
 
 const Register = () => {
@@ -14,7 +16,7 @@ const Register = () => {
     e.preventDefault();
 
     if (!userName || !password || !firstName || !lastName || !email) {
-      alert("All fields are required");
+      showNotification("All fields are required", 'warning');
       return;
     }
 
@@ -41,7 +43,7 @@ const Register = () => {
       if (json.status === 201) {
         sessionStorage.setItem('username', json.userName);
         sessionStorage.setItem('userRole', json.userRole || 'Customer');
-        alert("Registration successful! You are now logged in.");
+        showNotification("Registration successful! You are now logged in.", 'success');
         
         // Redirect to role-specific home page
         const userRole = json.userRole || 'Customer';
@@ -53,34 +55,19 @@ const Register = () => {
           navigate("/customer/home");
         }
       } else if (json.status === 409) {
-        alert("User already exists. Please choose a different username.");
+        showNotification("User already exists. Please choose a different username.", 'error');
       } else {
-        alert("Registration failed: " + (json.message || "Unknown error"));
+        showNotification("Registration failed: " + (json.message || "Unknown error"), 'error');
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert("Registration failed. Please try again.");
+      showNotification("Registration failed. Please try again.", 'error');
     }
   };
 
   return (
     <div style={{ padding: "20px", maxWidth: "500px", margin: "0 auto" }}>
-      {/* Simple navigation breadcrumb */}
-      <div style={{ marginBottom: '20px' }}>
-        <button 
-          onClick={() => navigate('/')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#007bff',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            fontSize: '14px'
-          }}
-        >
-          ← Back to Home
-        </button>
-      </div>
+      <BackButton />
       
       <header style={{ textAlign: 'center', marginBottom: '30px' }}>
         <h1>🔐 Register for ElectronicsRetail</h1>

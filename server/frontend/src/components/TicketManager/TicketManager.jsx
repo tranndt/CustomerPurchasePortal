@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
 import './TicketManager.css';
 
 const TicketManager = () => {
@@ -166,6 +167,7 @@ const TicketManager = () => {
       <SimpleNav />
       <div className="tickets-management">
         <div className="tickets-container">
+          <BackButton />
           {/* Header */}
           <div className="tickets-header">
             <h1 className="tickets-title">Ticket Management</h1>

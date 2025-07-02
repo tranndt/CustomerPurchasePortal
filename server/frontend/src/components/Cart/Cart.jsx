@@ -27,7 +27,26 @@ const Cart = () => {
       });
       const data = await response.json();
       if (data.status === 200) {
-        setCartItems(data.cart_items);
+        // Ensure proper number parsing for all cart items
+        const processedCartItems = data.cart_items.map(item => {
+          // Handle potential string prices or undefined values
+          const itemPrice = item.product.price;
+          const totalPrice = item.total_price;
+          
+          // Convert to number, handling strings, decimals, or undefined
+          const parsedPrice = isNaN(parseFloat(itemPrice)) ? 0 : parseFloat(itemPrice);
+          const parsedTotal = isNaN(parseFloat(totalPrice)) ? 0 : parseFloat(totalPrice);
+          
+          return {
+            ...item,
+            product: {
+              ...item.product,
+              price: parsedPrice
+            },
+            total_price: parsedTotal
+          };
+        });
+        setCartItems(processedCartItems);
       } else if (data.status === 401) {
         setError('Please log in to view your cart');
       } else {
@@ -65,7 +84,11 @@ const Cart = () => {
       if (data.status === 200) {
         setCartItems(prev => prev.map(item => 
           item.id === cartItemId 
-            ? { ...item, quantity: newQuantity, total_price: data.cart_item.total_price }
+            ? { 
+                ...item, 
+                quantity: newQuantity, 
+                total_price: isNaN(parseFloat(data.cart_item.total_price)) ? 0 : parseFloat(data.cart_item.total_price)
+              }
             : item
         ));
         // Trigger cart update event
@@ -143,7 +166,10 @@ const Cart = () => {
   };
 
   const getTotalAmount = () => {
-    return cartItems.reduce((total, item) => total + item.total_price, 0);
+    return cartItems.reduce((total, item) => {
+      const itemTotal = isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price);
+      return total + itemTotal;
+    }, 0);
   };
 
   if (loading) {
@@ -218,7 +244,6 @@ const Cart = () => {
 
                 <div className="item-details">
                   <h3>{item.product.name}</h3>
-                  <p className="item-price">${item.product.price.toFixed(2)} each</p>
                   <p className="stock-info">
                     {item.product.is_in_stock ? (
                       <span className="in-stock">✓ In Stock ({item.product.stock_quantity} available)</span>
@@ -250,7 +275,7 @@ const Cart = () => {
                 </div>
 
                 <div className="item-total">
-                  <p className="total-price">${item.total_price.toFixed(2)}</p>
+                  <p className="total-price">${(isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price)).toFixed(2)}</p>
                   <button 
                     onClick={() => removeItem(item.id)}
                     disabled={updatingItems[item.id]}

@@ -110,7 +110,7 @@ const CustomerHome = () => {
               <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛍️</div>
               <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shop Electronics</h3>
               <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Browse our complete electronics catalog and manage your shopping cart
+                Browse our complete electronics catalog and find great products
               </p>
               <button 
                 onClick={() => navigate('/shop')}
@@ -124,50 +124,6 @@ const CustomerHome = () => {
                   fontWeight: "600",
                   fontSize: "14px",
                   boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Visit Store
-              </button>
-            </div>
-
-            {/* Shopping Cart Card */}
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛒</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shopping Cart</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Review items in your cart and proceed to checkout
-              </p>
-              <button 
-                onClick={() => navigate('/shop')}
-                style={{
-                  background: "linear-gradient(135deg, #28a745 0%, #218838 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
                   transition: "all 0.2s ease"
                 }}
                 onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}

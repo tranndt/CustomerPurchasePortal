@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SimpleNav from '../SimpleNav/SimpleNav';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
 
 const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -67,6 +68,7 @@ const MyTickets = () => {
           maxWidth: "1000px", 
           margin: "0 auto"
         }}>
+          <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
           <div style={{
             textAlign: "center",
             marginBottom: "32px",

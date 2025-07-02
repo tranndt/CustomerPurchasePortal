@@ -1,4 +1,5 @@
 import React from 'react';
+import { showNotification } from '../Notification/Notification';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
 
@@ -17,10 +18,10 @@ const Header = () => {
       sessionStorage.removeItem('username');
       window.location.href = window.location.origin;
       window.location.reload();
-      alert("Logging out "+username+"...")
+      showNotification("Logging out "+username+"...", 'info');
     }
     else {
-      alert("The user could not be logged out.")
+      showNotification("The user could not be logged out.", 'error');
     }
   };
     

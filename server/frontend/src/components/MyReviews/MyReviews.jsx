@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SimpleNav from '../SimpleNav/SimpleNav';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
+import '../../styles/ProductCard.css';
 
 const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -39,6 +41,8 @@ const MyReviews = () => {
           maxWidth: "1000px", 
           margin: "0 auto"
         }}>
+          <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
+          
           <div style={{
             textAlign: "center",
             marginBottom: "32px",
@@ -102,68 +106,41 @@ const MyReviews = () => {
               <p style={{ color: "#adb5bd", margin: "0", fontSize: "16px" }}>You have not submitted any reviews yet.</p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div className="product-cards-grid">
               {reviews.map((review) => (
-                <div key={review.id} style={{
-                  backgroundColor: "white",
-                  borderRadius: "12px",
-                  padding: "24px",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-                  border: "1px solid #e9ecef",
-                  transition: "transform 0.2s ease, box-shadow 0.2s ease"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-                }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "20px", alignItems: "start" }}>
-                    <div>
-                      <h4 style={{ margin: "0 0 16px 0", color: "#2c3e50", fontSize: "20px" }}>{review.product_name}</h4>
-                      <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
-                        <span style={{ fontWeight: "600", color: "#495057", marginRight: "12px" }}>Rating:</span>
-                        <div style={{ display: "flex", alignItems: "center" }}>
+                <div key={review.id} className="product-card-shared">
+                  <div className="product-card-content">
+                    {/* Product Image */}
+                    <div className="product-image-container small">
+                      <img 
+                        src={review.product_image || 'https://via.placeholder.com/100x100/f8f9fa/6c757d?text=No+Image'} 
+                        alt={review.product_name}
+                      />
+                    </div>
+
+                    {/* Review Details */}
+                    <div className="product-details">
+                      <h4 className="product-title">{review.product_name}</h4>
+                      <div className="rating-display">
+                        <span className="product-info-label">Rating:</span>
+                        <div className="rating-stars">
                           {[...Array(5)].map((_, i) => (
-                            <span key={i} style={{ 
-                              color: i < review.rating ? "#ffc107" : "#e9ecef", 
-                              fontSize: "18px",
-                              marginRight: "2px"
-                            }}>★</span>
+                            <span key={i} className={`rating-star ${i < review.rating ? '' : 'empty'}`}>★</span>
                           ))}
-                          <span style={{ marginLeft: "8px", color: "#6c757d", fontWeight: "600" }}>
-                            {review.rating} / 5
-                          </span>
                         </div>
                       </div>
-                      <div style={{ marginBottom: "16px" }}>
-                        <span style={{ fontWeight: "600", color: "#495057", display: "block", marginBottom: "8px" }}>Review:</span>
-                        <p style={{ 
-                          margin: "0", 
-                          color: "#6c757d", 
-                          lineHeight: "1.6",
-                          padding: "12px",
-                          backgroundColor: "#f8f9fa",
-                          borderRadius: "8px",
-                          border: "1px solid #e9ecef"
-                        }}>
-                          {review.review_text}
-                        </p>
+                      <div className="product-info-grid">
+                        <div className="product-info-item">
+                          <span className="product-info-label">Reviewed on:</span>
+                          <span className="product-info-value">{new Date(review.created_on).toLocaleDateString()}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div style={{ textAlign: "right", minWidth: "140px" }}>
-                      <span style={{ 
-                        fontSize: "12px", 
-                        color: "#6c757d",
-                        backgroundColor: "#f8f9fa",
-                        padding: "6px 12px",
-                        borderRadius: "20px",
-                        border: "1px solid #e9ecef"
-                      }}>
-                        {new Date(review.created_on).toLocaleDateString()}
-                      </span>
+                      
+                      {review.review_text && (
+                        <div className="review-text">
+                          {review.review_text}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

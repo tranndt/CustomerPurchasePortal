@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
+import { showNotification } from '../Notification/Notification';
 
 const SupportClaim = () => {
   const { transaction_id } = useParams();
@@ -25,7 +27,7 @@ const SupportClaim = () => {
 
   const submitSupportTicket = async () => {
     if (!order) {
-      alert("Order information not found.");
+      showNotification("Order information not found.", 'error');
       return;
     }
     
@@ -45,10 +47,10 @@ const SupportClaim = () => {
 
     const result = await res.json();
     if (result.status === 200) {
-      alert("Support ticket submitted!");
+      showNotification("Support ticket submitted!", 'success');
       navigate("/customer/orders");
     } else {
-      alert("Failed to submit support ticket: " + (result.message || result.error || "Unknown error"));
+      showNotification("Failed to submit support ticket: " + (result.message || result.error || "Unknown error"), 'error');
     }
   };
 
@@ -64,6 +66,8 @@ const SupportClaim = () => {
           maxWidth: "800px", 
           margin: "0 auto"
         }}>
+          <BackButton to="/customer/orders" label="← Back to My Orders" variant="primary" />
+          
           <div style={{
             textAlign: "center",
             marginBottom: "32px",

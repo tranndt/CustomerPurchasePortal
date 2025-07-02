@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
 
 const TicketDetail = () => {
   const { ticket_id } = useParams();
@@ -166,34 +167,7 @@ const TicketDetail = () => {
           border: "1px solid #e9ecef"
         }}>
           <div style={{ marginBottom: "24px" }}>
-            <button 
-              onClick={handleGoBack}
-              style={{ 
-                backgroundColor: "#6c757d", 
-                color: "white", 
-                border: "none", 
-                padding: "10px 20px", 
-                borderRadius: "8px", 
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                transition: "all 0.2s ease",
-                boxShadow: "0 2px 4px rgba(108, 117, 125, 0.2)"
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#5a6268";
-                e.target.style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "#6c757d";
-                e.target.style.transform = "translateY(0)";
-              }}
-            >
-              ← Back to Tickets
-            </button>
+            <BackButton />
           </div>
 
           <div style={{ marginBottom: "32px" }}>

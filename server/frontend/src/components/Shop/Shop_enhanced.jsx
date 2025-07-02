@@ -120,7 +120,7 @@ const Shop = () => {
       if (data.status === 200) {
         setCartItems(prev => prev.map(item => 
           item.id === cartItemId 
-            ? { ...item, quantity: newQuantity, total_price: data.cart_item.total_price }
+            ? { ...item, quantity: newQuantity, total_price: isNaN(parseFloat(data.cart_item.total_price)) ? 0 : parseFloat(data.cart_item.total_price) }
             : item
         ));
         // Trigger cart update event
@@ -244,7 +244,10 @@ const Shop = () => {
     setCurrentPage(1);
   };
 
-  const cartTotal = cartItems.reduce((total, item) => total + parseFloat(item.total_price), 0);
+  const cartTotal = cartItems.reduce((total, item) => {
+    const itemTotal = isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price);
+    return total + itemTotal;
+  }, 0);
   const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   if (loading) {
@@ -370,18 +373,24 @@ const Shop = () => {
                           <p className="product-category">{product.category}</p>
                           <div className="product-price">${parseFloat(product.price).toFixed(2)}</div>
                           
-                          {/* Stock Status or Cart Status */}
-                          <div className="product-status">
-                            {!product.is_in_stock ? (
-                              <span className="out-of-stock-badge">Out of Stock</span>
-                            ) : cartQuantity > 0 ? (
-                              <span className="in-cart-badge">
-                                {cartQuantity} in cart
-                              </span>
-                            ) : (
-                              <span className="in-stock-badge">
-                                {product.stock_quantity} available
-                              </span>
+                          {/* Stock Status and Cart Status */}
+                          <div className="product-status-row">
+                            <div className="stock-status">
+                              {!product.is_in_stock ? (
+                                <span className="out-of-stock-badge">Out of Stock</span>
+                              ) : product.stock_quantity <= 5 ? (
+                                <span className="low-stock-badge">Low Stock</span>
+                              ) : (
+                                <span className="in-stock-badge">Available</span>
+                              )}
+                            </div>
+                            
+                            {cartQuantity > 0 && (
+                              <div className="cart-status">
+                                <span className="in-cart-indicator">
+                                  🛒 {cartQuantity}
+                                </span>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -484,7 +493,6 @@ const Shop = () => {
                       <div className="cart-item-info">
                         <h4>{item.product_name}</h4>
                         <p className="cart-item-category">{item.product_category}</p>
-                        <p className="cart-item-price">${parseFloat(item.product_price).toFixed(2)} each</p>
                       </div>
                       
                       <div className="cart-item-controls">
@@ -505,7 +513,7 @@ const Shop = () => {
                         </div>
                         
                         <div className="cart-item-total">
-                          ${parseFloat(item.total_price).toFixed(2)}
+                          ${(isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price)).toFixed(2)}
                         </div>
                         
                         <button 

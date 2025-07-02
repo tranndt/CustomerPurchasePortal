@@ -1,0 +1,127 @@
+/* Back Button Component Styles */
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-bottom: 20px;
+  background: none;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.back-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #495057;
+  border-color: #adb5bd;
+}
+
+.back-button:active {
+  transform: translateY(0);
+}
+
+/* Default variant */
+.back-button-default {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.back-button-default:hover {
+  background-color: #e9ecef;
+  color: #495057;
+  border-color: #adb5bd;
+}
+
+/* Primary variant */
+.back-button-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: 1px solid #007bff;
+}
+
+.back-button-primary:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  color: white;
+  border-color: #0056b3;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Secondary variant */
+.back-button-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.back-button-secondary:hover {
+  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+  color: white;
+  border-color: #495057;
+  box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* Success variant */
+.back-button-success {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.back-button-success:hover {
+  background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+  color: white;
+  border-color: #1e7e34;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+/* Light variant for dark backgrounds */
+.back-button-light {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #343a40;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.back-button-light:hover {
+  background-color: rgba(255, 255, 255, 1);
+  color: #212529;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Minimal variant */
+.back-button-minimal {
+  background: none;
+  color: #007bff;
+  border: none;
+  padding: 8px 12px;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.back-button-minimal:hover {
+  color: #0056b3;
+  text-decoration-color: #0056b3;
+  background-color: rgba(0, 123, 255, 0.05);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .back-button {
+    padding: 8px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+}

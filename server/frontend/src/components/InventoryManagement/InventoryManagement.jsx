@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import BackButton from '../BackButton/BackButton';
 import './InventoryManagement.css';
 
 const InventoryManagement = () => {
@@ -78,6 +79,8 @@ const InventoryManagement = () => {
       <SimpleNav />
       <div className="inventory-management">
         <div className="inventory-container">
+        <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
+        
         {/* Header */}
         <div className="inventory-header">
           <h1 className="inventory-title">Inventory Management</h1>

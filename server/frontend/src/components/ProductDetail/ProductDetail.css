@@ -246,6 +246,15 @@
   width: 60px;
   font-size: 16px;
   font-weight: 500;
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield; /* Standard */
+}
+
+/* Hide spinners in webkit browsers */
+.quantity-input::-webkit-outer-spin-button,
+.quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .quantity-input:focus {

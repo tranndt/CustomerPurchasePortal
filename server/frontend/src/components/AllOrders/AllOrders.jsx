@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
+import { showNotification } from '../Notification/Notification';
 
 const AllOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -17,7 +19,7 @@ const AllOrders = () => {
       if (data.status === 200) {
         setOrders(data.orders);
       } else {
-        alert("Access denied or failed to load orders.");
+        showNotification("Access denied or failed to load orders.", 'error');
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -55,6 +57,8 @@ const AllOrders = () => {
           maxWidth: "1200px", 
           margin: "0 auto"
         }}>
+          <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
+          
           <div style={{
             textAlign: "center",
             marginBottom: "32px",

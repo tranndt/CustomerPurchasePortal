@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import BackButton from '../BackButton/BackButton';
+import { showNotification } from '../Notification/Notification';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -54,12 +56,12 @@ const ProductDetail = () => {
     }
 
     if (!product.is_in_stock) {
-      alert('This product is out of stock');
+      showNotification('This product is out of stock', 'warning');
       return;
     }
 
     if (quantity > product.stock_quantity) {
-      alert(`Only ${product.stock_quantity} items available in stock`);
+      showNotification(`Only ${product.stock_quantity} items available in stock`, 'warning');
       return;
     }
 
@@ -80,14 +82,14 @@ const ProductDetail = () => {
 
       const data = await response.json();
       if (data.status === 200) {
-        alert(`${quantity} item(s) added to cart successfully!`);
+        showNotification(`${quantity} item(s) added to cart successfully!`, 'success');
         // Trigger cart update event for navigation
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Failed to add item to cart');
+        showNotification(data.message || 'Failed to add item to cart', 'error');
       }
     } catch (err) {
-      alert('Error adding item to cart: ' + err.message);
+      showNotification('Error adding item to cart: ' + err.message, 'error');
     } finally {
       setAddingToCart(false);
     }
@@ -130,14 +132,7 @@ const ProductDetail = () => {
     <div>
       <SimpleNav />
       <div className="product-detail-container">
-        {/* Breadcrumb */}
-        <div className="breadcrumb">
-          <button onClick={() => navigate('/shop')} className="breadcrumb-link">
-            Shop
-          </button>
-          <span className="breadcrumb-separator">›</span>
-          <span className="breadcrumb-current">{product.name}</span>
-        </div>
+        <BackButton />
 
         <div className="product-detail-content">
           {/* Product Image */}
@@ -206,6 +201,12 @@ const ProductDetail = () => {
                       value={quantity}
                       onChange={handleQuantityChange}
                       className="quantity-input"
+                      style={{ 
+                        MozAppearance: 'textfield',
+                        WebkitAppearance: 'none',
+                        margin: 0 
+                      }}
+                      onWheel={(e) => e.target.blur()}
                     />
                     <button 
                       onClick={() => setQuantity(Math.min(product.stock_quantity, quantity + 1))}

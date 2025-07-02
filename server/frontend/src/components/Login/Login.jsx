@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showNotification } from '../Notification/Notification';
+import BackButton from '../BackButton/BackButton';
 
 import "./Login.css";
 
@@ -114,10 +116,10 @@ const Login = () => {
           }        
       }
       else {
-        alert("The user could not be authenticated.")
+        showNotification("The user could not be authenticated.", 'error');
       }
     } catch (error) {
-      alert("Login failed. Please try again.");
+      showNotification("Login failed. Please try again.", 'error');
     } finally {
       setLoading(false);
     }
@@ -155,10 +157,10 @@ const Login = () => {
           }        
       }
       else {
-        alert("Demo login failed. This user may not have the default password.");
+        showNotification("Demo login failed. This user may not have the default password.", 'error');
       }
     } catch (error) {
-      alert("Demo login failed. Please try manual login.");
+      showNotification("Demo login failed. Please try manual login.", 'error');
     } finally {
       setLoading(false);
     }
@@ -167,22 +169,7 @@ const Login = () => {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-      {/* Simple navigation breadcrumb */}
-      <div style={{ marginBottom: '20px' }}>
-        <button 
-          onClick={() => navigate('/')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#007bff',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            fontSize: '14px'
-          }}
-        >
-          ← Back to Home
-        </button>
-      </div>
+      <BackButton />
       
       <header style={{ textAlign: 'center', marginBottom: '30px' }}>
         <h1>🛍️ ElectronicsRetail</h1>

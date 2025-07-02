@@ -5,6 +5,7 @@ const SimpleNav = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userFullName, setUserFullName] = useState('');
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     // Function to check authentication state
@@ -12,9 +13,11 @@ const SimpleNav = () => {
       const username = sessionStorage.getItem('username');
       const firstName = sessionStorage.getItem('firstName');
       const lastName = sessionStorage.getItem('lastName');
+      const role = sessionStorage.getItem('userRole');
       
       if (username) {
         setIsLoggedIn(true);
+        setUserRole(role || 'customer');
         // Create full name from first and last name, fallback to username
         if (firstName && lastName) {
           setUserFullName(`${firstName} ${lastName}`);
@@ -26,6 +29,7 @@ const SimpleNav = () => {
       } else {
         setIsLoggedIn(false);
         setUserFullName('');
+        setUserRole('');
       }
     };
 
@@ -34,7 +38,7 @@ const SimpleNav = () => {
 
     // Listen for storage events (when sessionStorage changes in other tabs/windows)
     const handleStorageChange = (e) => {
-      if (e.key === 'username' || e.key === 'firstName' || e.key === 'lastName') {
+      if (e.key === 'username' || e.key === 'firstName' || e.key === 'lastName' || e.key === 'userRole') {
         checkAuthState();
       }
     };
@@ -75,8 +79,7 @@ const SimpleNav = () => {
         // Update state
         setIsLoggedIn(false);
         setUserFullName('');
-        
-        // Redirect to home
+        setUserRole('');
         navigate('/');
       } else {
         console.error('Logout failed');
@@ -94,7 +97,36 @@ const SimpleNav = () => {
       
       setIsLoggedIn(false);
       setUserFullName('');
+      setUserRole('');
       navigate('/');
+    }
+  };
+
+  const getHomeLink = () => {
+    const role = userRole?.toLowerCase();
+    switch (role) {
+      case 'admin':
+      case 'manager':
+        return '/admin/home';
+      case 'support':
+        return '/support/home';
+      case 'customer':
+      default:
+        return '/customer/home';
+    }
+  };
+
+  const getHomeLinkText = () => {
+    const role = userRole?.toLowerCase();
+    switch (role) {
+      case 'admin':
+      case 'manager':
+        return 'Admin Home';
+      case 'support':
+        return 'Support Home';
+      case 'customer':
+      default:
+        return 'Customer Home';
     }
   };
 
@@ -123,6 +155,22 @@ const SimpleNav = () => {
         >
           Store
         </button>
+        {isLoggedIn && (
+          <button 
+            onClick={() => navigate(getHomeLink())}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#007bff', 
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}
+          >
+            {getHomeLinkText()}
+          </button>
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {isLoggedIn ? (

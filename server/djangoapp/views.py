@@ -119,6 +119,8 @@ def get_customer_orders(request):
             "quantity": order.quantity,
             "total_amount": str(order.total_amount),
             "date_purchased": order.date_purchased,
+            "product_image": order.product.image_url,
+            "product_id": order.product.id,
         } for order in orders
     ]
     return JsonResponse({"status": 200, "orders": results})
@@ -346,6 +348,8 @@ def get_customer_reviews(request):
             'rating': r.rating,
             'review_text': r.review_text,
             'created_on': r.created_on,
+            'product_image': r.product.image_url,
+            'product_id': r.product.id,
         }
         for r in reviews
     ]

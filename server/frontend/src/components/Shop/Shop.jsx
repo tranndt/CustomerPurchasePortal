@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import { showNotification } from '../Notification/Notification';
 import './Shop.css';
 
 const Shop = () => {
@@ -13,15 +14,17 @@ const Shop = () => {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [addingToCart, setAddingToCart] = useState({});
   const [activeTab, setActiveTab] = useState('browse');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   const products_url = "http://localhost:8000/djangoapp/api/products";
   const categories_url = "http://localhost:8000/djangoapp/api/products/categories";
   const cart_url = "http://localhost:8000/djangoapp/api/cart";
-  const cart_add_url = "http://localhost:8000/djangoapp/api/cart/add";
   const cart_update_url = "http://localhost:8000/djangoapp/api/cart/update";
   const cart_remove_url = "http://localhost:8000/djangoapp/api/cart/remove";
   const checkout_url = "http://localhost:8000/djangoapp/api/cart/checkout";
@@ -47,7 +50,17 @@ const Shop = () => {
       });
       const data = await response.json();
       if (data.status === 200) {
-        setCartItems(data.cart_items);
+        // Normalize cart items data structure
+        const normalizedCartItems = data.cart_items.map(item => ({
+          ...item,
+          // Ensure backward compatibility with both data structures
+          product_id: item.product ? item.product.id : item.product_id,
+          product_name: item.product ? item.product.name : item.product_name,
+          product_category: item.product ? item.product.category : item.product_category,
+          product_price: item.product ? item.product.price : item.product_price,
+          product_image: item.product ? item.product.image_url : item.product_image,
+        }));
+        setCartItems(normalizedCartItems);
       }
     } catch (err) {
       console.error('Error loading cart:', err);
@@ -95,49 +108,6 @@ const Shop = () => {
     }
   };
 
-  const handleAddToCart = async (productId, quantity = 1) => {
-    if (!isLoggedIn) {
-      // Redirect to login for guests
-      const confirmLogin = window.confirm(
-        'You need to log in to add items to your cart. Would you like to log in now?'
-      );
-      if (confirmLogin) {
-        navigate('/login');
-      }
-      return;
-    }
-
-    setAddingToCart(prev => ({ ...prev, [productId]: true }));
-
-    try {
-      const response = await fetch(cart_add_url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          product_id: productId,
-          quantity: quantity
-        })
-      });
-
-      const data = await response.json();
-      if (data.status === 200) {
-        alert('Item added to cart successfully!');
-        fetchCart(); // Refresh cart
-        // Trigger cart update event for navigation
-        window.dispatchEvent(new CustomEvent('cartUpdated'));
-      } else {
-        alert(data.message || 'Failed to add item to cart');
-      }
-    } catch (err) {
-      alert('Error adding item to cart: ' + err.message);
-    } finally {
-      setAddingToCart(prev => ({ ...prev, [productId]: false }));
-    }
-  };
-
   const updateCartQuantity = async (cartItemId, newQuantity) => {
     if (newQuantity < 1) {
       removeCartItem(cartItemId);
@@ -161,16 +131,16 @@ const Shop = () => {
       if (data.status === 200) {
         setCartItems(prev => prev.map(item => 
           item.id === cartItemId 
-            ? { ...item, quantity: newQuantity, total_price: data.cart_item.total_price }
+            ? { ...item, quantity: newQuantity, total_price: isNaN(parseFloat(data.cart_item.total_price)) ? 0 : parseFloat(data.cart_item.total_price) }
             : item
         ));
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Failed to update item');
+        showNotification(data.message || 'Failed to update item', 'error');
       }
     } catch (err) {
-      alert('Error updating item: ' + err.message);
+      showNotification('Error updating item: ' + err.message, 'error');
     }
   };
 
@@ -193,10 +163,10 @@ const Shop = () => {
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Failed to remove item');
+        showNotification(data.message || 'Failed to remove item', 'error');
       }
     } catch (err) {
-      alert('Error removing item: ' + err.message);
+      showNotification('Error removing item: ' + err.message, 'error');
     }
   };
 
@@ -207,7 +177,7 @@ const Shop = () => {
     }
 
     if (cartItems.length === 0) {
-      alert('Your cart is empty');
+      showNotification('Your cart is empty', 'warning');
       return;
     }
 
@@ -228,29 +198,69 @@ const Shop = () => {
 
       const data = await response.json();
       if (data.status === 200) {
-        alert('Order placed successfully!');
+        showNotification('Order placed successfully!', 'success');
         setCartItems([]);
         setActiveTab('browse');
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Checkout failed');
+        showNotification(data.message || 'Checkout failed', 'error');
       }
     } catch (err) {
-      alert('Error during checkout: ' + err.message);
+      showNotification('Error during checkout: ' + err.message, 'error');
     }
   };
 
+  // Get cart quantity for a specific product
+  const getCartQuantity = (productId) => {
+    const cartItem = cartItems.find(item => 
+      (item.product ? item.product.id : item.product_id) === productId
+    );
+    return cartItem ? cartItem.quantity : 0;
+  };
+
+  // Handle product card click
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
+  // Filter and paginate products
   const filteredProducts = products.filter(product => {
     const matchesCategory = !selectedCategory || product.category === selectedCategory;
     const matchesSearch = !searchTerm || 
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    // Show all products regardless of stock status - let users see what's available
     return matchesCategory && matchesSearch;
   });
 
-  const cartTotal = cartItems.reduce((total, item) => total + parseFloat(item.total_price), 0);
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handle category change - reset to page 1
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
+
+  // Handle search change - reset to page 1
+  const handleSearchChange = (search) => {
+    setSearchTerm(search);
+    setCurrentPage(1);
+  };
+
+  const cartTotal = cartItems.reduce((total, item) => {
+    const itemTotal = isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price);
+    return total + itemTotal;
+  }, 0);
   const cartCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   if (loading) {
@@ -309,76 +319,154 @@ const Shop = () => {
         {/* Browse Tab */}
         {activeTab === 'browse' && (
           <div className="browse-section">
-            {/* Filters */}
-            <div className="filters-section">
-              <div className="filter-group">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
+            <div className="browse-layout">
+              {/* Left Panel - Category Filter */}
+              <div className="category-panel">
+                <h3 className="category-panel-title">Categories</h3>
+                <div className="category-list">
+                  <button
+                    className={`category-item ${selectedCategory === '' ? 'active' : ''}`}
+                    onClick={() => handleCategoryChange('')}
+                  >
+                    All Categories ({products.length})
+                  </button>
+                  {categories.map(category => {
+                    const categoryCount = products.filter(p => p.category === category).length;
+                    return (
+                      <button
+                        key={category}
+                        className={`category-item ${selectedCategory === category ? 'active' : ''}`}
+                        onClick={() => handleCategoryChange(category)}
+                      >
+                        {category} ({categoryCount})
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="filter-group">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="category-select"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="filter-info">
-                Showing {filteredProducts.length} products
-              </div>
-            </div>
 
-            {/* Products Grid */}
-            <div className="products-grid">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="product-card">
-                  {product.image_url && (
-                    <img 
-                      src={product.image_url} 
-                      alt={product.name}
-                      className="product-image"
+              {/* Main Content */}
+              <div className="main-content">
+                {/* Search and Info */}
+                <div className="top-controls">
+                  <div className="search-section">
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="search-input"
                     />
-                  )}
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-category">{product.category}</p>
-                    <p className="product-description">{product.description}</p>
-                    <div className="product-price">${parseFloat(product.price).toFixed(2)}</div>
-                    <div className="product-stock">
-                      {product.is_in_stock ? 
-                        `${product.stock_quantity} in stock` : 
-                        'Out of stock'
-                      }
-                    </div>
-                    <button
-                      onClick={() => handleAddToCart(product.id, 1)}
-                      disabled={!product.is_in_stock || addingToCart[product.id]}
-                      className={`add-to-cart-btn ${!product.is_in_stock ? 'disabled' : ''}`}
-                    >
-                      {addingToCart[product.id] ? 'Adding...' : 
-                       !product.is_in_stock ? 'Out of Stock' :
-                       isLoggedIn ? 'Add to Cart' : 'Login to Purchase'}
-                    </button>
+                  </div>
+                  <div className="results-info">
+                    Showing {currentProducts.length} of {filteredProducts.length} products
+                    {currentPage > 1 && ` (Page ${currentPage} of ${totalPages})`}
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {filteredProducts.length === 0 && (
-              <div className="no-products">
-                <h3>No products found</h3>
-                <p>Try adjusting your search or category filter.</p>
+                {/* Products Grid */}
+                <div className="products-grid">
+                  {currentProducts.map(product => {
+                    const cartQuantity = getCartQuantity(product.id);
+                    return (
+                      <div 
+                        key={product.id} 
+                        className="product-card clickable"
+                        onClick={() => handleProductClick(product.id)}
+                      >
+                        {product.image_url && (
+                          <img 
+                            src={product.image_url} 
+                            alt={product.name}
+                            className="product-image"
+                          />
+                        )}
+                        <div className="product-info">
+                          <h3 className="product-name">{product.name}</h3>
+                          <p className="product-category">{product.category}</p>
+                          <div className="product-price">${parseFloat(product.price).toFixed(2)}</div>
+                          
+                          {/* Stock Status and Cart Status */}
+                          <div className="product-status-row">
+                            <div className="stock-status">
+                              {!product.is_in_stock ? (
+                                <span className="out-of-stock-badge">Out of Stock</span>
+                              ) : product.stock_quantity <= 5 ? (
+                                <span className="low-stock-badge">Low Stock</span>
+                              ) : (
+                                <span className="in-stock-badge">Available</span>
+                              )}
+                            </div>
+                            
+                            {cartQuantity > 0 && (
+                              <div className="cart-status">
+                                <span className="in-cart-indicator">
+                                  🛒 {cartQuantity}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="pagination-btn"
+                    >
+                      Previous
+                    </button>
+                    
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const pageNumber = index + 1;
+                      // Show first page, last page, current page, and 2 pages around current
+                      const showPage = pageNumber === 1 || 
+                                      pageNumber === totalPages || 
+                                      Math.abs(pageNumber - currentPage) <= 2;
+                      
+                      if (!showPage) {
+                        // Show ellipsis for gaps
+                        if (pageNumber === currentPage - 3 || pageNumber === currentPage + 3) {
+                          return <span key={pageNumber} className="pagination-ellipsis">...</span>;
+                        }
+                        return null;
+                      }
+                      
+                      return (
+                        <button
+                          key={pageNumber}
+                          onClick={() => handlePageChange(pageNumber)}
+                          className={`pagination-btn ${currentPage === pageNumber ? 'active' : ''}`}
+                        >
+                          {pageNumber}
+                        </button>
+                      );
+                    })}
+                    
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="pagination-btn"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+
+                {filteredProducts.length === 0 && (
+                  <div className="no-products">
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or category filter.</p>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -415,10 +503,32 @@ const Shop = () => {
                 <div className="cart-items">
                   {cartItems.map(item => (
                     <div key={item.id} className="cart-item">
+                      {/* Product Image */}
+                      <div className="cart-item-image">
+                        <img 
+                          src={(item.product ? item.product.image_url : item.product_image) || 'https://via.placeholder.com/80x80/f8f9fa/6c757d?text=No+Image'} 
+                          alt={item.product ? item.product.name : item.product_name}
+                          style={{
+                            width: "80px",
+                            height: "80px",
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            border: "1px solid #e9ecef",
+                            flexShrink: 0
+                          }}
+                        />
+                      </div>
+
                       <div className="cart-item-info">
-                        <h4>{item.product_name}</h4>
-                        <p className="cart-item-category">{item.product_category}</p>
-                        <p className="cart-item-price">${parseFloat(item.product_price).toFixed(2)} each</p>
+                        <h4>{item.product ? item.product.name : item.product_name}</h4>
+                        <p className="cart-item-category">{item.product ? item.product.category : item.product_category}</p>
+                        <p className="cart-item-price">
+                          ${(() => {
+                            const price = item.product ? item.product.price : item.product_price;
+                            const parsedPrice = isNaN(parseFloat(price)) ? 0 : parseFloat(price);
+                            return parsedPrice.toFixed(2);
+                          })()} each
+                        </p>
                       </div>
                       
                       <div className="cart-item-controls">
@@ -439,7 +549,7 @@ const Shop = () => {
                         </div>
                         
                         <div className="cart-item-total">
-                          ${parseFloat(item.total_price).toFixed(2)}
+                          ${(isNaN(parseFloat(item.total_price)) ? 0 : parseFloat(item.total_price)).toFixed(2)}
                         </div>
                         
                         <button 

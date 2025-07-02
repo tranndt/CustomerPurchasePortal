@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import BackButton from '../BackButton/BackButton';
 import './OrderFulfillment.css';
 
 const OrderFulfillment = () => {
@@ -267,6 +268,8 @@ const OrderFulfillment = () => {
       <SimpleNav />
       <div className="order-fulfillment">
         <div className="order-fulfillment-container">
+        <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
+        
         {/* Header */}
         <div className="order-fulfillment-header">
           <h1 className="order-fulfillment-title">Order Fulfillment & Management</h1>

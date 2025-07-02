@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
+import BackButton from "../BackButton/BackButton";
+import { showNotification } from '../Notification/Notification';
 
 const ProductReview = () => {
   const { transaction_id } = useParams();
@@ -32,7 +34,7 @@ const ProductReview = () => {
 
   const submitReview = async () => {
     if (!productId) {
-      alert("Product not found for this order.");
+      showNotification("Product not found for this order.", 'error');
       return;
     }
     const response = await fetch("http://localhost:8000/djangoapp/api/customer/review", {
@@ -48,10 +50,10 @@ const ProductReview = () => {
 
     const result = await response.json();
     if (result.status === 200) {
-      alert("Review submitted!");
+      showNotification("Review submitted!", 'success');
       navigate("/customer/orders");
     } else {
-      alert("Failed to submit review: " + (result.message || result.error || "Unknown error"));
+      showNotification("Failed to submit review: " + (result.message || result.error || "Unknown error"), 'error');
     }
   };
 
@@ -67,6 +69,8 @@ const ProductReview = () => {
           maxWidth: "800px", 
           margin: "0 auto"
         }}>
+          <BackButton to="/customer/orders" label="← Back to My Orders" variant="primary" />
+          
           <div style={{
             textAlign: "center",
             marginBottom: "32px",
