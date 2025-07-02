@@ -19,6 +19,7 @@ import MyTickets from './components/MyTickets/MyTickets';
 import AllReviews from './components/AllReviews/AllReviews';
 import Products from './components/Products/Products';
 import Cart from './components/Cart/Cart';
+import OrderFulfillment from './components/OrderFulfillment/OrderFulfillment';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
       <Route path="/customer/reviews/:transaction_id" element={<ProtectedRoute><ProductReview /></ProtectedRoute>} />
       <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
       <Route path="/admin/orders" element={<ProtectedRoute><AllOrders /></ProtectedRoute>} />
+      <Route path="/admin/fulfillment" element={<ProtectedRoute><OrderFulfillment /></ProtectedRoute>} />
       <Route path="/admin/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
       <Route path="/admin/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
       <Route path="/admin/reviews" element={<ProtectedRoute><AllReviews /></ProtectedRoute>} />

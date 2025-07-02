@@ -698,7 +698,7 @@ def cart_checkout(request):
             transaction_id = f"TXN{datetime.now().strftime('%Y%m%d%H%M%S')}{request.user.id}"
             orders_created = []
             
-            # Create orders and update stock
+            # Create orders with pending status - don't update stock until approved
             for item in cart_items:
                 order = Order.objects.create(
                     customer=request.user,
@@ -706,18 +706,18 @@ def cart_checkout(request):
                     quantity=item.quantity,
                     date_purchased=datetime.now().date(),
                     transaction_id=transaction_id,
-                    total_amount=item.total_price
+                    total_amount=item.total_price,
+                    status='pending'  # Orders start as pending for manager approval
                 )
                 
-                # Update stock quantity
-                item.product.stock_quantity -= item.quantity
-                item.product.save()
+                # Don't update stock quantity here - wait for manager approval
                 
                 orders_created.append({
                     "id": order.id,
                     "product_name": item.product.name,
                     "quantity": item.quantity,
-                    "total_amount": float(order.total_amount)
+                    "total_amount": float(order.total_amount),
+                    "status": order.status
                 })
             
             # Clear cart
@@ -725,7 +725,7 @@ def cart_checkout(request):
             
             return JsonResponse({
                 "status": 200, 
-                "message": "Purchase completed successfully",
+                "message": "Order submitted successfully and is pending approval",
                 "transaction_id": transaction_id,
                 "orders": orders_created
             })
@@ -733,3 +733,203 @@ def cart_checkout(request):
             return JsonResponse({"status": 500, "message": str(e)})
     else:
         return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+# Order Fulfillment Management Views
+@require_GET
+def get_pending_orders(request):
+    """Get all pending orders for manager review"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    # Check if user has manager/admin role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+    
+    try:
+        pending_orders = Order.objects.filter(status='pending').select_related('customer', 'product').order_by('-date_purchased')
+        orders_data = []
+        
+        for order in pending_orders:
+            orders_data.append({
+                "id": order.id,
+                "transaction_id": order.transaction_id,
+                "customer_name": f"{order.customer.first_name} {order.customer.last_name}".strip() or order.customer.username,
+                "customer_username": order.customer.username,
+                "product_name": order.product.name,
+                "product_category": order.product.category,
+                "quantity": order.quantity,
+                "unit_price": float(order.product.price),
+                "total_amount": float(order.total_amount),
+                "date_purchased": order.date_purchased.isoformat(),
+                "status": order.status,
+                "stock_available": order.product.stock_quantity,
+                "notes": order.notes
+            })
+        
+        return JsonResponse({"status": 200, "orders": orders_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@require_GET
+def get_all_orders_for_management(request):
+    """Get all orders for management overview"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    # Check if user has manager/admin role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+    
+    try:
+        orders = Order.objects.all().select_related('customer', 'product', 'processed_by').order_by('-date_purchased')
+        orders_data = []
+        
+        for order in orders:
+            orders_data.append({
+                "id": order.id,
+                "transaction_id": order.transaction_id,
+                "customer_name": f"{order.customer.first_name} {order.customer.last_name}".strip() or order.customer.username,
+                "customer_username": order.customer.username,
+                "product_name": order.product.name,
+                "product_category": order.product.category,
+                "quantity": order.quantity,
+                "unit_price": float(order.product.price),
+                "total_amount": float(order.total_amount),
+                "date_purchased": order.date_purchased.isoformat(),
+                "status": order.status,
+                "processed_by": order.processed_by.username if order.processed_by else None,
+                "processed_at": order.processed_at.isoformat() if order.processed_at else None,
+                "notes": order.notes
+            })
+        
+        return JsonResponse({"status": 200, "orders": orders_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})
+
+@csrf_exempt
+def process_order(request):
+    """Approve or reject an order"""
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": 401, "message": "Authentication required"})
+        
+        # Check if user has manager/admin role
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+            if profile.role not in ['admin', 'manager']:
+                return JsonResponse({"status": 403, "message": "Access denied"})
+        except UserProfile.DoesNotExist:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+        
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            action = data.get('action')  # 'approve' or 'reject'
+            notes = data.get('notes', '')
+            
+            if action not in ['approve', 'reject']:
+                return JsonResponse({"status": 400, "message": "Invalid action"})
+            
+            try:
+                order = Order.objects.get(id=order_id, status='pending')
+            except Order.DoesNotExist:
+                return JsonResponse({"status": 404, "message": "Order not found or already processed"})
+            
+            if action == 'approve':
+                # Check if enough stock is available
+                if order.quantity > order.product.stock_quantity:
+                    return JsonResponse({
+                        "status": 400, 
+                        "message": f"Insufficient stock. Only {order.product.stock_quantity} items available"
+                    })
+                
+                # Update stock quantity
+                order.product.stock_quantity -= order.quantity
+                order.product.save()
+                
+                # Update order status
+                order.status = 'approved'
+                order.processed_by = request.user
+                order.processed_at = datetime.now()
+                order.notes = notes
+                order.save()
+                
+                message = f"Order {order.transaction_id} approved successfully"
+            
+            else:  # reject
+                order.status = 'rejected'
+                order.processed_by = request.user
+                order.processed_at = datetime.now()
+                order.notes = notes
+                order.save()
+                
+                message = f"Order {order.transaction_id} rejected"
+            
+            return JsonResponse({
+                "status": 200, 
+                "message": message,
+                "order": {
+                    "id": order.id,
+                    "status": order.status,
+                    "processed_by": order.processed_by.username,
+                    "processed_at": order.processed_at.isoformat()
+                }
+            })
+        except Exception as e:
+            return JsonResponse({"status": 500, "message": str(e)})
+    else:
+        return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+@require_GET
+def get_inventory_overview(request):
+    """Get inventory overview for management"""
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": 401, "message": "Authentication required"})
+    
+    # Check if user has manager/admin role
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        if profile.role not in ['admin', 'manager']:
+            return JsonResponse({"status": 403, "message": "Access denied"})
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"status": 403, "message": "Access denied"})
+    
+    try:
+        products = Product.objects.filter(is_active=True).order_by('name')
+        inventory_data = []
+        
+        # Calculate pending orders for each product
+        from django.db.models import Sum
+        
+        for product in products:
+            pending_quantity = Order.objects.filter(
+                product=product, 
+                status='pending'
+            ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+            
+            available_after_pending = product.stock_quantity - pending_quantity
+            
+            inventory_data.append({
+                "id": product.id,
+                "name": product.name,
+                "category": product.category,
+                "price": float(product.price),
+                "current_stock": product.stock_quantity,
+                "pending_orders": pending_quantity,
+                "available_after_pending": available_after_pending,
+                "is_low_stock": product.stock_quantity <= 10,
+                "is_out_of_stock": product.stock_quantity == 0,
+                "created_at": product.created_at.isoformat()
+            })
+        
+        return JsonResponse({"status": 200, "inventory": inventory_data})
+    except Exception as e:
+        return JsonResponse({"status": 500, "message": str(e)})

@@ -48,6 +48,12 @@ urlpatterns = [
     path("api/cart/update", views.cart_update_item, name='cart_update'),
     path("api/cart/remove", views.cart_remove_item, name='cart_remove'),
     path("api/cart/checkout", views.cart_checkout, name='cart_checkout'),
+    
+    # Order Fulfillment & Inventory Management endpoints (Manager/Admin only)
+    path("api/manager/orders/pending", views.get_pending_orders, name='get_pending_orders'),
+    path("api/manager/orders/all", views.get_all_orders_for_management, name='get_all_orders_management'),
+    path("api/manager/orders/process", views.process_order, name='process_order'),
+    path("api/manager/inventory", views.get_inventory_overview, name='get_inventory'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

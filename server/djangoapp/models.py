@@ -34,15 +34,27 @@ class Product(models.Model):
         return f"{self.name} - {self.category}"
 
 class Order(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'), 
+        ('rejected', 'Rejected'),
+        ('fulfilled', 'Fulfilled'),
+        ('cancelled', 'Cancelled')
+    ]
+    
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     date_purchased = models.DateField()
     transaction_id = models.CharField(max_length=100)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    processed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='processed_orders')
+    processed_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Order {self.transaction_id} by {self.customer.username}"
+        return f"Order {self.transaction_id} by {self.customer.username} - {self.status}"
 
 class CartItem(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
