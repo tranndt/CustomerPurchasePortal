@@ -1,5 +1,0 @@
-flask
-nltk
-requests
-python-dotenv
-vadersentiment

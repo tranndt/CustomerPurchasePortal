@@ -112,6 +112,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+djangoenv/
 
 # Spyder project settings
 .spyderproject
@@ -130,3 +131,47 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Documentation backup
+docs_backup/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# API keys and secrets
+apikey.json
+*.key
+*.pem
+.env.local
+.env.production
+
+# Docker
+.dockerignore
+
+# Database files
+*.sqlite3
+*.db
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Deprecated directories
+sentiment_service/

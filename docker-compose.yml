@@ -30,5 +30,12 @@ services:
       - backend_url=http://express:3030
       - sentiment_analyzer_url=http://flask:5002/
 
+  frontend:
+    build: ./server/frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - django
+
 volumes:
   mongodata:
