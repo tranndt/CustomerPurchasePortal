@@ -1,0 +1,198 @@
+/* SimpleNav Component Styles - Using Design System */
+
+.simple-nav {
+  padding: 12px 36px;
+  background-color: white;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  height: 70px;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.simple-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.company-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #a855f7 0%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+}
+
+.company-name::after {
+  content: '™';
+  font-size: 0.7em;
+  position: relative;
+  top: -0.5em;
+  margin-left: 1px;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  padding: 10px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.nav-link.shop {
+  color: #a259ec; /* Shop purple */
+}
+
+.nav-link.shop:hover {
+  background-color: rgba(162, 89, 236, 0.1);
+}
+
+.nav-link.home {
+  color: #a259ec; /* Orders blue */
+}
+
+.nav-link.home:hover {
+  background-color: rgba(162, 89, 236, 0.1);
+}
+
+.simple-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: #64748b; /* Tailwind slate-500 */
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-name {
+  font-weight: 600;
+  color: #334155; /* Tailwind slate-700 */
+  margin: 0 4px;
+}
+
+.nav-button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-all);
+  font-size: 14px;
+}
+
+.nav-button.login {
+  background: linear-gradient(135deg, #3b82f6, #1e40af); /* Orders blue gradient */
+  color: white;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.2);
+}
+
+.nav-button.login:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(30, 64, 175, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e3a8a); /* Slightly darker on hover */
+}
+
+.nav-button.register {
+  background: linear-gradient(135deg, #22c55e, #166534); /* Feedback green gradient */
+  color: white;
+  box-shadow: 0 2px 4px rgba(22, 101, 52, 0.2);
+}
+
+.nav-button.register:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(22, 101, 52, 0.3);
+  background: linear-gradient(135deg, #16a34a, #14532d); /* Slightly darker on hover */
+}
+
+.nav-button.logout {
+  background: linear-gradient(135deg, #ef4444, #b91c1c); /* Red gradient */
+  color: white;
+  box-shadow: 0 2px 4px rgba(185, 28, 28, 0.2);
+}
+
+.nav-button.logout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(185, 28, 28, 0.3);
+  background: linear-gradient(135deg, #dc2626, #991b1b); /* Slightly darker on hover */
+}
+
+/* User Role Badge */
+.user-role {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  text-transform: uppercase;
+}
+
+.admin-role {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626; /* Red-600 */
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.support-role {
+  background-color: rgba(245, 158, 11, 0.15); 
+  color: #d97706; /* Amber-600 */
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.customer-role {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Global utility class for pages using SimpleNav */
+.page-with-nav {
+  padding-top: 70px; /* Match navbar height */
+}
+
+/* Ensure body content doesn't get hidden behind fixed nav */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Alternative: Use this class on main content containers */
+.content-below-nav {
+  margin-top: 80; /* Match navbar height */
+}
+
+/* Main page container that should account for fixed navbar */
+.main-page-container {
+  padding-top: 80px; /* Match navbar height */
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Fix for content containers that come after SimpleNav */
+.simple-nav ~ div {
+  padding-top: 80px;
+}

@@ -1,0 +1,177 @@
+/* MyTickets Component Styles - Using Design System */
+
+/* Support Ticket specific accent colors */
+:root {
+  --ticket-light: #ffc107;
+  --ticket-dark: #b45309;
+  --ticket-gradient: linear-gradient(135deg, var(--ticket-light), var(--ticket-dark));
+  --ticket-shadow: rgba(180, 83, 9, 0.25);
+}
+
+.ticket-page-container {
+  padding: 24px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.ticket-page-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ticket-page-header {
+  text-align: center;
+  margin-bottom: 32px;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e9ecef;
+}
+
+.ticket-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  background: var(--ticket-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-page-subtitle {
+  color: #6c757d;
+  font-size: 16px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.ticket-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px var(--ticket-shadow);
+  border-color: var(--ticket-light);
+}
+
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.ticket-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.ticket-meta {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.ticket-status {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.ticket-content {
+  margin-bottom: 16px;
+}
+
+.ticket-content p {
+  margin: 0;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+.ticket-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ticket-button {
+  background: var(--ticket-gradient);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px var(--ticket-shadow);
+}
+
+.ticket-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px var(--ticket-shadow);
+}
+
+.ticket-button.secondary {
+  background: white;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
+  box-shadow: none;
+}
+
+.ticket-button.secondary:hover {
+  background: #f8f9fa;
+}
+
+.create-ticket-button {
+  background: var(--ticket-gradient);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin: 24px auto;
+  display: block;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px var(--ticket-shadow);
+}
+
+.create-ticket-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px var(--ticket-shadow);
+}
+
+.no-tickets {
+  text-align: center;
+  padding: 48px 24px;
+  background: white;
+  border-radius: 16px;
+  margin-top: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e9ecef;
+}
+
+.no-tickets h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.no-tickets p {
+  color: #6c757d;
+  margin: 0 0 24px 0;
+}

@@ -4,13 +4,12 @@ import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
 import '../../styles/global.css';
+import './MyReviews.css';
 
 const MyReviews = () => {
-  const [activeTab, setActiveTab] = useState('write'); // 'write' or 'all'
+  const [activeTab, setActiveTab] = useState('write'); // 'write' or 'myReviews'
   const [reviews, setReviews] = useState([]);
-  const [allReviews, setAllReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadingAll, setLoadingAll] = useState(true);
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(5);
   const [canSubmit, setCanSubmit] = useState(true);
@@ -45,19 +44,7 @@ const MyReviews = () => {
         setLoading(false);
       });
       
-    // Fetch all public reviews
-    fetch(`http://localhost:8000/djangoapp/api/reviews/public`, {
-      credentials: 'include',
-    })
-      .then(res => res.json())
-      .then(data => {
-        setAllReviews(data.reviews || []);
-        setLoadingAll(false);
-      })
-      .catch((error) => {
-        console.error('All reviews fetch error:', error);
-        setLoadingAll(false);
-      });
+    // No longer fetching all public reviews
   }, [navigate]);
 
   const submitReview = async () => {
@@ -115,13 +102,12 @@ const MyReviews = () => {
   };
 
   const renderRatingStars = () => (
-    <div className="rating-input">
+    <div className="rating-select">
       {[...Array(5)].map((_, i) => (
         <span 
           key={i} 
-          className={`rating-star ${i < rating ? 'filled' : 'empty'}`}
+          className={`rating-star ${i < rating ? 'filled' : ''}`}
           onClick={() => handleRatingChange(i + 1)}
-          style={{ cursor: 'pointer', fontSize: '28px' }}
         >
           ★
         </span>
@@ -130,7 +116,7 @@ const MyReviews = () => {
   );
 
   const renderWriteReviewTab = () => (
-    <div style={{ padding: "24px", backgroundColor: "white", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)" }}>
+    <div className="review-form">
       {canSubmit ? (
         <div>
           <h3 style={{ marginBottom: "20px", color: "#2c3e50" }}>Share Your Shopping Experience</h3>
@@ -161,25 +147,14 @@ const MyReviews = () => {
           <button
             onClick={submitReview}
             disabled={loading || !canSubmit}
-            style={{
-              backgroundColor: "#667eea",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              padding: "12px 24px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-              opacity: loading || !canSubmit ? "0.7" : "1"
-            }}
+            className="submit-button"
           >
             {loading ? "Submitting..." : "Submit Feedback"}
           </button>
         </div>
       ) : (
         <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <div style={{ fontSize: "48px", marginBottom: "20px" }}>✅</div>
+          <div style={{ fontSize: "36px", marginBottom: "20px" }}>✅</div>
           <h3 style={{ color: "#2c3e50", marginBottom: "12px" }}>Thank you for your feedback!</h3>
           <p style={{ color: "#6c757d", margin: "0 0 20px 0" }}>You have already submitted a review today. You can leave another review tomorrow.</p>
         </div>
@@ -222,32 +197,24 @@ const MyReviews = () => {
           <p style={{ color: "#adb5bd", margin: "0", fontSize: "16px" }}>You have not submitted any feedback yet.</p>
         </div>
       ) : (
-        <div className="product-cards-grid">
+        <div className="my-reviews-list">
           {reviews.map((review) => (
-            <div key={review.id} className="product-card-shared">
-              <div className="product-card-content">
-                <div className="product-details" style={{ width: "100%" }}>
-                  <div className="rating-display" style={{ marginBottom: "15px" }}>
-                    <span className="product-info-label">Rating:</span>
-                    <div className="rating-stars">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className={`rating-star ${i < review.rating ? '' : 'empty'}`}>★</span>
-                      ))}
-                    </div>
+            <div key={review.id} className="my-review-card">
+              <div className="my-review-content">
+                <div className="my-review-header">
+                  <span className="my-review-rating-label">Rating:</span>
+                  <div className="my-review-stars">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className={`rating-star ${i < review.rating ? 'filled' : ''}`}>★</span>
+                    ))}
                   </div>
-                  <div className="product-info-grid">
-                    <div className="product-info-item">
-                      <span className="product-info-label">Submitted on:</span>
-                      <span className="product-info-value">{new Date(review.created_on).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  
-                  {review.review_text && (
-                    <div className="review-text">
-                      {review.review_text}
-                    </div>
-                  )}
+                  <span className="my-review-date">{new Date(review.created_on).toLocaleDateString()}</span>
                 </div>
+                {review.review_text && (
+                  <div className="my-review-text">
+                    {review.review_text}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -256,187 +223,41 @@ const MyReviews = () => {
     </div>
   );
 
-  const renderAllReviewsTab = () => (
-    <div>
-      {loadingAll ? (
-        <div style={{ 
-          textAlign: "center", 
-          padding: "80px 20px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)"
-        }}>
-          <div style={{
-            width: "48px",
-            height: "48px",
-            border: "4px solid #f3f3f3",
-            borderTop: "4px solid #667eea",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-            margin: "0 auto 20px"
-          }}></div>
-          <p style={{ color: "#6c757d", margin: "0", fontSize: "16px" }}>Loading all reviews...</p>
-        </div>
-      ) : allReviews.length === 0 ? (
-        <div style={{ 
-          textAlign: "center", 
-          padding: "80px 20px",
-          backgroundColor: "white",
-          borderRadius: "12px",
-          border: "2px dashed #dee2e6",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)"
-        }}>
-          <div style={{ fontSize: "64px", marginBottom: "20px" }}>⭐</div>
-          <h3 style={{ color: "#6c757d", marginBottom: "12px", fontSize: "24px" }}>No reviews found</h3>
-          <p style={{ color: "#adb5bd", margin: "0", fontSize: "16px" }}>Be the first to leave a review!</p>
-        </div>
-      ) : (
-        <div className="product-cards-grid">
-          {allReviews.map((review) => (
-            <div key={review.id} className="product-card-shared">
-              <div className="product-card-content">
-                <div className="product-details" style={{ width: "100%" }}>
-                  <h4 className="product-title" style={{ color: "#495057", marginBottom: "10px" }}>
-                    {review.customer_name || "Anonymous Customer"}
-                  </h4>
-                  <div className="rating-display" style={{ marginBottom: "15px" }}>
-                    <div className="rating-stars">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className={`rating-star ${i < review.rating ? '' : 'empty'}`}>★</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="product-info-grid">
-                    <div className="product-info-item">
-                      <span className="product-info-label">Submitted on:</span>
-                      <span className="product-info-value">{new Date(review.created_on).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  
-                  {review.review_text && (
-                    <div className="review-text">
-                      {review.review_text}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  // Removed renderAllReviewsTab
 
   return (
     <div>
       <SimpleNav />
-      <div style={{ 
-        padding: "24px", 
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh"
-      }}>
-        <div style={{ 
-          maxWidth: "1000px", 
-          margin: "0 auto"
-        }}>
+      <div className="review-page-container">
+        <div className="review-page-content">
           <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
           
-          <div style={{
-            textAlign: "center",
-            marginBottom: "32px",
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: "32px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-            border: "1px solid #e9ecef"
-          }}>
-            <h1 style={{ 
-              fontSize: "32px", 
-              fontWeight: "700", 
-              color: "#2c3e50", 
-              margin: "0 0 12px 0",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }}>
-              ⭐ Shopping Experience Feedback
+          <div className="review-page-header">
+            <h1 className="review-page-title">
+              Shopping Experience Feedback
             </h1>
-            <p style={{ 
-              color: "#6c757d", 
-              fontSize: "16px", 
-              margin: "0",
-              fontWeight: "400"
-            }}>
+            <p className="review-page-subtitle">
               Share your thoughts about your shopping experience
             </p>
           </div>
 
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
-            marginBottom: "24px" 
-          }}>
-            <button
+          <div className="review-tabs">
+            <div 
+              className={`review-tab ${activeTab === 'write' ? 'active' : ''}`}
               onClick={() => setActiveTab('write')}
-              style={{
-                flex: "1",
-                marginRight: "12px",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "none",
-                backgroundColor: activeTab === 'write' ? "#667eea" : "#f8f9fa",
-                color: activeTab === 'write' ? "white" : "#495057",
-                fontSize: "16px",
-                fontWeight: "500",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                boxShadow: activeTab === 'write' ? "0 4px 8px rgba(0, 0, 0, 0.1)" : "none"
-              }}
             >
               Leave Feedback
-            </button>
-            <button
+            </div>
+            <div
+              className={`review-tab ${activeTab === 'myReviews' ? 'active' : ''}`}
               onClick={() => setActiveTab('myReviews')}
-              style={{
-                flex: "1",
-                marginRight: "12px",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "none",
-                backgroundColor: activeTab === 'myReviews' ? "#667eea" : "#f8f9fa",
-                color: activeTab === 'myReviews' ? "white" : "#495057",
-                fontSize: "16px",
-                fontWeight: "500",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                boxShadow: activeTab === 'myReviews' ? "0 4px 8px rgba(0, 0, 0, 0.1)" : "none"
-              }}
             >
               My Feedback
-            </button>
-            <button
-              onClick={() => setActiveTab('allReviews')}
-              style={{
-                flex: "1",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "none",
-                backgroundColor: activeTab === 'allReviews' ? "#667eea" : "#f8f9fa",
-                color: activeTab === 'allReviews' ? "white" : "#495057",
-                fontSize: "16px",
-                fontWeight: "500",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                boxShadow: activeTab === 'allReviews' ? "0 4px 8px rgba(0, 0, 0, 0.1)" : "none"
-              }}
-            >
-              All Feedback
-            </button>
+            </div>
           </div>
 
           {activeTab === 'write' && renderWriteReviewTab()}
           {activeTab === 'myReviews' && renderMyReviewsTab()}
-          {activeTab === 'allReviews' && renderAllReviewsTab()}
         </div>
       </div>
     </div>

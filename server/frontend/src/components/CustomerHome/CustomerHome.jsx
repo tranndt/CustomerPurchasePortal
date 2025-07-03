@@ -4,10 +4,12 @@ import SimpleNav from '../SimpleNav/SimpleNav';
 
 const CustomerHome = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const [userFullName, setUserFullName] = useState('');
 
   useEffect(() => {
     const storedUsername = sessionStorage.getItem('username');
+    const firstName = sessionStorage.getItem('firstName');
+    const lastName = sessionStorage.getItem('lastName');
     const userRole = sessionStorage.getItem('userRole');
     if (!storedUsername) {
       navigate('/');
@@ -20,7 +22,14 @@ const CustomerHome = () => {
         navigate('/support/home');
       }
     } else {
-      setUsername(storedUsername);
+      // Create full name from first and last name, fallback to username
+      if (firstName && lastName) {
+        setUserFullName(`${firstName} ${lastName}`);
+      } else if (firstName) {
+        setUserFullName(firstName);
+      } else {
+        setUserFullName(storedUsername);
+      }
     }
   }, [navigate]);
 
@@ -28,7 +37,7 @@ const CustomerHome = () => {
     <div>
       <SimpleNav />
       <div style={{ 
-        padding: "24px", 
+        padding: "94px 24px 24px 24px", // 70px for navbar + 24px original padding
         backgroundColor: "#f8f9fa",
         minHeight: "100vh"
       }}>
@@ -48,13 +57,12 @@ const CustomerHome = () => {
             <h1 style={{ 
               fontSize: "32px", 
               fontWeight: "700", 
-              color: "#2c3e50", 
+              color: "8c757d", 
               margin: "0 0 12px 0",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
+              // WebkitTextFillColor: "transparent"
             }}>
-              Welcome to Your Dashboard
+              My Account Dashboard
             </h1>
             <p style={{ 
               color: "#6c757d", 
@@ -71,13 +79,13 @@ const CustomerHome = () => {
             borderRadius: "12px",
             padding: "24px",
             marginBottom: "32px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-            border: "1px solid #e9ecef",
-            background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+            boxShadow: "0 8px 15px rgba(118, 75, 162, 0.25)",
+            border: "1px solid rgba(102, 126, 234, 0.3)",
+            background: "linear-gradient(135deg,rgba(177, 102, 234, 0.98) 0%,rgba(118, 75, 162, 0.85) 100%)",
             color: "white"
           }}>
             <h3 style={{ margin: "0 0 8px 0", fontSize: "20px", fontWeight: "600" }}>
-              Welcome back, {username}! 👋
+              Welcome back, {userFullName}! 👋
             </h3>
             <p style={{ margin: "0", fontSize: "14px", opacity: "0.9" }}>
               Quick access to your dashboard features below
@@ -91,177 +99,123 @@ const CustomerHome = () => {
           }}>
             
 
-            {/* My Orders Card */}
+            {/* My Orders Card - Blue */}
             <div style={{
               backgroundColor: "white",
               borderRadius: "12px",
               padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
+              boxShadow: "0 8px 15px rgba(30, 64, 175, 0.25)",
+              border: "1px solid rgba(59, 130, 246, 0.3)",
               transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
+              cursor: "pointer",
+              background: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)", // Blue gradient: lighter to darker
+              position: "relative",
+              textAlign: "center"
             }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>📦</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Orders</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                View your purchase history and order details
-              </p>
-              <button 
-                onClick={() => navigate('/customer/orders')}
-                style={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                View Orders
-              </button>
-            </div>
-
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🎫</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Support</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Submit and track your support tickets
-              </p>
-              <button 
-                onClick={() => navigate('/customer/tickets')}
-                style={{
-                  background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Support Tickets
-              </button>
-            </div>
-
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⭐</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Feedback</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                See and manage your shopping experience reviews and feedback
-              </p>
-              <button 
-                onClick={() => navigate('/customer/reviews')}
-                style={{
-                  background: "linear-gradient(135deg, #ffc107 0%, #ff8f00 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(255, 193, 7, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                My Feedback
-              </button>
-            </div>
-{/* Browse Products Card */}
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
+            onClick={() => navigate('/customer/orders')}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
+              e.currentTarget.style.boxShadow = "0 12px 20px rgba(30, 64, 175, 0.4)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(30, 64, 175, 0.25)";
             }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛍️</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shop</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center' }}>📦</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px" }}>Orders</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5" }}>
+                View your purchase history and order details
+              </p>
+              {/* No button needed as the entire card is clickable */}
+            </div>
+
+            {/* Support Card - Amber */}
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 8px 15px rgba(180, 83, 9, 0.25)",
+              border: "1px solid rgba(255, 193, 7, 0.3)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+              background: "linear-gradient(135deg, #ffc107 0%, #b45309 100%)", // Amber gradient: lighter to darker
+              position: "relative",
+              textAlign: "center"
+            }}
+            onClick={() => navigate('/customer/tickets')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 12px 20px rgba(180, 83, 9, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(180, 83, 9, 0.25)";
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center' }}>🎫</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px" }}>Support</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5" }}>
+                Submit and track your support tickets
+              </p>
+              {/* No button needed as the entire card is clickable */}
+            </div>
+
+            {/* Feedback Card - Green */}
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 8px 15px rgba(22, 101, 52, 0.25)",
+              border: "1px solid rgba(34, 197, 94, 0.3)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+              background: "linear-gradient(135deg, #22c55e 0%, #166534 100%)", // Green gradient: lighter to darker
+              position: "relative",
+              textAlign: "center"
+            }}
+            onClick={() => navigate('/customer/reviews')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 12px 20px rgba(22, 101, 52, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(22, 101, 52, 0.25)";
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center' }}>⭐</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px" }}>Feedback</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5" }}>
+                See and manage your shopping experience reviews and feedback
+              </p>
+              {/* No button needed as the entire card is clickable */}
+            </div>
+{/* Browse Products Card - Purple */}
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 8px 15px rgba(126, 34, 206, 0.25)",
+              border: "1px solid rgba(162, 89, 236, 0.3)",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer",
+              background: "linear-gradient(135deg, #a259ec 0%, #7e22ce 100%)", // Purple gradient: lighter to darker
+              position: "relative",
+              textAlign: "center"
+            }}
+            onClick={() => navigate('/shop')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 12px 20px rgba(126, 34, 206, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(126, 34, 206, 0.25)";
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center' }}>🛍️</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px" }}>Shop</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5" }}>
                 Browse our complete electronics catalog and find great products
               </p>
-              <button 
-                onClick={() => navigate('/shop')}
-                style={{
-                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Visit Store
-              </button>
+              {/* No button needed as the entire card is clickable */}
             </div>
           </div>
         </div>

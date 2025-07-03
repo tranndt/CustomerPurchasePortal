@@ -105,7 +105,7 @@ const AdminHome = () => {
     <div>
       <SimpleNav />
       <div style={{ 
-        padding: "24px", 
+        padding: "94px 24px 24px 24px", // 70px for navbar + 24px original padding
         backgroundColor: "#f8f9fa",
         minHeight: "100vh"
       }}>

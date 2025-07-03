@@ -200,7 +200,7 @@
 }
 
 .order-detail-value.total-amount {
-  color: #28a745;
+  color: #1e40af;
   font-size: 16px;
 }
 

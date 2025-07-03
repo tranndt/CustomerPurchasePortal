@@ -177,7 +177,7 @@ const TicketManager = () => {
           <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
           {/* Header */}
           <div className="tickets-header">
-            <h1 className="tickets-title">Ticket Management</h1>
+            <h1 className="tickets-title">Manage Tickets</h1>
             <p className="tickets-subtitle">
               Oversee, assign, and resolve all customer support tickets and inquiries
             </p>

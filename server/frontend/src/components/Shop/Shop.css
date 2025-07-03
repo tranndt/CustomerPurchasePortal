@@ -1,9 +1,17 @@
 /* Shop Component Styles - Using Design System */
 
+:root {
+  --shop-gradient: linear-gradient(135deg,#973dec 0%, #0901a1c6 100%);
+  --shop-gradient-hover: linear-gradient(135deg,#9333ea 0%, #3730a3 100%);
+  --shop-accent: #a855f7;
+  --shop-accent-dark: #4f46e5;
+}
+
 .shop-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-5);
+  padding-top: calc(100px + var(--spacing-7)); /* Account for fixed navbar */
   font-family: var(--font-family-sans-serif);
 }
 
@@ -11,7 +19,7 @@
   text-align: center;
   margin-bottom: var(--spacing-8);
   padding: var(--spacing-8) var(--spacing-5);
-  background: var(--gradient-primary);
+  background: var(--shop-gradient);
   border-radius: var(--border-radius-xl);
   color: var(--white);
 }
@@ -48,12 +56,13 @@
 }
 
 .shop-tab.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  color: var(--shop-accent);
+  border-bottom-color: var(--shop-accent);
+  background: none;
 }
 
 .shop-tab:hover {
-  color: var(--primary-color);
+  color: var(--shop-accent-dark);
 }
 
 /* Browse Section Layout */
@@ -105,18 +114,22 @@
   border-radius: var(--border-radius);
   cursor: pointer;
   font-size: var(--font-size-sm);
-  color: var(--gray-700);
+  color: var(--gray-600);
   transition: var(--transition-all);
+  font-weight: 1000;
 }
 
 .category-item:hover {
-  background-color: var(--gray-200);
+  background: var(--shop-gradient);
+  color: var(--white);
+  font-weight: 1000;
 }
 
 .category-item.active {
-  background-color: var(--primary-color);
+  background: var(--shop-gradient);
   color: var(--white);
-  font-weight: 500;
+  font-weight: 1000;
+  box-shadow: 0 2px 8px rgba(168,85,247,0.10);
 }
 
 /* Main Content */
@@ -205,14 +218,16 @@
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: var(--gray-200);
-  border-color: var(--gray-500);
+  background: var(--shop-gradient-hover);
+  color: var(--white);
+  border-color: var(--shop-accent-dark);
 }
 
 .pagination-btn.active {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background: var(--shop-gradient);
+  border-color: var(--shop-accent);
   color: var(--white);
+  box-shadow: 0 2px 8px rgba(168,85,247,0.10);
 }
 
 .pagination-btn:disabled {
@@ -273,7 +288,7 @@
 }
 
 .browse-btn {
-  background-color: var(--primary-color);
+  background: var(--shop-gradient);
   color: var(--white);
   border: none;
   padding: var(--spacing-3) var(--spacing-6);
@@ -282,10 +297,11 @@
   font-size: var(--font-size-base);
   font-weight: 600;
   transition: var(--transition-all);
+  box-shadow: 0 2px 8px rgba(168,85,247,0.10);
 }
 
 .browse-btn:hover {
-  background-color: var(--primary-hover);
+  background: var(--shop-gradient-hover);
   transform: translateY(-1px);
 }
 
@@ -323,21 +339,13 @@
 }
 
 .checkout-btn {
-  width: 100%;
-  background-color: var(--success-color);
+  background: var(--shop-gradient);
   color: var(--white);
-  border: none;
-  padding: var(--spacing-3);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  margin-top: var(--spacing-4);
-  transition: var(--transition-all);
+  box-shadow: 0 2px 8px rgba(168,85,247,0.10);
 }
 
 .checkout-btn:hover {
-  background-color: var(--success-hover);
+  background: var(--shop-gradient-hover);
   transform: translateY(-1px);
 }
 

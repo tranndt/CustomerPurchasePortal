@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../../styles/global.css';
+import './SimpleNav.css';
 
 const SimpleNav = () => {
   const navigate = useNavigate();
@@ -131,64 +133,54 @@ const SimpleNav = () => {
   };
 
   return (
-    <nav style={{ 
-      padding: '10px 20px', 
-      backgroundColor: '#f8f9fa', 
-      borderBottom: '1px solid #ddd',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <h3 style={{ margin: 0, color: '#007bff' }}>ElectronicsRetail™</h3>
+    <nav className="simple-nav">
+      <div className="simple-nav-left">
+        <h3 className="company-name" onClick={() => navigate('/')}>
+          ElectronicsRetail™
+        </h3>
         <button 
           onClick={() => navigate('/shop')}
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            color: '#007bff', 
-            cursor: 'pointer',
-            textDecoration: 'underline',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}
+          className="nav-link shop"
         >
           Shop
         </button>
         {isLoggedIn && (
           <button 
             onClick={() => navigate(getHomeLink())}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
-              color: '#007bff', 
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              fontSize: '14px',
-              fontWeight: 'bold'
-            }}
+            className="nav-link home"
           >
             {getHomeLinkText()}
           </button>
         )}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="simple-nav-right">
         {isLoggedIn ? (
           <>
-            <span style={{ fontSize: '14px', marginRight: '10px' }}>
-              Welcome, {userFullName}
+            <span className="welcome-text">
+              Welcome, <span className="welcome-name">{userFullName}</span>
+              {userRole && (
+                <span className={`user-role ${
+                  userRole.toLowerCase() === 'admin' || userRole.toLowerCase() === 'manager'
+                    ? 'admin-role'
+                    : userRole.toLowerCase() === 'support'
+                    ? 'support-role'
+                    : userRole.toLowerCase() === 'customer'
+                    ? 'customer-role'
+                    : ''
+                }`}>
+                  {userRole}
+                </span>
+              )}
             </span>
+            {/* Show something only for customers */}
+            {userRole && userRole.toLowerCase() === 'customer' && (
+              <span className="customer-special">
+                {/* Add customer-specific content here */}
+              </span>
+            )}
             <button 
               onClick={handleLogout}
-              style={{
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
+              className="nav-button logout"
             >
               Logout
             </button>
@@ -197,37 +189,20 @@ const SimpleNav = () => {
           <>
             <button 
               onClick={() => navigate('/login')}
-              style={{
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                marginRight: '10px'
-              }}
+              className="nav-button login"
             >
               Login
             </button>
             <button 
               onClick={() => navigate('/register')}
-              style={{
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
+              className="nav-button register"
             >
               Register
             </button>
           </>
         )}
       </div>
-    </nav>
+    </nav>    
   );
 };
 

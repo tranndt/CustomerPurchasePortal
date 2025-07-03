@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
+import '../../styles/global.css';
+import './MyTickets.css';
 
 const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -59,42 +61,14 @@ const MyTickets = () => {
   return (
     <div>
       <SimpleNav />
-      <div style={{ 
-        padding: "24px", 
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh"
-      }}>
-        <div style={{ 
-          maxWidth: "1000px", 
-          margin: "0 auto"
-        }}>
+      <div className="ticket-page-container">
+        <div className="ticket-page-content">
           <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
-          <div style={{
-            textAlign: "center",
-            marginBottom: "32px",
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: "32px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-            border: "1px solid #e9ecef"
-          }}>
-            <h1 style={{ 
-              fontSize: "32px", 
-              fontWeight: "700", 
-              color: "#2c3e50", 
-              margin: "0 0 12px 0",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }}>
-              🎫 My Support Tickets
+          <div className="ticket-page-header">
+            <h1 className="ticket-page-title">
+              My Support Tickets
             </h1>
-            <p style={{ 
-              color: "#6c757d", 
-              fontSize: "16px", 
-              margin: "0",
-              fontWeight: "400"
-            }}>
+            <p className="ticket-page-subtitle">
               Track your support requests and resolutions
             </p>
           </div>

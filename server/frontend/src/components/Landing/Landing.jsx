@@ -1,128 +1,194 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Landing.css';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [loaded, setLoaded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Animation effect on component mount
+  useEffect(() => {
+    setLoaded(true);
+    
+    // Add scroll listener for parallax effects
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'stretch',
-      color: 'white',
-      padding: 0,
-      fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-    }}>
-      {/* Left: Branding */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        padding: '60px',
-        background: 'transparent',
-      }}>
-        <div className="site-name" style={{
-          fontSize: '3.5rem',
-          marginBottom: 10,
-        }}>
+    <>
+      {/* Navigation Bar */}
+      <nav className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="nav-brand" onClick={() => navigate('/')}>
           ElectronicsRetail™
         </div>
-        <h1 style={{
-          fontSize: '2.75rem',
-          fontWeight: 700,
-          marginBottom: '16px',
-          textShadow: '2px 2px 8px rgba(0,0,0,0.15)',
-          fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-        }}>
-          Powering Your Tech Journey
-        </h1>
-        <p style={{
-          fontSize: '1.2rem',
-          maxWidth: 500,
-          opacity: 0.95,
-          lineHeight: 1.6,
-          fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-        }}>
-          Discover cutting-edge electronics, track your orders, and manage all your purchases in one place. Built to serve both shoppers and store staff.
-        </p>
-      </div>
-
-      {/* Right: Actions */}
-      <div style={{
-        flex: 1,
-        background: 'white',
-        color: '#2c3e50',
-        padding: '60px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        boxShadow: '-2px 0 16px 0 rgba(0,0,0,0.05)',
-        fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-      }}>
-        <h2 style={{ fontSize: '1.8rem', marginBottom: '30px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
-          Welcome to Your Account Portal
-        </h2>
-
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>🛒 Shop Now</h3>
-          <p style={{ fontSize: '1rem', marginBottom: '10px', color: '#555', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
-            Explore our latest tech products and buy directly from your personalized storefront.
-          </p>
-          <button
-            onClick={() => navigate('/shop')}
-            style={{
-              backgroundColor: '#f39c12',
-              color: 'white',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              marginBottom: '20px',
-              transition: '0.3s',
-              fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-            }}
-            onMouseOver={e => e.target.style.backgroundColor = '#d68910'}
-            onMouseOut={e => e.target.style.backgroundColor = '#f39c12'}
-          >
-            Browse Store
-          </button>
+        <div className="nav-links">
+          <div className="nav-link" onClick={() => navigate('/shop')}>Shop</div>
+          <div className="nav-link" onClick={() => navigate('/about')}>About</div>
+          <div className="nav-link nav-button" onClick={() => navigate('/login')}>Login</div>
         </div>
-
+      </nav>
+    
+      {/* Welcome Section - Top 1/4 */}
+      <div className={`welcome-section fade-in ${loaded ? 'active' : ''} `} 
+           style={{ 
+             height: '14vh',
+             marginTop: '60px',
+             display: 'flex',
+             alignItems: 'center',
+             justifyContent: 'center',
+             textAlign: 'center',
+             background: 'linear-gradient(135deg, rgba(142, 72, 208, 0.95) 0%, rgba(38, 30, 186, 0.95) 100%)',
+             color: '#fff',
+             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.84)',
+           }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>🔐 Sign In</h3>
-          <p style={{ fontSize: '1rem', marginBottom: '10px', color: '#555', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
-            Log in as a customer or store manager to view orders, manage inventory, or leave reviews.
-          </p>
-          <button
-            onClick={() => navigate('/login')}
-            style={{
-              backgroundColor: '#2980b9',
-              color: 'white',
-              border: 'none',
-              padding: '12px 28px',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: '0.3s',
-              fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
-            }}
-            onMouseOver={e => e.target.style.backgroundColor = '#21618c'}
-            onMouseOut={e => e.target.style.backgroundColor = '#2980b9'}
-          >
-            Log In
-          </button>
+          <h1 style={{ 
+            fontSize: '2.5em', 
+            marginBottom: '5px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}>
+            Welcome to ElectronicsRetail™!
+          </h1>
         </div>
       </div>
-    </div>
+
+      <div className={`landing-container ${scrolled ? 'scrolled' : ''}`} style={{ height: 'calc(100vh - 60px - 8vh)', display: 'flex' }}>
+
+        {/* Left: Branding with enhanced visual depth */}
+        <div 
+          className="branding-section"
+          style={{
+            width: '50%',
+            background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.95) 0%, rgba(79, 70, 229, 0.95) 100%), url("https://images.unsplash.com/photo-1581092921461-eab98e4fee3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80") center/cover no-repeat'
+          }}
+        >
+          {/* Semi-transparent diagonal pattern overlay for depth */}
+          <div className="diagonal-pattern"></div>
+          <div className="floating-shapes">
+            <div className="shape shape-1"></div>
+            <div className="shape shape-2"></div>
+            <div className="shape shape-3"></div>
+          </div>
+
+          <div className="branding-content">
+            <h1 className={`brand-headline fade-in delay-2 ${loaded ? 'active' : ''}`}>
+              Your Stop for Great Tech. Smarter, Faster, Connected.
+            </h1>
+            <p className={`brand-description fade-in delay-3 ${loaded ? 'active' : ''}`}>
+              From must-have gadgets to the latest smart home gear, we deliver the technology you need — fast, reliable, and right to your door.
+            </p>
+          
+            {/* Shop Our Categories Section */}
+            <div className={`product-categories fade-in delay-4 ${loaded ? 'active' : ''}`} onClick={() => navigate('/shop')}>
+              <h3 className="categories-title">Shop Our Categories</h3>
+              <div className="categories-grid">
+                <div className="category">
+                  <div className="category-icon">📱</div>
+                  <div className="category-text">Smartphones</div>
+                </div>
+                <div className="category">
+                  <div className="category-icon">💻</div>
+                  <div className="category-text">Laptops</div>
+                </div>
+                <div className="category">
+                  <div className="category-icon">🎧</div>
+                  <div className="category-text">Audio</div>
+                </div>
+                <div className="category">
+                  <div className="category-icon">📺</div>
+                  <div className="category-text">Smart TVs</div>
+                </div>
+                <div className="category">
+                  <div className="category-icon">⌚</div>
+                  <div className="category-text">Wearables</div>
+                </div>
+                <div className="category">
+                  <div className="category-icon">🎮</div>
+                  <div className="category-text">Gaming</div>
+                </div>
+              </div>
+              <div className="shop-now-overlay">
+                <div className="shop-now-text">Browse All Products </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Actions */}
+        <div className="action-section" style={{ width: '50%' }}>
+          {/* Subtle background pattern for visual interest */}
+          <div className="subtle-pattern"></div>
+
+          <div className="action-content">
+            <h2 className={`action-title fade-in delay-2 ${loaded ? 'active' : ''}`}>
+              Access Your Account Portal
+            </h2>
+            <p className="block-description">
+              Log in to our Customer or Employee Portal to make purchases, track delivery and manage orders. </p>
+            {/* App Preview/Illustration with mockup frame */}
+            <div className={`preview-container fade-in delay-3 ${loaded ? 'active' : ''}`}>
+              <div className="browser-mockup">
+                <div className="browser-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div className="browser-address">electronicsretail.app</div>
+              </div>
+              <div className="preview-image">
+                <img 
+                  src="customer-dashboard.png" 
+                  alt="Electronics dashboard preview" 
+                  sizes="(max-width: 400px) 50vw, 400px" 
+                  style={{ maxWidth: '100%', height: 'auto', imageRendering: 'auto' }}
+                />
+              </div>
+            </div>
+
+            <div className="action-blocks">
+              <div className={`action-block fade-in delay-4 ${loaded ? 'active' : ''}`} 
+                   style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="btn-secondary scale-on-hover"
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="btn-primary scale-on-hover"
+                >
+                  Register
+                </button>
+              </div>
+            </div>
+          
+            {/* Footer section */}
+            <div className={`footer fade-in delay-6 ${loaded ? 'active' : ''}`}>
+              <div>© 2025 ElectronicsRetail Inc. All rights reserved.</div>
+              <div className="footer-links">
+                <span className="footer-link">About</span>
+                <span className="footer-divider">•</span>
+                <span className="footer-link">Privacy</span>
+                <span className="footer-divider">•</span>
+                <span className="footer-link">Terms</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -86,7 +86,7 @@ const SupportClaim = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent"
             }}>
-              🎫 Submit Support Ticket
+              Submit A Support Ticket
             </h1>
             <p style={{ 
               color: "#6c757d", 

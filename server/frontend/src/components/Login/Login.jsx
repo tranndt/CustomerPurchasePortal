@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showNotification } from '../Notification/Notification';
-import BackButton from '../BackButton/BackButton';
-
 import "./Login.css";
 
 const Login = () => {
@@ -11,12 +9,29 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [demoUsers, setDemoUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   let login_url = "http://localhost:8000/djangoapp/login";
   let demo_users_url = "http://localhost:8000/djangoapp/api/demo-users";
 
-  // Fetch demo users on component mount
+  // Animation effect on component mount and fetch demo users
   useEffect(() => {
+    setLoaded(true);
+    
+    // Add scroll listener for parallax effects
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    
+    // Fetch demo users
     const fetchDemoUsers = async () => {
       console.log("Attempting to fetch demo users from:", demo_users_url);
       try {
@@ -81,6 +96,8 @@ const Login = () => {
     };
 
     fetchDemoUsers();
+    
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [demo_users_url]);
 
   const login = async (e) => {
@@ -103,6 +120,8 @@ const Login = () => {
       const json = await res.json();
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
+          sessionStorage.setItem('firstName', json.firstName || '');
+          sessionStorage.setItem('lastName', json.lastName || '');
           sessionStorage.setItem('userRole', json.userRole || 'Customer');
           
           // Redirect to role-specific home page
@@ -144,6 +163,8 @@ const Login = () => {
       const json = await res.json();
       if (json.status != null && json.status === 200) {
           sessionStorage.setItem('username', json.userName);
+          sessionStorage.setItem('firstName', json.firstName || '');
+          sessionStorage.setItem('lastName', json.lastName || '');
           sessionStorage.setItem('userRole', json.userRole || 'Customer');
           
           // Redirect to role-specific home page
@@ -168,156 +189,120 @@ const Login = () => {
   
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-      <BackButton />
-      
-      <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1>🛍️ ElectronicsRetail™</h1>
-        <p>Access your orders, reviews, and support tickets</p>
-      </header>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
-        gap: '30px', 
-        alignItems: 'start' 
-      }}>
-        {/* Login Form */}
-        <div style={{ backgroundColor: '#f8f9fa', padding: '30px', borderRadius: '8px' }}>
-          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Login</h2>
-          <form onSubmit={login}>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Username:</label>
-              <input 
-                type="text" 
-                value={userName}
-                placeholder="Enter your username" 
-                onChange={(e) => setUserName(e.target.value)}
-                required
-                style={{ 
-                  width: '100%', 
-                  padding: '10px', 
-                  borderRadius: '4px', 
-                  border: '1px solid #ddd',
-                  fontSize: '16px'
-                }}
-              />
-            </div>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Password:</label>
-              <input 
-                type="password" 
-                value={password}
-                placeholder="Enter your password" 
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                style={{ 
-                  width: '100%', 
-                  padding: '10px', 
-                  borderRadius: '4px', 
-                  border: '1px solid #ddd',
-                  fontSize: '16px'
-                }}
-              />
-            </div>
-            
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  backgroundColor: loading ? '#6c757d' : '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '4px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  fontSize: '16px',
-                  flex: 1
-                }}
-              >
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => navigate("/")}
-                style={{
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  flex: 1
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-          
-          <div style={{ textAlign: 'center', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #ddd' }}>
-            <p>Don't have an account? <a href="/register" style={{ color: '#007bff', textDecoration: 'none' }}>Register here</a></p>
-          </div>
+    <>
+      {/* Navigation Bar */}
+      <nav className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="nav-brand" onClick={() => navigate('/')}>
+          ElectronicsRetail™
         </div>
-
-        {/* Demo Users Section */}
-        <div style={{ backgroundColor: '#f0f8ff', padding: '30px', borderRadius: '8px' }}>
-          <h2 style={{ marginTop: 0, marginBottom: '15px' }}>🚀 Demo Profiles</h2>
-          <p style={{ color: '#666', marginBottom: '20px' }}>Click on any profile to login instantly (demo purposes)</p>
+        <div className="nav-links">
+          <div className="nav-link" onClick={() => navigate('/shop')}>Shop</div>
+          <div className="nav-link" onClick={() => navigate('/about')}>About</div>
+          <div className="nav-link nav-button" onClick={() => navigate('/register')}>Register</div>
+        </div>
+      </nav>
+      
+      <div className={`auth-container ${loaded ? 'loaded' : ''}`}>
+        <div className="auth-content">
+          <div className="auth-header">
+            <h1 className="auth-title">Sign In to Your Account</h1>
+            <p className="auth-subtitle">Access your orders, reviews, and manage your electronics</p>
+          </div>
           
-          {demoUsers.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {demoUsers.map((user, index) => (
-                <div 
-                  key={index}
-                  onClick={() => loginAsDemo(user.username)}
-                  style={{
-                    backgroundColor: 'white',
-                    border: '1px solid #ddd',
-                    padding: '15px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    ':hover': {
-                      backgroundColor: '#e9ecef'
-                    }
-                  }}
-                  onMouseEnter={(e) => e.target.style.backgroundColor = '#e9ecef'}
-                  onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-                >
-                  <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                    {user.first_name && user.last_name 
-                      ? `${user.first_name} ${user.last_name}` 
-                      : user.username}
-                  </div>
-                  <div style={{ color: '#666', fontSize: '14px' }}>@{user.username}</div>
-                  <div style={{ 
-                    color: user.role === 'Admin' ? '#dc3545' : '#28a745', 
-                    fontSize: '12px', 
-                    fontWeight: 'bold',
-                    marginTop: '5px'
-                  }}>
-                    {user.role || 'Customer'}
-                  </div>
+          <div className="auth-grid">
+            {/* Login Form */}
+            <div className="auth-form-container">
+              <h2 className="form-title">Login</h2>
+              <form onSubmit={login} className="auth-form">
+                <div className="form-group">
+                  <label className="form-label">Username</label>
+                  <input 
+                    type="text" 
+                    className="form-input"
+                    value={userName}
+                    placeholder="Enter your username" 
+                    onChange={(e) => setUserName(e.target.value)}
+                    required
+                  />
                 </div>
-              ))}
+                
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <input 
+                    type="password" 
+                    className="form-input"
+                    value={password}
+                    placeholder="Enter your password" 
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="form-actions">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className={`btn-primary ${loading ? 'btn-loading' : ''}`}
+                  >
+                    {loading ? 'Logging in...' : 'Login'}
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => navigate("/")}
+                    className="btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+              
+              <div className="form-footer">
+                <p>Don't have an account? <span className="form-link" onClick={() => navigate('/register')}>Register here</span></p>
+              </div>
             </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: '#666' }}>
-              <p>Loading demo profiles...</p>
+
+            {/* Demo Users Section */}
+            <div className="auth-demo-container">
+              <h2 className="demo-title">Demo Profiles</h2>
+              <p className="demo-subtitle">Click any profile to login instantly</p>
+              
+              {demoUsers.length > 0 ? (
+                <div className="demo-profiles-grid">
+                  {demoUsers.map((user, index) => (
+                    <div 
+                      key={index}
+                      onClick={() => loginAsDemo(user.username)}
+                      className="demo-profile-card"
+                    >
+                      {/* Role Badge */}
+                      <div className={`role-badge role-${user.role?.toLowerCase() || 'customer'}`}>
+                        {user.role || 'Customer'}
+                      </div>
+                      
+                      <div className="profile-name">
+                        {user.first_name && user.last_name 
+                          ? `${user.first_name} ${user.last_name}` 
+                          : user.username}
+                      </div>
+                      <div className="profile-username">@{user.username}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="demo-loading">
+                  <p>Loading demo profiles...</p>
+                </div>
+              )}
+              
+              <div className="demo-note">
+                <strong>Note:</strong> These are demo accounts. All demo users use the password: <code>password123</code>
+              </div>
             </div>
-          )}
-          
-          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fff3cd', borderRadius: '4px', fontSize: '14px' }}>
-            <strong>Note:</strong> These are demo accounts. All demo users use the password: <code>password123</code>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

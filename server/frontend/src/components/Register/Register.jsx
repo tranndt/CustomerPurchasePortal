@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showNotification } from '../Notification/Notification';
-import BackButton from '../BackButton/BackButton';
 import "./Register.css";
 
 const Register = () => {
@@ -11,6 +10,26 @@ const Register = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
+  const [loaded, setLoaded] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  
+  // Animation effect on component mount
+  useEffect(() => {
+    setLoaded(true);
+    
+    // Add scroll listener for parallax effects
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      if (scrollPosition > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const register = async (e) => {
     e.preventDefault();
@@ -42,6 +61,8 @@ const Register = () => {
       
       if (json.status === 201) {
         sessionStorage.setItem('username', json.userName);
+        sessionStorage.setItem('firstName', json.firstName || '');
+        sessionStorage.setItem('lastName', json.lastName || '');
         sessionStorage.setItem('userRole', json.userRole || 'Customer');
         showNotification("Registration successful! You are now logged in.", 'success');
         
@@ -66,109 +87,115 @@ const Register = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "500px", margin: "0 auto" }}>
-      <BackButton />
+    <>
+      {/* Navigation Bar */}
+      <nav className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
+        <div className="nav-brand" onClick={() => navigate('/')}>
+          ElectronicsRetail™
+        </div>
+        <div className="nav-links">
+          <div className="nav-link" onClick={() => navigate('/shop')}>Shop</div>
+          <div className="nav-link" onClick={() => navigate('/about')}>About</div>
+          <div className="nav-link nav-button" onClick={() => navigate('/login')}>Login</div>
+        </div>
+      </nav>
       
-      <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1>🔐 Register for ElectronicsRetail™</h1>
-        <p>Create your account to access orders, reviews, and support</p>
-      </header>
-      
-      <div style={{ backgroundColor: "#f8f9fa", padding: "30px", borderRadius: "8px" }}>
-        <form onSubmit={register}>
-          <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>First Name:</label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
+      <div className={`auth-container ${loaded ? 'loaded' : ''}`}>
+        <div className="auth-content register-content">
+          <div className="auth-header">
+            <h1 className="auth-title">Create Your Account</h1>
+            <p className="auth-subtitle">Join ElectronicsRetail™ to shop, review products, and access support</p>
           </div>
           
-          <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>Last Name:</label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
+          <div className="auth-form-container register-form-container">
+            <h2 className="form-title">Registration Form</h2>
+            <form onSubmit={register} className="auth-form register-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">First Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={firstName}
+                    placeholder="Enter your first name"
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label className="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={lastName}
+                    placeholder="Enter your last name"
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  value={email}
+                  placeholder="Enter your email address"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Username</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={userName}
+                  placeholder="Choose a username"
+                  onChange={(e) => setUserName(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Password</label>
+                <input
+                  type="password"
+                  className="form-input"
+                  value={password}
+                  placeholder="Create a password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="form-actions">
+                <button
+                  type="submit"
+                  className="btn-primary"
+                >
+                  Create Account
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/login")}
+                  className="btn-secondary"
+                >
+                  Back to Login
+                </button>
+              </div>
+            </form>
+            
+            <div className="form-footer">
+              <p>Already have an account? <span className="form-link" onClick={() => navigate('/login')}>Login here</span></p>
+            </div>
           </div>
-          
-          <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>Email:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>Username:</label>
-            <input
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "5px" }}>Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ddd" }}
-            />
-          </div>
-          
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              type="submit"
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                border: "none",
-                padding: "10px 20px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                flex: 1
-              }}
-            >
-              Register
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/login")}
-              style={{
-                backgroundColor: "#6c757d",
-                color: "white",
-                border: "none",
-                padding: "10px 20px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                flex: 1
-              }}
-            >
-              Back to Login
-            </button>
-          </div>
-        </form>
-        
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <p>Already have an account? <a href="/login">Login here</a></p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

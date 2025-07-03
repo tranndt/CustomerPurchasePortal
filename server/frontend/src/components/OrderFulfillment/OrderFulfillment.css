@@ -193,6 +193,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--gray-100);
+  font-size: 30px;
 }
 
 .order-image img {
@@ -283,7 +284,7 @@
 }
 
 .order-detail-value.total-amount {
-  color: var(--success-color);
+  color: #3b82f6;
   font-size: var(--font-size-lg);
 }
 

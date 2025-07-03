@@ -42,7 +42,9 @@ def login_user(request):
                 
                 return JsonResponse({
                     "status": 200, 
-                    "userName": username, 
+                    "userName": username,
+                    "firstName": user.first_name,
+                    "lastName": user.last_name,
                     "userRole": user_role,
                     "message": "Authenticated"
                 })
@@ -83,7 +85,9 @@ def register_user(request):
             login(request, user)
             return JsonResponse({
                 "status": 201, 
-                "userName": user.username, 
+                "userName": user.username,
+                "firstName": user.first_name,
+                "lastName": user.last_name,
                 "userRole": "customer",
                 "message": "User registered successfully"
             })

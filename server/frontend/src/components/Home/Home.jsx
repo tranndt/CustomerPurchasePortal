@@ -21,7 +21,7 @@ const Home = () => {
       <SimpleNav />
       <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
         <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h1>Welcome to Your Dashboard</h1>
+          <h1>My Account Dashboard</h1>
           <p>Manage your orders, reviews, and support tickets</p>
         </header>
 

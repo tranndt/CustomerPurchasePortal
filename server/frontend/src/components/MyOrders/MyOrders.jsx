@@ -35,8 +35,8 @@ const MyOrders = () => {
           <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
           
           <div className="page-header">
-            <h1 className="page-title gradient-text">
-              📦 My Orders
+            <h1 className="page-title">
+              My Orders
             </h1>
             <p className="page-subtitle">
               View your purchase history and manage your orders
@@ -104,13 +104,13 @@ const MyOrders = () => {
                       onClick={() => navigate('/customer/reviews')}
                       className="order-action-btn secondary"
                     >
-                      ⭐ Leave Feedback
+                      Leave Feedback
                     </button>
                     <button 
                       onClick={() => navigate(`/customer/tickets/${order.transaction_id}`)}
                       className="order-action-btn primary"
                     >
-                      🎫 Get Support
+                      Get Support
                     </button>
                   </div>
                 </div>
