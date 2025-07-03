@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
-import '../../styles/ProductCard.css';
+import '../../styles/global.css';
+import './MyOrders.css';
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -29,75 +30,27 @@ const MyOrders = () => {
   return (
     <div>
       <SimpleNav />
-      <div style={{ 
-        padding: "24px", 
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh"
-      }}>
-        <div style={{ 
-          maxWidth: "1200px", 
-          margin: "0 auto"
-        }}>
+      <div className="page-container">
+        <div className="page-content">
           <BackButton to="/customer/home" label="← Back to Customer Home" variant="primary" />
           
-          <div style={{
-            textAlign: "center",
-            marginBottom: "32px",
-            backgroundColor: "white",
-            borderRadius: "16px",
-            padding: "32px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-            border: "1px solid #e9ecef"
-          }}>
-            <h1 style={{ 
-              fontSize: "32px", 
-              fontWeight: "700", 
-              color: "#2c3e50", 
-              margin: "0 0 12px 0",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent"
-            }}>
+          <div className="page-header">
+            <h1 className="page-title gradient-text">
               📦 My Orders
             </h1>
-            <p style={{ 
-              color: "#6c757d", 
-              fontSize: "16px", 
-              margin: "0",
-              fontWeight: "400"
-            }}>
+            <p className="page-subtitle">
               View your purchase history and manage your orders
             </p>
           </div>
 
           {orders.length === 0 ? (
-            <div style={{ 
-              textAlign: "center", 
-              padding: "80px 20px",
-              backgroundColor: "white",
-              borderRadius: "12px",
-              border: "2px dashed #dee2e6",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)"
-            }}>
-              <div style={{ fontSize: "64px", marginBottom: "20px" }}>📦</div>
-              <h3 style={{ color: "#6c757d", marginBottom: "12px", fontSize: "24px" }}>No orders found</h3>
-              <p style={{ color: "#adb5bd", margin: "0 0 24px 0", fontSize: "16px" }}>Your order history will appear here once you make a purchase.</p>
+            <div className="empty-state">
+              <div className="empty-icon">📦</div>
+              <h3 className="empty-title">No orders found</h3>
+              <p className="empty-description">Your order history will appear here once you make a purchase.</p>
               <button 
                 onClick={() => navigate('/shop')}
-                style={{
-                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "16px",
-                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+                className="btn btn-gradient-primary"
               >
                 🛍️ Start Shopping
               </button>

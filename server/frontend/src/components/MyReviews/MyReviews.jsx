@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
-import '../../styles/ProductCard.css';
+import '../../styles/global.css';
 
 const MyReviews = () => {
   const [activeTab, setActiveTab] = useState('write'); // 'write' or 'all'
