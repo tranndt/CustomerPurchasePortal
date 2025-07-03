@@ -175,3 +175,11 @@ temp/
 
 # Deprecated directories
 sentiment_service/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.crt

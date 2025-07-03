@@ -18,6 +18,14 @@ from .models import UserProfile, Product, Order, Review, SupportTicket, CartItem
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+# Health check for Render deployment
+def health_check(request):
+    """
+    Basic health check endpoint for monitoring service availability.
+    Used by Render for health checks.
+    """
+    return JsonResponse({'status': 'ok', 'message': 'Service is healthy'})
+
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
 def login_user(request):

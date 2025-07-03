@@ -6,6 +6,9 @@ from . import views
 
 app_name = 'djangoapp'
 urlpatterns = [
+    # Health check endpoint
+    path(route='health-check', view=views.health_check, name='health_check'),
+
     # path for registration
     # path(route='register', view=views.registration, name='register'),
 

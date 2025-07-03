@@ -73,26 +73,37 @@ python app.py
 - **Admin Dashboard**: Management interface for admins
 - **Responsive Design**: Mobile-friendly interface
 
-## 🛠️ Technology Stack
+## 🚀 Deployment on Render
 
-### Backend
+This application can be deployed on [Render](https://render.com) using Docker.
 
-- **Python Django**: Web framework and main API server
-- **Node.js/Express**: Microservice for data management
-- **Flask**: Sentiment analysis microservice
-- **MongoDB**: Document database
-- **VADER**: Sentiment analysis
+### Steps to Deploy
 
-### Frontend
+1. **Create a new Web Service on Render**
+   - Connect your GitHub repository
+   - Select "Docker" as the environment
+   - Use the main branch for deployment
+   - Set the port to 8000 (main Django application port)
 
-- **React.js**: Component-based UI framework
-- **Bootstrap**: CSS framework for responsive design
-- **HTML/CSS/JavaScript**: Static pages and styling
+2. **Environment Variables**
+   - Add all required environment variables from `.env.example`
+   - Make sure to set `DEBUG=False` for production
+   - Add any necessary API keys
 
-### DevOps
+3. **External Services**
+   - For MongoDB, you'll need to provision an external MongoDB service like MongoDB Atlas
+   - Add the MongoDB connection string as an environment variable
 
-- **Docker & Docker Compose**: Containerization and orchestration
-- **Gunicorn**: Python WSGI HTTP Server
+4. **Scaling**
+   - Start with the Standard plan for better performance
+   - Free tier may experience cold starts that could affect service
+
+### Monitoring
+
+- Use the Render dashboard to monitor logs
+- Set up health checks for each service
+
+For detailed deployment instructions, see [deploy-render.md](deploy-render.md).
 
 ## 📦 Installation & Setup
 
