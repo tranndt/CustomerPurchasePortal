@@ -86,34 +86,41 @@ const TicketManager = () => {
       <div className="tickets-grid">
         {ticketsToShow.map((ticket) => (
           <div key={ticket.ticket_id} className="ticket-card">
-            <div className="ticket-header">
-              <div className="ticket-id">Ticket #{ticket.ticket_id}</div>
-              {getStatusBadge(ticket.status)}
+            {/* Ticket Image/Icon */}
+            <div className="ticket-image">
+              {ticket.product_image ? (
+                <img src={ticket.product_image} alt={ticket.product} />
+              ) : (
+                <span>🎫</span>
+              )}
             </div>
             
-            <div className="ticket-details">
-              <div className="ticket-detail-row">
-                <span className="ticket-detail-label">Customer:</span>
-                <span className="ticket-detail-value">{ticket.customer}</span>
+            <div className="ticket-content">
+              <div className="ticket-header">
+                <div className="ticket-id">Ticket #{ticket.ticket_id}</div>
+                {getStatusBadge(ticket.status)}
               </div>
-              <div className="ticket-detail-row">
-                <span className="ticket-detail-label">Product:</span>
-                <span className="ticket-detail-value">{ticket.product}</span>
-              </div>
-              <div className="ticket-detail-row">
-                <span className="ticket-detail-label">Submitted:</span>
-                <span className="ticket-detail-value">{new Date(ticket.submitted).toLocaleDateString()}</span>
-              </div>
-              <div className="ticket-detail-row">
-                <span className="ticket-detail-label">Issue:</span>
-                <span className="ticket-detail-value ticket-issue">{ticket.issue}</span>
-              </div>
-              {ticket.assigned_to && (
+              
+              <div className="ticket-details compact">
                 <div className="ticket-detail-row">
-                  <span className="ticket-detail-label">Assigned To:</span>
-                  <span className="ticket-detail-value">{ticket.assigned_to}</span>
+                  <span className="ticket-detail-label">Customer:</span>
+                  <span className="ticket-detail-value">{ticket.customer}</span>
                 </div>
-              )}
+                <div className="ticket-detail-row">
+                  <span className="ticket-detail-label">Product:</span>
+                  <span className="ticket-detail-value">{ticket.product}</span>
+                </div>
+                <div className="ticket-detail-row">
+                  <span className="ticket-detail-label">Issue:</span>
+                  <span className="ticket-detail-value ticket-issue">{ticket.issue}</span>
+                </div>
+                {ticket.assigned_to && (
+                  <div className="ticket-detail-row">
+                    <span className="ticket-detail-label">Assigned To:</span>
+                    <span className="ticket-detail-value">{ticket.assigned_to}</span>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="ticket-actions">

@@ -163,76 +163,53 @@ const OrderFulfillment = () => {
       <div className="orders-grid">
         {orders.map(order => (
           <div key={order.id} className="order-card">
-            <div className="order-header">
-              <div className="order-id">Order #{order.id}</div>
-              {getStatusBadge(order.status)}
+            {/* Product Image */}
+            <div className="order-image">
+              {order.product_image ? (
+                <img src={order.product_image} alt={order.product_name} />
+              ) : (
+                <span>📦</span>
+              )}
             </div>
+            
+            <div className="order-content">
+              <div className="order-header">
+                <div className="order-id">Order #{order.id}</div>
+                {getStatusBadge(order.status)}
+              </div>
+              
+              <div className="order-details compact">
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Product:</span>
+                  <span className="order-detail-value">{order.product_name}</span>
+                </div>
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Customer:</span>
+                  <span className="order-detail-value">{order.customer_name}</span>
+                </div>
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Quantity:</span>
+                  <span className="order-detail-value">{order.quantity} × ${order.unit_price.toFixed(2)}</span>
+                </div>
+                <div className="order-detail-row">
+                  <span className="order-detail-label">Total:</span>
+                  <span className="order-detail-value total-amount">${order.total_amount.toFixed(2)}</span>
+                </div>
+                {order.notes && (
+                  <div className="order-detail-row">
+                    <span className="order-detail-label">Notes:</span>
+                    <span className="order-detail-value">{order.notes}</span>
+                  </div>
+                )}
+              </div>
 
-            <div className="order-details">
-              <div className="order-detail-row">
-                <span className="order-detail-label">Product:</span>
-                <span className="order-detail-value">{order.product_name}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Customer:</span>
-                <span className="order-detail-value">{order.customer_name}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Username:</span>
-                <span className="order-detail-value">@{order.customer_username}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Category:</span>
-                <span className="order-detail-value">{order.product_category}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Quantity:</span>
-                <span className="order-detail-value">{order.quantity}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Unit Price:</span>
-                <span className="order-detail-value">${order.unit_price.toFixed(2)}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Total:</span>
-                <span className="order-detail-value total-amount">${order.total_amount.toFixed(2)}</span>
-              </div>
-              <div className="order-detail-row">
-                <span className="order-detail-label">Date:</span>
-                <span className="order-detail-value">{new Date(order.date_purchased).toLocaleDateString()}</span>
-              </div>
-              {order.stock_available !== undefined && (
-                <div className="order-detail-row">
-                  <span className="order-detail-label">Stock Available:</span>
-                  <span className={`order-detail-value ${order.stock_available >= order.quantity ? 'stock-sufficient' : 'stock-insufficient'}`}>
-                    {order.stock_available} units
-                  </span>
-                </div>
-              )}
-              <div className="order-detail-row">
-                <span className="order-detail-label">Transaction ID:</span>
-                <span className="order-detail-value transaction-id">{order.transaction_id}</span>
-              </div>
-              {order.processed_by && (
-                <div className="order-detail-row">
-                  <span className="order-detail-label">Processed By:</span>
-                  <span className="order-detail-value">{order.processed_by}</span>
-                </div>
-              )}
-              {order.processed_at && (
-                <div className="order-detail-row">
-                  <span className="order-detail-label">Processed Date:</span>
-                  <span className="order-detail-value">{new Date(order.processed_at).toLocaleDateString()}</span>
-                </div>
-              )}
-              {order.notes && (
-                <div className="order-detail-row">
-                  <span className="order-detail-label">Notes:</span>
-                  <span className="order-detail-value">{order.notes}</span>
+              {showActions && order.stock_available !== undefined && order.stock_available < order.quantity && (
+                <div className="stock-warning">
+                  ⚠️ Insufficient stock available. Cannot approve until restocked.
                 </div>
               )}
             </div>
-
+            
             {showActions && (
               <div className="order-actions">
                 <button
@@ -249,12 +226,6 @@ const OrderFulfillment = () => {
                 >
                   {processingOrders[order.id] ? 'Processing...' : 'Reject'}
                 </button>
-              </div>
-            )}
-
-            {showActions && order.stock_available !== undefined && order.stock_available < order.quantity && (
-              <div className="stock-warning">
-                ⚠️ Insufficient stock available. Cannot approve until restocked.
               </div>
             )}
           </div>

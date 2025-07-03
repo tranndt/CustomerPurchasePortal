@@ -126,7 +126,7 @@ const SimpleNav = () => {
         return 'Support Home';
       case 'customer':
       default:
-        return 'Customer Home';
+        return 'My Account';
     }
   };
 
@@ -146,14 +146,14 @@ const SimpleNav = () => {
           style={{ 
             background: 'none', 
             border: 'none', 
-            color: '#28a745', 
+            color: '#007bff', 
             cursor: 'pointer',
             textDecoration: 'underline',
             fontSize: '14px',
             fontWeight: 'bold'
           }}
         >
-          Store
+          Shop
         </button>
         {isLoggedIn && (
           <button 

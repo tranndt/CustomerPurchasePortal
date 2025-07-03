@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
 import './InventoryManagement.css';
+import '../../styles/global.css';
 
 const InventoryManagement = () => {
   const [inventory, setInventory] = useState([]);
@@ -9,6 +10,9 @@ const InventoryManagement = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('allProducts');
+  const [requestedItems, setRequestedItems] = useState([]);
+  const [requestQuantities, setRequestQuantities] = useState({});
 
   const inventory_url = "http://localhost:8000/djangoapp/api/manager/inventory";
 
@@ -37,16 +41,56 @@ const InventoryManagement = () => {
     fetchInventory();
   }, [fetchInventory]);
 
-  // Filter inventory based on search term and category
+  // Helper function for checking if an item is requested
+  const isItemRequested = (itemId) => {
+    return requestedItems.some(item => item.id === itemId);
+  };
+  
+  // Filter inventory based on search term, category, and active tab
   const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          item.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+    
+    // Filter by tab
+    if (activeTab === 'stockRequested') {
+      return matchesSearch && matchesCategory && isItemRequested(item.id);
+    }
+    
     return matchesSearch && matchesCategory;
   });
 
   // Get unique categories for filter
   const categories = [...new Set(inventory.map(item => item.category))];
+  
+  // Helper functions for stock requests
+  const handleQuantityChange = (itemId, change) => {
+    setRequestQuantities(prev => {
+      const currentValue = prev[itemId] || 1;
+      const newValue = Math.max(1, currentValue + change);
+      return { ...prev, [itemId]: newValue };
+    });
+  };
+  
+  const handleRequestStock = (item) => {
+    const quantity = requestQuantities[item.id] || 1;
+    
+    // Add to requested items
+    setRequestedItems(prev => {
+      const existingItem = prev.find(ri => ri.id === item.id);
+      if (existingItem) {
+        return prev.map(ri => ri.id === item.id ? { ...ri, quantity: quantity } : ri);
+      } else {
+        return [...prev, { ...item, quantity, requested_at: new Date() }];
+      }
+    });
+    
+    // Reset quantity input
+    setRequestQuantities(prev => ({ ...prev, [item.id]: 1 }));
+    
+    // Show confirmation
+    alert(`Requested ${quantity} units of ${item.name} for restocking`);
+  };
 
   if (loading) {
     return (
@@ -108,9 +152,25 @@ const InventoryManagement = () => {
             <div className="stats-label">Pending Orders</div>
           </div>
           <div className="stats-card">
-            <div className="stats-number">{categories.length}</div>
-            <div className="stats-label">Categories</div>
+            <div className="stats-number">{requestedItems.length}</div>
+            <div className="stats-label">Stock Requests</div>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="inventory-tabs">
+          <button 
+            className={`inventory-tab ${activeTab === 'allProducts' ? 'active' : ''}`}
+            onClick={() => setActiveTab('allProducts')}
+          >
+            All Products ({inventory.length})
+          </button>
+          <button 
+            className={`inventory-tab ${activeTab === 'stockRequested' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stockRequested')}
+          >
+            Stock Requested ({requestedItems.length})
+          </button>
         </div>
 
         {/* Filters */}
@@ -153,56 +213,97 @@ const InventoryManagement = () => {
           ) : (
             filteredInventory.map(item => (
               <div key={item.id} className="inventory-card">
-                <div className="inventory-name">{item.name}</div>
-                
-                <div className="inventory-details">
-                  <div className="inventory-detail-row">
-                    <span className="inventory-detail-label">Category:</span>
-                    <span className="inventory-detail-value">{item.category}</span>
-                  </div>
-                  <div className="inventory-detail-row">
-                    <span className="inventory-detail-label">Price:</span>
-                    <span className="inventory-detail-value">${item.price.toFixed(2)}</span>
-                  </div>
-                  <div className="inventory-detail-row">
-                    <span className="inventory-detail-label">Current Stock:</span>
-                    <span className={`inventory-detail-value ${item.is_out_of_stock ? 'stock-critical' : item.is_low_stock ? 'stock-warning' : 'stock-good'}`}>
-                      {item.current_stock} units
-                    </span>
-                  </div>
-                  <div className="inventory-detail-row">
-                    <span className="inventory-detail-label">Pending Orders:</span>
-                    <span className="inventory-detail-value">{item.pending_orders} units</span>
-                  </div>
-                  <div className="inventory-detail-row">
-                    <span className="inventory-detail-label">Available After Pending:</span>
-                    <span className={`inventory-detail-value ${item.available_after_pending <= 0 ? 'stock-critical' : item.available_after_pending <= 5 ? 'stock-warning' : 'stock-good'}`}>
-                      {item.available_after_pending} units
-                    </span>
-                  </div>
-                  {item.is_active === false && (
-                    <div className="inventory-detail-row">
-                      <span className="inventory-detail-label">Status:</span>
-                      <span className="inventory-detail-value inactive">Inactive</span>
-                    </div>
+                {/* Product Image */}
+                <div className="inventory-image">
+                  {item.image_url ? (
+                    <img src={item.image_url} alt={item.name} />
+                  ) : (
+                    <span>📦</span>
                   )}
                 </div>
+                
+                {/* Product Content */}
+                <div className="inventory-content">
+                  <div className="inventory-name">{item.name}</div>
+                  
+                  <div className="inventory-details">
+                    <div className="inventory-detail-row">
+                      <span className="inventory-detail-label">Category:</span>
+                      <span className="inventory-detail-value">{item.category}</span>
+                    </div>
+                    <div className="inventory-detail-row">
+                      <span className="inventory-detail-label">Price:</span>
+                      <span className="inventory-detail-value">${item.price.toFixed(2)}</span>
+                    </div>
+                    <div className="inventory-detail-row">
+                      <span className="inventory-detail-label">Current Stock:</span>
+                      <span className={`inventory-detail-value ${item.is_out_of_stock ? 'stock-critical' : item.is_low_stock ? 'stock-warning' : 'stock-good'}`}>
+                        {item.current_stock} units
+                      </span>
+                    </div>
+                    <div className="inventory-detail-row">
+                      <span className="inventory-detail-label">Pending Orders:</span>
+                      <span className="inventory-detail-value">{item.pending_orders} units</span>
+                    </div>
+                  
+                    {isItemRequested(item.id) && (
+                      <div className="inventory-detail-row">
+                        <span className="inventory-detail-label">Requested:</span>
+                        <span className="inventory-detail-value">
+                          <span className="requested-badge">
+                            {requestedItems.find(ri => ri.id === item.id)?.quantity || 0} units
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                    
 
-                {/* Status Indicators */}
-                <div className="status-indicators">
-                  {item.is_out_of_stock && (
-                    <div className="stock-indicator stock-critical">
-                      🚨 Out of Stock
+                  </div>
+                  
+                  {/* Status Indicators */}
+                  <div className="status-indicators">
+                    {item.is_out_of_stock && (
+                      <div className="stock-indicator stock-critical">
+                        🚨 Out of Stock
+                      </div>
+                    )}
+                    {item.is_low_stock && !item.is_out_of_stock && (
+                      <div className="stock-indicator stock-warning">
+                        ⚠️ Low Stock
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Request Stock Actions */}
+                <div className="inventory-actions">
+                  {isItemRequested(item.id) ? (
+                    <div className="stock-indicator requested-badge">
+                      ✓ Stock Requested
                     </div>
-                  )}
-                  {item.is_low_stock && !item.is_out_of_stock && (
-                    <div className="stock-indicator stock-warning">
-                      ⚠️ Low Stock
-                    </div>
-                  )}
-                  {!item.is_active && (
-                    <div className="stock-indicator inactive">
-                      🔒 Inactive Product
+                  ) : (
+                    <div className="request-restock-form">
+                      <div className="quantity-input">
+                        <button 
+                          className="quantity-btn"
+                          onClick={() => handleQuantityChange(item.id, -1)}
+                        >-</button>
+                        <span className="quantity-value">
+                          {requestQuantities[item.id] || 1}
+                        </span>
+                        <button 
+                          className="quantity-btn"
+                          onClick={() => handleQuantityChange(item.id, 1)}
+                        >+</button>
+                      </div>
+                      
+                      <button 
+                        className="request-btn"
+                        onClick={() => handleRequestStock(item)}
+                      >
+                        Request Stock
+                      </button>
+
                     </div>
                   )}
                 </div>

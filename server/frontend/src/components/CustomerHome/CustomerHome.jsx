@@ -89,49 +89,7 @@ const CustomerHome = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
             gap: '24px' 
           }}>
-            {/* Browse Products Card */}
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛍️</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shop Electronics</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Browse our complete electronics catalog and find great products
-              </p>
-              <button 
-                onClick={() => navigate('/shop')}
-                style={{
-                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Visit Store
-              </button>
-            </div>
+            
 
             {/* My Orders Card */}
             <div style={{
@@ -152,7 +110,7 @@ const CustomerHome = () => {
               e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
             }}>
               <div style={{ fontSize: "36px", marginBottom: "16px" }}>📦</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>My Orders</h3>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Orders</h3>
               <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
                 View your purchase history and order details
               </p>
@@ -174,49 +132,6 @@ const CustomerHome = () => {
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
                 View Orders
-              </button>
-            </div>
-
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⭐</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>My Reviews</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                See and manage your product reviews
-              </p>
-              <button 
-                onClick={() => navigate('/customer/reviews')}
-                style={{
-                  background: "linear-gradient(135deg, #ffc107 0%, #ff8f00 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(255, 193, 7, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                My Reviews
               </button>
             </div>
 
@@ -260,6 +175,92 @@ const CustomerHome = () => {
                 onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
               >
                 Support Tickets
+              </button>
+            </div>
+
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
+              border: "1px solid #e9ecef",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
+            }}>
+              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⭐</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Feedback</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
+                See and manage your shopping experience reviews and feedback
+              </p>
+              <button 
+                onClick={() => navigate('/customer/reviews')}
+                style={{
+                  background: "linear-gradient(135deg, #ffc107 0%, #ff8f00 100%)",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  boxShadow: "0 2px 4px rgba(255, 193, 7, 0.3)",
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
+                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+              >
+                My Feedback
+              </button>
+            </div>
+{/* Browse Products Card */}
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
+              border: "1px solid #e9ecef",
+              transition: "transform 0.2s ease, box-shadow 0.2s ease",
+              cursor: "pointer"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
+            }}>
+              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🛍️</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Shop</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
+                Browse our complete electronics catalog and find great products
+              </p>
+              <button 
+                onClick={() => navigate('/shop')}
+                style={{
+                  background: "linear-gradient(135deg, #007bff 0%, #0056b3 100%)",
+                  color: "white",
+                  border: "none",
+                  padding: "12px 24px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  boxShadow: "0 2px 4px rgba(0, 123, 255, 0.3)",
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
+                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+              >
+                Visit Store
               </button>
             </div>
           </div>
