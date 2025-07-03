@@ -73,7 +73,6 @@ const AdminHome = () => {
   }, [navigate, fetchBadgeCounts]);
 
   const renderBadge = (count) => {
-    console.log('Rendering badge with count:', count);
     if (count === 0) return null;
     return (
       <span style={{
@@ -82,16 +81,20 @@ const AdminHome = () => {
         right: '8px',
         backgroundColor: '#dc3545',
         color: 'white',
-        borderRadius: '50%',
-        width: '24px',
-        height: '24px',
+        borderRadius: '10px',
+        minWidth: '44px',
+        height: '32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '12px',
+        fontSize: '22px',
         fontWeight: 'bold',
-        boxShadow: '0 2px 4px rgba(220, 53, 69, 0.3)',
-        zIndex: 10
+        boxShadow: '0 4px 8px rgba(220, 53, 69, 0.25)',
+        zIndex: 10,
+        border: '3px solid #fff',
+        letterSpacing: '1px',
+        padding: '0 12px',
+        transition: 'transform 0.15s',
       }}>
         {count > 99 ? '99+' : count}
       </span>

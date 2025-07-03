@@ -140,7 +140,7 @@ const SimpleNav = () => {
       alignItems: 'center'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <h3 style={{ margin: 0, color: '#007bff' }}>ElectronicsRetail</h3>
+        <h3 style={{ margin: 0, color: '#007bff' }}>ElectronicsRetail™</h3>
         <button 
           onClick={() => navigate('/shop')}
           style={{ 

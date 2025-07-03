@@ -74,17 +74,21 @@ class CartItem(models.Model):
 
 class Review(models.Model):
     customer = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     review_text = models.TextField()
     rating = models.IntegerField()
     sentiment = models.CharField(max_length=10, default='neutral')
     created_on = models.DateTimeField(auto_now_add=True)
-
+    moderated = models.BooleanField(default=False)
+    
+    # No longer product specific, so we don't need the product field
+    # Instead, we'll make sure users can only leave one review per day
+    
     class Meta:
-        unique_together = ('customer', 'product')  # One review per product per customer
-
+        # We don't need unique_together anymore since we'll check date-based restrictions in the view
+        ordering = ['-created_on']  # Newest reviews first
+    
     def __str__(self):
-        return f"{self.customer.username} review on {self.product.name}"
+        return f"{self.customer.username}'s shopping experience review on {self.created_on.strftime('%Y-%m-%d')}"
 
 class SupportTicket(models.Model):
     STATUS_CHOICES = [

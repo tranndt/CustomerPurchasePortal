@@ -38,7 +38,7 @@ function App() {
         <Route path="/customer/reviews" element={<ProtectedRoute><MyReviews /></ProtectedRoute>} />
         <Route path="/customer/tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
         <Route path="/customer/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-        <Route path="/customer/reviews/:transaction_id" element={<ProtectedRoute><ProductReview /></ProtectedRoute>} />
+        {/* Removed product-specific review route, now using general shopping experience reviews */}
         <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
         <Route path="/admin/fulfillment" element={<ProtectedRoute><OrderFulfillment /></ProtectedRoute>} />
         <Route path="/admin/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />

@@ -5,152 +5,121 @@ const Landing = () => {
   const navigate = useNavigate();
 
   return (
-    <div style={{ 
+    <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)',
       display: 'flex',
-      flexDirection: 'column',
+      flexDirection: 'row',
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'stretch',
       color: 'white',
-      textAlign: 'center',
-      padding: '20px'
+      padding: 0,
+      fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
     }}>
-      <div style={{ maxWidth: '600px' }}>
-        <h1 style={{ 
-          fontSize: '3.5rem', 
-          marginBottom: '20px',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+      {/* Left: Branding */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        padding: '60px',
+        background: 'transparent',
+      }}>
+        <div className="site-name" style={{
+          fontSize: '3.5rem',
+          marginBottom: 10,
         }}>
-          � ElectronicsRetail
+          ElectronicsRetail™
+        </div>
+        <h1 style={{
+          fontSize: '2.75rem',
+          fontWeight: 700,
+          marginBottom: '16px',
+          textShadow: '2px 2px 8px rgba(0,0,0,0.15)',
+          fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
+        }}>
+          Powering Your Tech Journey
         </h1>
-        
-        <p style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '30px',
-          opacity: 0.9,
-          lineHeight: '1.6'
+        <p style={{
+          fontSize: '1.2rem',
+          maxWidth: 500,
+          opacity: 0.95,
+          lineHeight: 1.6,
+          fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
         }}>
-          Your premier destination for electronics and technology products. 
-          Experience seamless shopping with our intuitive platform designed for customers, 
-          administrators, and support teams.
+          Discover cutting-edge electronics, track your orders, and manage all your purchases in one place. Built to serve both shoppers and store staff.
         </p>
-        
-        <div style={{ 
-          display: 'flex', 
-          gap: '20px', 
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <button 
+      </div>
+
+      {/* Right: Actions */}
+      <div style={{
+        flex: 1,
+        background: 'white',
+        color: '#2c3e50',
+        padding: '60px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        boxShadow: '-2px 0 16px 0 rgba(0,0,0,0.05)',
+        fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
+      }}>
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '30px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
+          Welcome to Your Account Portal
+        </h2>
+
+        <div style={{ marginBottom: '40px' }}>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>🛒 Shop Now</h3>
+          <p style={{ fontSize: '1rem', marginBottom: '10px', color: '#555', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
+            Explore our latest tech products and buy directly from your personalized storefront.
+          </p>
+          <button
             onClick={() => navigate('/shop')}
             style={{
-              backgroundColor: '#ffc107',
-              color: '#212529',
-              border: 'none',
-              padding: '15px 30px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease',
-              minWidth: '140px'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#e0a800';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#ffc107';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            🛍️ Browse Store
-          </button>
-          
-          <button 
-            onClick={() => navigate('/login')}
-            style={{
-              backgroundColor: '#007bff',
+              backgroundColor: '#f39c12',
               color: 'white',
               border: 'none',
-              padding: '15px 30px',
+              padding: '12px 28px',
               borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
               cursor: 'pointer',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease',
-              minWidth: '120px'
+              marginBottom: '20px',
+              transition: '0.3s',
+              fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
             }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#0056b3';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#007bff';
-              e.target.style.transform = 'translateY(0)';
-            }}
+            onMouseOver={e => e.target.style.backgroundColor = '#d68910'}
+            onMouseOut={e => e.target.style.backgroundColor = '#f39c12'}
           >
-            Login
-          </button>
-          
-          <button 
-            onClick={() => navigate('/register')}
-            style={{
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              padding: '15px 30px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease',
-              minWidth: '120px'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = '#1e7e34';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = '#28a745';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            Register
+            Browse Store
           </button>
         </div>
-        
-        <div style={{ 
-          marginTop: '50px',
-          padding: '20px',
-          backgroundColor: 'rgba(255,255,255,0.1)',
-          borderRadius: '10px',
-          backdropFilter: 'blur(10px)'
-        }}>
-          <h3 style={{ marginBottom: '15px' }}>Features</h3>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '15px',
-            textAlign: 'left'
-          }}>
-            <div>
-              <strong>🛒 Order Management</strong>
-              <p style={{ margin: '5px 0', opacity: 0.8 }}>Track and manage your orders easily</p>
-            </div>
-            <div>
-              <strong>⭐ Product Reviews</strong>
-              <p style={{ margin: '5px 0', opacity: 0.8 }}>Share your experience with products</p>
-            </div>
-            <div>
-              <strong>🎫 Support Tickets</strong>
-              <p style={{ margin: '5px 0', opacity: 0.8 }}>Get help when you need it</p>
-            </div>
-          </div>
+
+        <div>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>🔐 Sign In</h3>
+          <p style={{ fontSize: '1rem', marginBottom: '10px', color: '#555', fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif` }}>
+            Log in as a customer or store manager to view orders, manage inventory, or leave reviews.
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              backgroundColor: '#2980b9',
+              color: 'white',
+              border: 'none',
+              padding: '12px 28px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: '0.3s',
+              fontFamily: `-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif`,
+            }}
+            onMouseOver={e => e.target.style.backgroundColor = '#21618c'}
+            onMouseOut={e => e.target.style.backgroundColor = '#2980b9'}
+          >
+            Log In
+          </button>
         </div>
       </div>
     </div>

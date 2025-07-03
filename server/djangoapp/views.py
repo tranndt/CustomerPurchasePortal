@@ -340,19 +340,32 @@ def init_demo_data(request):
 def get_customer_reviews(request):
     if not request.user.is_authenticated:
         return JsonResponse({"status": 401, "error": "Unauthorized"}, status=401)
-    reviews = Review.objects.filter(customer=request.user).select_related('product').order_by('-created_on')
-    review_list = [
-        {
+    reviews = Review.objects.filter(customer=request.user).order_by('-created_on')
+    review_list = []
+    
+    for r in reviews:
+        review_data = {
             'id': r.id,
-            'product_name': r.product.name,
             'rating': r.rating,
             'review_text': r.review_text,
             'created_on': r.created_on,
-            'product_image': r.product.image_url,
-            'product_id': r.product.id,
         }
-        for r in reviews
-    ]
+        
+        # Handle both old and new review formats
+        if hasattr(r, 'product') and r.product:
+            review_data.update({
+                'product_name': r.product.name,
+                'product_image': r.product.image_url if r.product.image_url else None,
+                'product_id': r.product.id,
+                'is_product_review': True
+            })
+        else:
+            review_data.update({
+                'is_product_review': False
+            })
+        
+        review_list.append(review_data)
+    
     return JsonResponse({"status": 200, "reviews": review_list})
 
 from .models import SupportTicket, Product
@@ -963,39 +976,62 @@ def get_inventory_overview(request):
 
 @require_GET
 def get_reviews_for_management(request):
-    """Get all reviews for management overview"""
-    if not request.user.is_authenticated:
-        return JsonResponse({"status": 401, "message": "Authentication required"})
+    # Check if user has manager/admin privileges
+    user_role = None
     
-    # Check if user has manager/admin role
     try:
-        profile = UserProfile.objects.get(user=request.user)
-        if profile.role not in ['admin', 'manager']:
-            return JsonResponse({"status": 403, "message": "Access denied"})
-    except UserProfile.DoesNotExist:
+        # Check if the user has a profile with a role
+        if hasattr(request.user, 'userprofile'):
+            user_role = request.user.userprofile.role.lower() if request.user.userprofile.role else None
+    except:
+        pass
+    
+    # Try to get the session role
+    session_role = request.session.get('userRole', '').lower() if 'userRole' in request.session else None
+    
+    # Special check for demo users based on username (case insensitive)
+    username_lower = request.user.username.lower()
+    if username_lower.startswith('demo_') and ('admin' in username_lower or 'manager' in username_lower):
+        return JsonResponse({"status": 200, "reviews": get_demo_reviews()})
+    
+    # Allow access if the user is staff, superuser, has admin/manager role in their profile, or in the session
+    if not (request.user.is_staff or request.user.is_superuser or 
+            user_role in ['admin', 'manager'] or 
+            session_role in ['admin', 'manager']):
         return JsonResponse({"status": 403, "message": "Access denied"})
     
-    try:
-        reviews = Review.objects.all().select_related('customer', 'product').order_by('-created_on')
-        reviews_data = []
+    # Get all reviews for management
+    reviews = Review.objects.select_related('customer').order_by('-created_on')
+    
+    review_list = []
+    for r in reviews:
+        review_data = {
+            'id': r.id,
+            'customer': r.customer.username,
+            'customer_name': f"{r.customer.first_name} {r.customer.last_name}".strip() or r.customer.username,
+            'rating': r.rating,
+            'review_text': r.review_text,
+            'created_on': r.created_on,
+            'moderated': getattr(r, 'moderated', False),
+            'sentiment': r.sentiment
+        }
         
-        for review in reviews:
-            reviews_data.append({
-                "id": review.id,
-                "customer_name": f"{review.customer.first_name} {review.customer.last_name}".strip() or review.customer.username,
-                "customer_username": review.customer.username,
-                "product_name": review.product.name,
-                "product_category": review.product.category,
-                "review_text": review.review_text,
-                "rating": review.rating,
-                "sentiment": review.sentiment,
-                "created_on": review.created_on.isoformat(),
-                "moderated": False  # Since the model doesn't have this field, we'll default to False for now
+        # Add product info if this is a legacy product review
+        if hasattr(r, 'product') and r.product:
+            review_data.update({
+                'product_name': r.product.name,
+                'product_id': r.product.id,
+                'is_product_review': True
             })
-        
-        return JsonResponse({"status": 200, "reviews": reviews_data})
-    except Exception as e:
-        return JsonResponse({"status": 500, "message": str(e)})
+        else:
+            review_data.update({
+                'is_product_review': False,
+                'review_type': 'Shopping Experience'
+            })
+            
+        review_list.append(review_data)
+    
+    return JsonResponse({"status": 200, "reviews": review_list})
 
 @require_GET
 def get_tickets_for_management(request):
@@ -1034,3 +1070,136 @@ def get_tickets_for_management(request):
         return JsonResponse({"status": 200, "tickets": tickets_data})
     except Exception as e:
         return JsonResponse({"status": 500, "message": str(e)})
+
+@csrf_exempt
+@login_required
+def post_experience_review(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        review_text = data.get("review")
+        rating = data.get("rating")
+        
+        # Check if user has already submitted a review today
+        today = datetime.datetime.now().date()
+        has_review_today = Review.objects.filter(
+            customer=request.user,
+            created_on__date=today
+        ).exists()
+        
+        if has_review_today:
+            return JsonResponse({
+                "status": 400, 
+                "message": "You can only submit one review per day."
+            })
+
+        # Skip sentiment analysis for now
+        sentiment = "neutral"
+        
+        # Create the review (no product association)
+        review = Review.objects.create(
+            customer=request.user,
+            review_text=review_text,
+            rating=rating,
+            sentiment=sentiment
+        )
+        
+        return JsonResponse({
+            "status": 200, 
+            "message": "Thank you for your feedback!",
+            "review": {
+                'id': review.id,
+                'rating': review.rating,
+                'review_text': review.review_text,
+                'created_on': review.created_on.isoformat(),
+            }
+        })
+    
+    return JsonResponse({"status": 405, "message": "Method not allowed"})
+
+@require_GET
+def get_public_reviews(request):
+    # Get reviews that can be publicly viewed (for all customers)
+    reviews = Review.objects.select_related('customer').order_by('-created_on')[:50]  # Limit to most recent 50
+    
+    review_list = [
+        {
+            'id': r.id,
+            'customer_name': r.customer.first_name if r.customer.first_name else r.customer.username,
+            'rating': r.rating,
+            'review_text': r.review_text,
+            'created_on': r.created_on,
+        }
+        for r in reviews
+    ]
+    
+    return JsonResponse({"status": 200, "reviews": review_list})
+
+def get_demo_reviews():
+    """Generate demo reviews for demo users"""
+    import datetime
+    
+    # Create a list of demo reviews
+    return [
+        {
+            'id': 1,
+            'customer': 'john_doe',
+            'customer_name': 'John Doe',
+            'rating': 5,
+            'review_text': 'Great shopping experience! The website is easy to navigate and the checkout process was smooth.',
+            'created_on': (datetime.datetime.now() - datetime.timedelta(days=2)).isoformat(),
+            'moderated': True,
+            'sentiment': 'positive',
+            'is_product_review': False,
+            'review_type': 'Shopping Experience'
+        },
+        {
+            'id': 2,
+            'customer': 'jane_smith',
+            'customer_name': 'Jane Smith',
+            'rating': 4,
+            'review_text': 'I love the product selection, but shipping took a bit longer than expected.',
+            'created_on': (datetime.datetime.now() - datetime.timedelta(days=5)).isoformat(),
+            'moderated': False,
+            'sentiment': 'neutral',
+            'is_product_review': False,
+            'review_type': 'Shopping Experience'
+        },
+        {
+            'id': 3,
+            'customer': 'alex_wong',
+            'customer_name': 'Alex Wong',
+            'rating': 5,
+            'review_text': 'The customer service team was incredibly helpful when I had an issue with my order.',
+            'created_on': (datetime.datetime.now() - datetime.timedelta(days=1)).isoformat(),
+            'moderated': False,
+            'sentiment': 'positive',
+            'is_product_review': False,
+            'review_type': 'Shopping Experience'
+        },
+        {
+            'id': 4,
+            'customer': 'sarah_johnson',
+            'customer_name': 'Sarah Johnson',
+            'product_name': 'Smartphone XYZ',
+            'product_id': 1,
+            'rating': 3,
+            'review_text': 'The smartphone has good features, but battery life could be better.',
+            'created_on': (datetime.datetime.now() - datetime.timedelta(days=7)).isoformat(),
+            'moderated': True,
+            'sentiment': 'neutral',
+            'is_product_review': True
+        },
+        {
+            'id': 5,
+            'customer': 'mike_taylor',
+            'customer_name': 'Mike Taylor',
+            'product_name': 'Laptop ABC',
+            'product_id': 2,
+            'rating': 5,
+            'review_text': 'Amazing laptop! Fast performance and great display.',
+            'created_on': (datetime.datetime.now() - datetime.timedelta(days=3)).isoformat(),
+            'moderated': True,
+            'sentiment': 'positive',
+            'is_product_review': True
+        }
+    ]

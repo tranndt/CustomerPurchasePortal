@@ -11,9 +11,21 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 // Load product reviews data
 const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
 
-mongoose.connect("mongodb://mongo:27017/",{'dbName':'purchasePortalDB'});
+mongoose.connect("mongodb://mongo:27017/",{'dbName':'purchasePortalDB'})
+  .then(() => {
+    // Store db connection for use in routes
+    app.locals.db = mongoose.connection;
+    console.log('MongoDB connected successfully');
+  })
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+  });
 
 const Reviews = require('./review');
+const productsRoutes = require('./products');
+
+// Use products routes
+app.use(productsRoutes);
 
 try {
   Reviews.deleteMany({}).then(()=>{

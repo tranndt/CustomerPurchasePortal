@@ -45,7 +45,11 @@ const AllReviews = () => {
       return;
     }
     
-    if (userRole && userRole.toLowerCase() !== 'admin' && userRole.toLowerCase() !== 'manager') {
+    // Allow Demo Admin explicit access
+    const isDemoAdmin = username?.toLowerCase().includes('demo_admin');
+    
+    // Check role for regular users
+    if (!isDemoAdmin && userRole && userRole.toLowerCase() !== 'admin' && userRole.toLowerCase() !== 'manager') {
       navigate('/customer/home');
       return;
     }
@@ -81,7 +85,7 @@ const AllReviews = () => {
           <div key={review.id} className="review-card">
             <div className="review-header">
               <div className="review-product">
-                <h4>{review.product_name}</h4>
+                <h4>{review.is_product_review ? review.product_name : "Shopping Experience"}</h4>
                 <span className="review-customer">by {review.customer_name}</span>
               </div>
               <div className="review-rating">
@@ -154,6 +158,28 @@ const AllReviews = () => {
       <SimpleNav />
       <div className="reviews-management">
         <div className="reviews-container">
+          {/* Back Button */}
+          <button
+            className="back-button"
+            style={{
+              marginBottom: '24px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '10px 28px',
+              borderRadius: '12px',
+              fontWeight: 600,
+              fontSize: '17px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(102, 126, 234, 0.2)',
+              transition: 'background 0.2s',
+              display: 'inline-block',
+              letterSpacing: '0.5px',
+            }}
+            onClick={() => navigate('/admin/home')}
+          >
+            ← Back to Admin Home
+          </button>
           {/* Header */}
           <div className="reviews-header">
             <h1 className="reviews-title">Review Management</h1>

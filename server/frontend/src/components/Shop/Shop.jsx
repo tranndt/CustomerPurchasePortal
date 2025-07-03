@@ -292,7 +292,7 @@ const Shop = () => {
       <SimpleNav />
       <div className="shop-container">
         <div className="shop-header">
-          <h1 className="shop-title">ElectronicsRetail Store</h1>
+          <h1 className="shop-title">ElectronicsRetail™ Store</h1>
           <p className="shop-subtitle">
             Browse our collection of electronics and technology products {isLoggedIn ? 'and manage your cart' : '- login to start shopping'}
           </p>

@@ -18,12 +18,14 @@ urlpatterns = [
     path("api/customer/orders", views.get_customer_orders),
     path("api/customer/reviews", views.get_customer_reviews),
     path("api/customer/tickets", views.get_customer_tickets),
-    path("api/customer/review", views.post_review),
+    path("api/customer/review", views.post_review),  # Legacy product-specific review
+    path("api/customer/review/experience", views.post_experience_review),  # New shopping experience review
+    path("api/reviews/public", views.get_public_reviews),  # Public reviews for all customers to see
     path("api/customer/support/new", views.submit_support_ticket),
     
     # Admin endpoints
     path("api/admin/orders", views.get_all_orders),
-    path("api/admin/reviews", views.get_all_reviews),
+    path("api/admin/reviews", views.get_reviews_for_management),
     path("api/admin/tickets", views.get_support_tickets),
     path("api/admin/tickets/<int:ticket_id>", views.get_ticket_detail),
     path("api/admin/tickets/<int:ticket_id>/update", views.update_ticket_detail),

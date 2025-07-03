@@ -70,7 +70,7 @@ const Register = () => {
       <BackButton />
       
       <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1>🔐 Register for ElectronicsRetail</h1>
+        <h1>🔐 Register for ElectronicsRetail™</h1>
         <p>Create your account to access orders, reviews, and support</p>
       </header>
       

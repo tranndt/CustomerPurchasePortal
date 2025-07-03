@@ -70,7 +70,7 @@ const Home = () => {
         ) : (
           <div style={{ textAlign: 'center' }}>
             <div style={{ backgroundColor: '#f8f9fa', padding: '40px', borderRadius: '8px' }}>
-              <h2>Welcome to ElectronicsRetail</h2>
+              <h2>Welcome to ElectronicsRetail™</h2>
               <p>Please log in to access your orders, reviews, and support tickets.</p>
             </div>
             

@@ -148,10 +148,10 @@ const MyOrders = () => {
                   {/* Action Buttons */}
                   <div className="order-actions">
                     <button 
-                      onClick={() => navigate(`/customer/reviews/${order.transaction_id}`)}
+                      onClick={() => navigate('/customer/reviews')}
                       className="order-action-btn secondary"
                     >
-                      ⭐ Write Review
+                      ⭐ Leave Feedback
                     </button>
                     <button 
                       onClick={() => navigate(`/customer/tickets/${order.transaction_id}`)}

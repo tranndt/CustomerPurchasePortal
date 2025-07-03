@@ -172,7 +172,7 @@ const Login = () => {
       <BackButton />
       
       <header style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h1>🛍️ ElectronicsRetail</h1>
+        <h1>🛍️ ElectronicsRetail™</h1>
         <p>Access your orders, reviews, and support tickets</p>
       </header>
 
