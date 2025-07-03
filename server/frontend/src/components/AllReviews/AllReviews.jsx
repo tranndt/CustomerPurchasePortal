@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import './AllReviews.css';
+import BackButton from '../BackButton/BackButton';
 
 const AllReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -159,27 +160,8 @@ const AllReviews = () => {
       <div className="reviews-management">
         <div className="reviews-container">
           {/* Back Button */}
-          <button
-            className="back-button"
-            style={{
-              marginBottom: '24px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              padding: '10px 28px',
-              borderRadius: '12px',
-              fontWeight: 600,
-              fontSize: '17px',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(102, 126, 234, 0.2)',
-              transition: 'background 0.2s',
-              display: 'inline-block',
-              letterSpacing: '0.5px',
-            }}
-            onClick={() => navigate('/admin/home')}
-          >
-            ← Back to Admin Home
-          </button>
+          <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
+
           {/* Header */}
           <div className="reviews-header">
             <h1 className="reviews-title">Review Management</h1>

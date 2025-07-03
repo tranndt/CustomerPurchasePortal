@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
+import { useAlert } from '../AlertContext/AlertContext';
 import './InventoryManagement.css';
 import '../../styles/global.css';
 
@@ -13,6 +14,7 @@ const InventoryManagement = () => {
   const [activeTab, setActiveTab] = useState('allProducts');
   const [requestedItems, setRequestedItems] = useState([]);
   const [requestQuantities, setRequestQuantities] = useState({});
+  const { showAlert } = useAlert();
 
   const inventory_url = "http://localhost:8000/djangoapp/api/manager/inventory";
 
@@ -89,7 +91,7 @@ const InventoryManagement = () => {
     setRequestQuantities(prev => ({ ...prev, [item.id]: 1 }));
     
     // Show confirmation
-    alert(`Requested ${quantity} units of ${item.name} for restocking`);
+    showAlert(`Requested ${quantity} units of ${item.name} for restocking`, 'Stock Request Submitted', 'success');
   };
 
   if (loading) {

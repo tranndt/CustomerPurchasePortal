@@ -1,0 +1,214 @@
+/* CustomAlert styles with design system variables */
+.custom-alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.custom-alert-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.custom-alert-container {
+  background-color: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.custom-alert-container.open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.custom-alert-container.info {
+  border-top: 4px solid var(--info-color);
+}
+
+.custom-alert-container.success {
+  border-top: 4px solid var(--success-color);
+}
+
+.custom-alert-container.warning {
+  border-top: 4px solid var(--warning-color);
+}
+
+.custom-alert-container.error {
+  border-top: 4px solid var(--danger-color);
+}
+
+.custom-alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-5);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.custom-alert-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.custom-alert-close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-2xl);
+  color: var(--gray-500);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.custom-alert-close:hover {
+  background-color: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.custom-alert-content {
+  padding: var(--spacing-5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.custom-alert-icon {
+  font-size: 32px;
+  margin-bottom: var(--spacing-3);
+}
+
+.custom-alert-message {
+  font-size: var(--font-size-base);
+  color: var(--gray-700);
+  text-align: center;
+  margin: 0 0 var(--spacing-3) 0;
+  line-height: 1.5;
+}
+
+.custom-alert-input {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  margin-top: var(--spacing-3);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.custom-alert-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.custom-alert-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-5);
+  border-top: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
+  border-bottom-left-radius: var(--border-radius-lg);
+  border-bottom-right-radius: var(--border-radius-lg);
+}
+
+.custom-alert-button {
+  padding: var(--spacing-2) var(--spacing-5);
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.custom-alert-button.cancel {
+  background-color: var(--white);
+  color: var(--gray-600);
+  border: 1px solid var(--gray-300);
+}
+
+.custom-alert-button.cancel:hover {
+  background-color: var(--gray-100);
+}
+
+.custom-alert-button.confirm {
+  color: var(--white);
+}
+
+.custom-alert-button.confirm.info {
+  background-color: var(--info-color);
+}
+
+.custom-alert-button.confirm.info:hover {
+  background-color: var(--info-hover);
+}
+
+.custom-alert-button.confirm.success {
+  background-color: var(--success-color);
+}
+
+.custom-alert-button.confirm.success:hover {
+  background-color: var(--success-hover);
+}
+
+.custom-alert-button.confirm.warning {
+  background-color: var(--warning-color);
+}
+
+.custom-alert-button.confirm.warning:hover {
+  background-color: var(--warning-hover);
+}
+
+.custom-alert-button.confirm.error {
+  background-color: var(--danger-color);
+}
+
+.custom-alert-button.confirm.error:hover {
+  background-color: var(--danger-hover);
+}
+
+.custom-alert-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 500px) {
+  .custom-alert-container {
+    width: 90%;
+    max-width: none;
+    margin: 0 var(--spacing-4);
+  }
+  
+  .custom-alert-actions {
+    flex-direction: column;
+  }
+  
+  .custom-alert-button {
+    width: 100%;
+  }
+}

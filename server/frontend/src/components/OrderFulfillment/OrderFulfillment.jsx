@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
+import { useAlert } from '../AlertContext/AlertContext';
 import './OrderFulfillment.css';
 
 const OrderFulfillment = () => {
@@ -9,6 +10,7 @@ const OrderFulfillment = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [processingOrders, setProcessingOrders] = useState({});
+  const { showAlert, showPrompt } = useAlert();
 
   const pending_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/pending";
   const all_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/all";
@@ -86,32 +88,32 @@ const OrderFulfillment = () => {
 
       const data = await response.json();
       if (data.status === 200) {
-        alert(data.message);
         // Refresh all data
         await fetchAllData();
+        await showAlert(data.message, 'Success', 'success');
       } else {
-        alert(data.message || `Failed to ${action} order`);
+        await showAlert(data.message || `Failed to ${action} order`, 'Error', 'error');
       }
     } catch (err) {
-      alert(`Error ${action}ing order: ` + err.message);
+      await showAlert(`Error ${action}ing order: ` + err.message, 'Error', 'error');
     } finally {
       setProcessingOrders(prev => ({ ...prev, [orderId]: false }));
     }
   };
 
-  const handleApprove = (orderId) => {
-    const notes = prompt('Add any notes for this approval (optional):');
+  const handleApprove = async (orderId) => {
+    const notes = await showPrompt('Add any notes for this approval:', 'Enter notes (optional)', 'Approve Order', false, 'info');
     if (notes !== null) { // User didn't cancel
       processOrder(orderId, 'approve', notes);
     }
   };
 
-  const handleReject = (orderId) => {
-    const notes = prompt('Please provide a reason for rejection:');
+  const handleReject = async (orderId) => {
+    const notes = await showPrompt('Please provide a reason for rejection:', 'Enter reason', 'Reject Order', false, 'warning');
     if (notes !== null && notes.trim() !== '') {
       processOrder(orderId, 'reject', notes);
     } else if (notes !== null) {
-      alert('Please provide a reason for rejection');
+      await showAlert('Please provide a reason for rejection', 'Rejection Incomplete', 'warning');
     }
   };
 
@@ -270,12 +272,6 @@ const OrderFulfillment = () => {
           <div className="stats-card">
             <div className="stats-number">{allOrders.length}</div>
             <div className="stats-label">Total Orders</div>
-          </div>
-          <div className="stats-card">
-            <div className="stats-number">
-              ${allOrders.reduce((total, order) => total + order.total_amount, 0).toFixed(2)}
-            </div>
-            <div className="stats-label">Total Value</div>
           </div>
         </div>
 

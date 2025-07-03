@@ -79,19 +79,19 @@ const AdminHome = () => {
         position: 'absolute',
         top: '8px',
         right: '8px',
-        backgroundColor: '#dc3545',
-        color: 'white',
+        backgroundColor: '#ffc107', // yellow
+        color: '#212529', // dark text for contrast
         borderRadius: '10px',
         minWidth: '44px',
         height: '32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '22px',
+        fontSize: '18px',
         fontWeight: 'bold',
-        boxShadow: '0 4px 8px rgba(220, 53, 69, 0.25)',
+        boxShadow: '0 4px 8px rgba(220, 53, 69, 0.10)',
         zIndex: 10,
-        border: '3px solid #fff',
+        // border: '3px solid #fff', // removed white border
         letterSpacing: '1px',
         padding: '0 12px',
         transition: 'transform 0.15s',
@@ -127,7 +127,7 @@ const AdminHome = () => {
               fontWeight: "700", 
               color: "#2c3e50", 
               margin: "0 0 12px 0",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "linear-gradient(135deg,rgb(0, 0, 0) 0%,rgb(4, 0, 85) 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent"
             }}>
@@ -148,184 +148,134 @@ const AdminHome = () => {
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
             gap: '24px' 
           }}>
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer",
-              position: "relative"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
+            {/* Order Fulfillment - Blue */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                padding: "24px",
+                boxShadow: "0 8px 15px rgba(30, 64, 175, 0.25)",
+                border: "1px solid rgba(59, 130, 246, 0.3)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                cursor: "pointer",
+                position: "relative",
+                background: "linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)", // Blue gradient: lighter to darker
+                textAlign: 'center',
+              }}
+              onClick={() => navigate('/admin/fulfillment')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 12px 20px rgba(30, 64, 175, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 8px 15px rgba(30, 64, 175, 0.25)";
+              }}
+            >
               {renderBadge(badges.pendingOrders)}
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>⚡</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Order Fulfillment</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Comprehensive order management with all statuses: pending, approved, cancelled, and fulfilled orders
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center', textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>⚡</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>Order Fulfillment</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5", fontSize: "15px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>
+                Manage all incoming orders, track statuses, and view order history
               </p>
-              <button
-                onClick={() => navigate('/admin/fulfillment')}
-                style={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Order Fulfillment
-              </button>
             </div>
 
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer",
-              position: "relative"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
+            {/* Inventory Management - Green */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                padding: "24px",
+                boxShadow: "0 8px 15px rgba(22, 101, 52, 0.25)",
+                border: "1px solid rgba(34, 197, 94, 0.3)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                cursor: "pointer",
+                position: "relative",
+                background: "linear-gradient(135deg, #22c55e 0%, #166534 100%)", // Green gradient: lighter to darker
+                textAlign: 'center',
+              }}
+              onClick={() => navigate('/admin/inventory')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 12px 20px rgba(22, 101, 52, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 8px 15px rgba(22, 101, 52, 0.25)";
+              }}
+            >
               {renderBadge(badges.outOfStock)}
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>📊</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>Inventory Management</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Monitor stock levels, track pending orders, and manage product inventory
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center', textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>📊</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>Manage Inventory</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5" , fontSize: "15px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)"}}>
+                Monitor product inventory levels, request and track incoming stock
               </p>
-              <button
-                onClick={() => navigate('/admin/inventory')}
-                style={{
-                  background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                Manage Inventory
-              </button>
             </div>
 
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer",
-              position: "relative"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
+            {/* Support Tickets - Amber */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                padding: "24px",
+                boxShadow: "0 8px 15px rgba(180, 83, 9, 0.25)",
+                border: "1px solid rgba(255, 193, 7, 0.3)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                cursor: "pointer",
+                position: "relative",
+                background: "linear-gradient(135deg, #ffc107 0%, #b45309 100%)", // Amber gradient: lighter to darker
+                textAlign: 'center',
+              }}
+              onClick={() => navigate('/admin/tickets')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 12px 20px rgba(180, 83, 9, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 8px 15px rgba(180, 83, 9, 0.25)";
+              }}
+            >
+              {renderBadge(badges.newTickets)}
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center', textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>🎫</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)"}}>Support Tickets</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5", fontSize: "15px" , textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)"}}>
+                Manage customer support tickets and inquiries
+              </p>
+            </div>
+
+            {/* Reviews - Purple */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                padding: "24px",
+                boxShadow: "0 8px 15px rgba(126, 34, 206, 0.25)",
+                border: "1px solid rgba(162, 89, 236, 0.3)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                cursor: "pointer",
+                position: "relative",
+                background: "linear-gradient(135deg, #a259ec 0%, #7e22ce 100%)", // Purple gradient: lighter to darker
+                textAlign: 'center',
+              }}
+              onClick={() => navigate('/admin/reviews')}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 12px 20px rgba(126, 34, 206, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 8px 15px rgba(126, 34, 206, 0.25)";
+              }}
+            >
               {renderBadge(badges.newReviews)}
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>📝</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>All Reviews</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px", color: "#ffffff", display: 'flex', justifyContent: 'center', textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>📝</div>
+              <h3 style={{ margin: "0 0 12px 0", color: "#ffffff", textAlign: 'center', fontSize: "26px" , textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)"}}>Customer Feedback</h3>
+              <p style={{ margin: "0 0 20px 0", color: "#f8fafc", lineHeight: "1.5", fontSize: "15px", textShadow: "0 1px 2px rgba(0, 0, 0, 0.82)" }}>
                 View and moderate all customer product reviews
               </p>
-              <button
-                onClick={() => navigate('/admin/reviews')}
-                style={{
-                  background: "linear-gradient(135deg, #28a745 0%, #20c997 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(40, 167, 69, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                All Reviews
-              </button>
-            </div>
 
-            <div style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "24px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.07)",
-              border: "1px solid #e9ecef",
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              cursor: "pointer",
-              position: "relative"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 15px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.07)";
-            }}>
-              {renderBadge(badges.newTickets)}
-              <div style={{ fontSize: "36px", marginBottom: "16px" }}>🎫</div>
-              <h3 style={{ margin: "0 0 12px 0", color: "#2c3e50" }}>All Tickets</h3>
-              <p style={{ margin: "0 0 20px 0", color: "#6c757d", lineHeight: "1.5" }}>
-                Oversee, assign, and resolve all customer support tickets and inquiries
-              </p>
-              <button
-                onClick={() => navigate('/admin/tickets')}
-                style={{
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
-                  border: "none",
-                  padding: "12px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "14px",
-                  boxShadow: "0 2px 4px rgba(102, 126, 234, 0.3)",
-                  transition: "all 0.2s ease"
-                }}
-                onMouseEnter={(e) => e.target.style.transform = "translateY(-1px)"}
-                onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-              >
-                All Tickets
-              </button>
+
             </div>
           </div>
         </div>

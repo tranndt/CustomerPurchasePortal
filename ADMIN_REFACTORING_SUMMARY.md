@@ -85,6 +85,13 @@ Note: The current implementation stores requests in component state. For persist
    - Eliminated inactive status indicators and related styling
    - Created a more consistent visual experience for all products
 
+4. **Custom Alert System Implementation**:
+   - Replaced default JavaScript alert boxes with themed on-screen overlay dialogs
+   - Created a consistent, styled alert experience using the app's design system
+   - Implemented alert, confirm, and prompt functionality with optional inputs
+   - Added AlertContext provider for application-wide alert management
+   - Updated OrderFulfillment and InventoryManagement components to use the new system
+
 ## Future Improvements
 
 1. **Backend Integration**: Connect the inventory request feature to the backend for persistence.

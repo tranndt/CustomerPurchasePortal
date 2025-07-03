@@ -26,10 +26,11 @@
   font-size: var(--font-size-4xl);
   font-weight: 700;
   margin: 0 0 var(--spacing-3) 0;
-  background: var(--gradient-primary);
-  background-clip: text;
+  background: linear-gradient(135deg, #ffc107, #b45309); /* Amber gradient: lighter to darker */
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .tickets-subtitle {
@@ -119,7 +120,7 @@
   padding-bottom: var(--spacing-2);
 }
 
-.tab {
+.tickets-container .tab {
   padding: var(--spacing-3) var(--spacing-5);
   background-color: var(--white);
   border: 1px solid var(--gray-300);
@@ -131,15 +132,17 @@
   white-space: nowrap;
 }
 
-.tab:hover {
-  background-color: var(--gray-100);
-  color: var(--primary-color);
+.tickets-container .tab:hover {
+  background-color: rgba(180, 83, 9, 0.05);
+  color: #b45309; /* Darker amber accent color */
+  border-color: rgba(180, 83, 9, 0.3);
 }
 
-.tab.active {
-  background-color: var(--primary-color);
-  color: var(--white);
-  border-color: var(--primary-color);
+.tickets-container .tab.active {
+  background: linear-gradient(135deg, #ffc107, #b45309); /* Amber gradient: lighter to darker */
+  color: var(--white); /* White text for better readability */
+  border-color: #b45309; /* Darker amber accent color */
+  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.3);
 }
 
 .tab-content {
@@ -307,12 +310,14 @@
 }
 
 .view-button {
-  background-color: var(--primary-color);
-  color: var(--white);
+  background: linear-gradient(135deg, #b45309, #ffc107); /* Amber gradient */
+  color: var(--white); /* White text for better readability */
+  box-shadow: 0 2px 4px rgba(180, 83, 9, 0.2);
 }
 
 .view-button:hover {
-  background-color: var(--primary-hover);
+  background: linear-gradient(135deg, #92400e, #eab308); /* Slightly darker amber gradient */
+  box-shadow: 0 4px 8px rgba(180, 83, 9, 0.3);
 }
 
 .refresh-button {
@@ -322,19 +327,19 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--gradient-primary);
-  color: var(--white);
+  background: linear-gradient(135deg, #ffc107, #b45309); /* Amber gradient: lighter to darker */
+  color: var(--white); /* White text for better readability */
   border: none;
   font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.5);
   transition: var(--transition-all);
   z-index: 1000;
 }
 
 .refresh-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.5);
+  box-shadow: 0 8px 20px rgba(180, 83, 9, 0.6);
 }
 
 @media (max-width: 992px) {

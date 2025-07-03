@@ -21,36 +21,39 @@ import ProductDetail from './components/ProductDetail/ProductDetail';
 import OrderFulfillment from './components/OrderFulfillment/OrderFulfillment';
 import InventoryManagement from './components/InventoryManagement/InventoryManagement';
 import Notification from './components/Notification/Notification';
+import { AlertProvider } from './components/AlertContext/AlertContext';
 
 function App() {
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/product/:productId" element={<ProductDetail />} />
+    <AlertProvider>
+      <>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/product/:productId" element={<ProductDetail />} />
 
-        <Route path="/admin/home" element={<AdminHome />} />
-        <Route path="/support/home" element={<SupportHome />} />
-        <Route path="/login" element={<LoginPanel />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/customer/home" element={<CustomerHome />} />
-        <Route path="/customer/reviews" element={<ProtectedRoute><MyReviews /></ProtectedRoute>} />
-        <Route path="/customer/tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
-        <Route path="/customer/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-        {/* Removed product-specific review route, now using general shopping experience reviews */}
-        <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
-        <Route path="/admin/fulfillment" element={<ProtectedRoute><OrderFulfillment /></ProtectedRoute>} />
-        <Route path="/admin/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
-        <Route path="/admin/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
-        <Route path="/admin/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
-        <Route path="/admin/reviews" element={<ProtectedRoute><AllReviews /></ProtectedRoute>} />
-        <Route path="/support/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
-        <Route path="/support/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
+          <Route path="/admin/home" element={<AdminHome />} />
+          <Route path="/support/home" element={<SupportHome />} />
+          <Route path="/login" element={<LoginPanel />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/customer/home" element={<CustomerHome />} />
+          <Route path="/customer/reviews" element={<ProtectedRoute><MyReviews /></ProtectedRoute>} />
+          <Route path="/customer/tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
+          <Route path="/customer/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+          {/* Removed product-specific review route, now using general shopping experience reviews */}
+          <Route path="/customer/tickets/:transaction_id" element={<ProtectedRoute><SupportClaim /></ProtectedRoute>} />
+          <Route path="/admin/fulfillment" element={<ProtectedRoute><OrderFulfillment /></ProtectedRoute>} />
+          <Route path="/admin/inventory" element={<ProtectedRoute><InventoryManagement /></ProtectedRoute>} />
+          <Route path="/admin/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
+          <Route path="/admin/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
+          <Route path="/admin/reviews" element={<ProtectedRoute><AllReviews /></ProtectedRoute>} />
+          <Route path="/support/tickets" element={<ProtectedRoute><TicketManager /></ProtectedRoute>} />
+          <Route path="/support/tickets/:ticket_id" element={<ProtectedRoute><TicketDetail /></ProtectedRoute>} />
 
-      </Routes>
-      <Notification />
-    </>
+        </Routes>
+        <Notification />
+      </>
+    </AlertProvider>
   );
 }
 export default App;

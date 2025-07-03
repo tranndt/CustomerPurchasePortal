@@ -174,7 +174,7 @@ const TicketManager = () => {
       <SimpleNav />
       <div className="tickets-management">
         <div className="tickets-container">
-          <BackButton />
+          <BackButton to="/admin/home" label="← Back to Admin Home" variant="primary" />
           {/* Header */}
           <div className="tickets-header">
             <h1 className="tickets-title">Ticket Management</h1>
