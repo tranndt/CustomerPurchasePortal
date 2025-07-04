@@ -243,13 +243,13 @@ For sentiment analysis, the application can use IBM Watson X (with API key) or f
 
 - `GET /analyze/{text}` - Analyze sentiment of text
 
-## � Security Best Practices
+## 🔒 Security Best Practices
 
 ### API Keys and Credentials
 
 1. **Never store sensitive information in the repository**
    - API keys, passwords, and connection strings should never be committed to the repository
-   - Use environment variables instead
+   - Use environment variables or secret files instead
 
 2. **Use the credentials directory for local development**
    - Store API keys in the `credentials/` directory (which is gitignored)
@@ -262,7 +262,15 @@ For sentiment analysis, the application can use IBM Watson X (with API key) or f
    ./setup_api_keys.sh
    ```
 
-4. **For Render deployment**
+4. **For Render deployment - Using Secret Files (Recommended)**
+   - Use Render's "Secret Files" feature for better organization and security
+   - Add the following secret files in your Render dashboard:
+     - `secrets.env` → Mount at `/etc/secrets/secrets.env`
+     - `watsonx.json` → Mount at `/etc/secrets/watsonx.json`
+   - The application will automatically load these files at startup
+   - See [RENDER_SECRET_FILES.md](docs_backup/RENDER_SECRET_FILES.md) for detailed setup instructions
+
+5. **Alternative: Using Environment Variables in Render**
    - Add sensitive environment variables in the Render dashboard
    - Required variables:
      - `MONGODB_URI` - Your MongoDB connection string
@@ -271,6 +279,6 @@ For sentiment analysis, the application can use IBM Watson X (with API key) or f
 
 For more details, see [SECURITY_CREDENTIALS.md](docs_backup/SECURITY_CREDENTIALS.md).
 
-## �📝 License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

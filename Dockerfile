@@ -56,5 +56,8 @@ EXPOSE 8000 3030 5002
 # Set environment variable to ensure the correct port is used
 ENV PORT=8000
 
+# Create directory for mounted secrets
+RUN mkdir -p /etc/secrets
+
 # Start all services
 CMD ["/app/start.sh"]

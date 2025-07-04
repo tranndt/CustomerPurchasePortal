@@ -186,3 +186,5 @@ sentiment_service/
 apikey.json
 **/apikeys/
 credentials/
+secrets
+

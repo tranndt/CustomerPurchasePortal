@@ -6,29 +6,19 @@ services:
     region: oregon
     plan: standard
     healthCheckPath: /health/
+    
+    # Using Secret Files instead of environment variables
+    # All sensitive configuration will be loaded from these files
+    secretFiles:
+      - key: SECRETS_ENV
+        fromFile: secrets.env
+        mountPath: /etc/secrets/secrets.env
+      - key: WATSONX_CONFIG
+        fromFile: watsonx.json
+        mountPath: /etc/secrets/watsonx.json
+    
+    # Minimal environment variables - most config comes from secret files
     envVars:
-      # Django configuration
-      - key: DJANGO_SECRET_KEY
-        generateValue: true  # Render will generate a secure key
-      - key: DEBUG
-        value: "false"
-      - key: ALLOWED_HOSTS
-        value: electronicsretail-e-commerce.onrender.com,localhost,127.0.0.1
-      
-      # Internal service URLs (for container-internal communication)
-      - key: EXPRESS_API_URL
-        value: http://127.0.0.1:3030
-      - key: SENTIMENT_ANALYZER_URL
-        value: http://127.0.0.1:5002/
-      
-      # MongoDB connection - MUST be set manually in Render dashboard
-      - key: MONGODB_URI
-        sync: false  # User must provide this manually in the dashboard
-      
-      # WatsonX API credentials - MUST be set manually in Render dashboard
-      - key: WATSONX_API_KEY
-        sync: false  # User must provide this manually in the dashboard
-      - key: WATSONX_PROJECT_ID
-        sync: false  # User must provide this manually in the dashboard
-      - key: SERVER_URL
-        value: https://us-south.ml.cloud.ibm.com
+      # Set PORT for Render
+      - key: PORT
+        value: "8000"
