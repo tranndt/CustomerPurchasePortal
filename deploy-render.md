@@ -124,6 +124,21 @@ Since Render doesn't provide MongoDB hosting, you'll need to set up an external 
 * [x] Environment variables entered (from `.env.example`)
 * [x] App builds and runs on live URL
 
+## 🔐 Handling API Keys Securely
+
+When deploying to Render, API keys should **never** be committed to your repository. Instead:
+
+1. **Remove API keys from your repository**
+   - Add `apikey.json` and other credential files to `.gitignore`
+   - Create example files (like `apikey.example.json`) without real credentials
+
+2. **Add API keys as environment variables in Render**
+   - In your Render dashboard → Environment tab
+   - Add `WATSONX_API_KEY` with your actual key
+   - Add `WATSONX_PROJECT_ID` with your project ID
+
+This approach keeps your API keys secure while making them available to your application in production.
+
 ---
 
 ## 🔍 Troubleshooting

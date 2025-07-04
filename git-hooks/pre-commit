@@ -1,0 +1,29 @@
+#!/bin/bash
+# Pre-commit hook to prevent committing sensitive files
+# To use: Copy this file to .git/hooks/pre-commit and make it executable
+
+echo "Running pre-commit checks for sensitive files..."
+
+# Check for API key files
+if git diff --cached --name-only | grep -E "apikey\.json|.*\.key|.*\.pem" > /dev/null; then
+  echo "ERROR: Attempt to commit sensitive files detected."
+  echo "The following files should not be committed:"
+  git diff --cached --name-only | grep -E "apikey\.json|.*\.key|.*\.pem"
+  echo ""
+  echo "Please remove these files from your commit."
+  echo "If you need to save credentials, use the credentials/ directory (gitignored)."
+  exit 1
+fi
+
+# Check for .env files (except .env.example)
+if git diff --cached --name-only | grep -E "\.env$|\.env\.[^e]" > /dev/null; then
+  echo "ERROR: Attempt to commit .env file detected."
+  echo "The following files should not be committed:"
+  git diff --cached --name-only | grep -E "\.env$|\.env\.[^e]"
+  echo ""
+  echo "Please remove these files from your commit."
+  exit 1
+fi
+
+# Success - allow the commit
+exit 0

@@ -183,3 +183,6 @@ sentiment_service/
 *.key
 *.pem
 *.crt
+apikey.json
+**/apikeys/
+credentials/

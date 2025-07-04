@@ -1,0 +1,6 @@
+{
+	"name": "API Key Name",
+	"description": "Description of what this key is used for",
+	"createdAt": "YYYY-MM-DDThh:mm+0000",
+	"apikey": "your-api-key-goes-here"
+}

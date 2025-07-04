@@ -152,6 +152,36 @@ This application can be deployed on [Render](https://render.com) using Docker.
 
 The application uses MongoDB for data storage. Sample data is automatically loaded on startup.
 
+### API Keys
+
+For sentiment analysis, the application can use IBM Watson X (with API key) or fall back to VADER (local analysis):
+
+1. **Setting up API Keys**:
+
+   ```bash
+   # Store your API key in the credentials folder (gitignored)
+   mkdir -p credentials
+   cp apikey.example.json credentials/apikey.json
+   # Edit the file to include your actual API key
+   nano credentials/apikey.json
+   ```
+
+2. **Run the setup script** to add API keys to your environment:
+
+   ```bash
+   ./setup_api_keys.sh
+   ```
+
+3. **Manual Setup**: Alternatively, add to your `.env` file:
+
+   ```bash
+   WATSONX_API_KEY=your_api_key_here
+   WATSONX_PROJECT_ID=your_project_id
+   SERVER_URL=https://us-south.ml.cloud.ibm.com
+   ```
+
+> Note: If no API keys are provided, the system falls back to using VADER for sentiment analysis.
+
 ## 📱 Usage
 
 ### For All Users
