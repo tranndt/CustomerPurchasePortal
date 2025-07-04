@@ -11,7 +11,15 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 // Load product reviews data
 const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
 
-mongoose.connect("mongodb://mongo:27017/",{'dbName':'purchasePortalDB'})
+// Use environment variable for MongoDB connection if available, fallback to local MongoDB
+const mongoURI = process.env.MONGODB_URI || "mongodb://mongo:27017/purchasePortalDB";
+console.log("Connecting to MongoDB at: " + (process.env.MONGODB_URI ? "[ATLAS URI]" : "mongodb://mongo:27017/purchasePortalDB"));
+
+mongoose.connect(mongoURI, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000 // Increase timeout to 30 seconds
+})
   .then(() => {
     // Store db connection for use in routes
     app.locals.db = mongoose.connection;

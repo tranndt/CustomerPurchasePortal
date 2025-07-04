@@ -22,14 +22,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY =\
-    'django-insecure-ccow$tz_=9%dxu4(0%^(z%nx32#s@(zt9$ih@)5l54yny)wm-0'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ccow$tz_=9%dxu4(0%^(z%nx32#s@(zt9$ih@)5l54yny)wm-0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = []
-CSRF_TRUSTED_ORIGINS = []
+# Parse ALLOWED_HOSTS from environment variable
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+print(f"ALLOWED_HOSTS set to: {ALLOWED_HOSTS}")
+
+# CSRF trusted origins - add render domain and http/https variants
+render_domain = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_domain:
+    CSRF_TRUSTED_ORIGINS = [f"https://{render_domain}", f"http://{render_domain}"]
+    # Also add to ALLOWED_HOSTS if not already there
+    if render_domain not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_domain)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
