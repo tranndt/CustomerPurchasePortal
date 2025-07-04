@@ -1,0 +1,7 @@
+{
+  "name": "WatsonX API Key",
+  "description": "API key for IBM WatsonX service",
+  "apikey": "your_watsonx_api_key_here",
+  "url": "https://us-south.ml.cloud.ibm.com",
+  "project_id": "your_watsonx_project_id_here"
+}

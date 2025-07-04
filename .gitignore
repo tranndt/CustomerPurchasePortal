@@ -157,6 +157,8 @@ apikey.json
 *.pem
 .env.local
 .env.production
+secrets.env
+watsonx.json
 
 # Docker
 .dockerignore

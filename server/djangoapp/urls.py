@@ -6,6 +6,9 @@ from . import views
 
 app_name = 'djangoapp'
 urlpatterns = [
+    # Home page - serve React app or API info
+    path(route='', view=views.home, name='home'),
+    
     # Health check endpoint
     path(route='health-check', view=views.health_check, name='health_check'),
 

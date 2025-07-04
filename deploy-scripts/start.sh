@@ -40,7 +40,7 @@ cd /app/django
 echo "Starting Django application on port 8000 (main port Render will use)..."
 # Add a sleep to ensure other services are ready
 sleep 5
-# Use PORT env variable if set (for Render compatibility), otherwise use 8000
+# Render automatically assigns PORT environment variable - use it, fallback to 8000
 PORT="${PORT:-8000}"
 echo "Binding to port $PORT"
-gunicorn --bind :$PORT --workers 3 djangoproj.wsgi
+gunicorn --bind 0.0.0.0:$PORT --workers 3 djangoproj.wsgi

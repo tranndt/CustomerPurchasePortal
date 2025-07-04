@@ -21,6 +21,7 @@ FROM python:3.12.0-slim-bookworm
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
+    jq \
     && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
