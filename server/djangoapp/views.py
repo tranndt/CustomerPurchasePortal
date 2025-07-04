@@ -32,27 +32,19 @@ def home(request):
     Serve the React frontend application.
     This acts as the main entry point for the web application.
     """
-    from django.shortcuts import render
-    from django.conf import settings
-    import os
-    
-    # Check if React build exists
-    build_path = os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html')
-    if os.path.exists(build_path):
-        # Serve the React app
-        with open(build_path, 'r') as f:
-            return HttpResponse(f.read(), content_type='text/html')
-    else:
-        # Fallback if React build doesn't exist
-        return JsonResponse({
-            'message': 'ElectronicsRetail API',
-            'status': 'running',
-            'endpoints': {
-                'admin': '/admin/',
-                'api': '/djangoapp/api/',
-                'auth': '/djangoapp/login'
-            }
-        })
+    # For now, return a simple JSON response to test if Django is working
+    return JsonResponse({
+        'message': 'ElectronicsRetail API is running',
+        'status': 'success',
+        'service': 'django',
+        'endpoints': {
+            'admin': '/admin/',
+            'api': '/djangoapp/api/',
+            'auth': '/djangoapp/login',
+            'health': '/health/'
+        },
+        'note': 'Frontend will be available once React build is properly configured'
+    })
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt

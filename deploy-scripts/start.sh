@@ -38,6 +38,11 @@ echo "Express API service started with PID: $EXPRESS_PID"
 # Start Django application in foreground (main process)
 cd /app/django
 echo "Starting Django application on port 8000 (main port Render will use)..."
+
+# Collect static files for production
+echo "Collecting static files..."
+python manage.py collectstatic --noinput --clear
+
 # Add a sleep to ensure other services are ready
 sleep 5
 # Render automatically assigns PORT environment variable - use it, fallback to 8000

@@ -36,3 +36,15 @@ urlpatterns = [
     # Redirect root to djangoapp
     path('', RedirectView.as_view(url='/djangoapp/', permanent=False)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve React static files in production
+if not settings.DEBUG:
+    from django.views.static import serve
+    from django.urls import re_path
+    
+    # Serve React build static files
+    urlpatterns += [
+        re_path(r'^static/(?P<path>.*)$', serve, {
+            'document_root': settings.STATIC_ROOT,
+        }),
+    ]
