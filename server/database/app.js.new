@@ -1,0 +1,137 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const fs = require('fs');
+const cors = require('cors')
+const app = express()
+const port = 3030;
+
+// Import the enhanced MongoDB connection module
+const connectToMongoDB = require('./mongo-connection');
+
+app.use(cors())
+app.use(require('body-parser').urlencoded({ extended: false }));
+
+// Load product reviews data
+const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
+
+// Connect to MongoDB with enhanced authentication and diagnostics
+connectToMongoDB()
+  .then(({ connected, connection }) => {
+    if (connected) {
+      // Store db connection for use in routes
+      app.locals.db = connection;
+      console.log('MongoDB connection established and ready for use');
+      
+      // Wait a bit and then load reviews
+      setTimeout(loadReviews, 2000);
+    } else {
+      console.error('All MongoDB connection attempts failed');
+    }
+  })
+  .catch(err => {
+    console.error('Unexpected error during MongoDB connection:', err);
+  });
+
+const Reviews = require('./review');
+const productsRoutes = require('./products');
+
+// Use products routes
+app.use(productsRoutes);
+
+// Function to load reviews with better error handling
+const loadReviews = async () => {
+  try {
+    // First check if we're connected
+    if (mongoose.connection.readyState !== 1) {
+      console.log('MongoDB not connected, waiting before loading reviews...');
+      setTimeout(loadReviews, 5000); // Try again in 5 seconds
+      return;
+    }
+    
+    console.log('Checking for existing reviews...');
+    const existingCount = await Reviews.countDocuments();
+    
+    if (existingCount > 0) {
+      console.log(`${existingCount} reviews already exist, skipping data load`);
+      return;
+    }
+    
+    console.log('Loading reviews data...');
+    await Reviews.deleteMany({});
+    const result = await Reviews.insertMany(reviews_data['reviews']);
+    console.log(`Successfully loaded ${result.length} reviews`);
+  } catch (error) {
+    console.error('Error loading reviews data:', error);
+    console.log('Will retry loading reviews in 10 seconds...');
+    setTimeout(loadReviews, 10000); // Retry after 10 seconds
+  }
+};
+
+// Express route to home
+app.get('/', async (req, res) => {
+    res.send("Welcome to the Purchase Portal API")
+});
+
+// Express route for health check
+app.get('/health', (req, res) => {
+  const healthStatus = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    dbConnected: mongoose.connection.readyState === 1,
+    environment: process.env.NODE_ENV || 'development'
+  };
+  
+  res.json(healthStatus);
+});
+
+// Express route to fetch all reviews
+app.get('/fetchReviews', async (req, res) => {
+  try {
+    const documents = await Reviews.find();
+    res.json(documents);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching documents' });
+  }
+});
+
+// Express route to fetch reviews by a particular product
+app.get('/fetchReviews/product/:id', async (req, res) => {
+  try {
+    const documents = await Reviews.find({product_id: req.params.id});
+    res.json(documents);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching documents' });
+  }
+});
+
+// Express route to insert review
+app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
+  data = JSON.parse(req.body);
+  const documents = await Reviews.find().sort( { id: -1 } )
+  let new_id = documents.length > 0 ? documents[0]['id'] + 1 : 1;
+
+  const review = new Reviews({
+		"id": new_id,
+		"name": data['name'],
+		"product_id": data['product_id'] || 1,
+		"product_name": data['product_name'] || "Unknown Product",
+		"review": data['review'],
+		"rating": data['rating'] || 5,
+		"purchase": data['purchase'] || false,
+		"purchase_date": data['purchase_date'],
+		"sentiment": data['sentiment'] || "neutral"
+	});
+
+  try {
+    const savedReview = await review.save();
+    res.json(savedReview);
+  } catch (error) {
+		console.log(error);
+    res.status(500).json({ error: 'Error inserting review' });
+  }
+});
+
+// Start the Express server
+app.listen(port, () => {
+  console.log(`Server is running on http://127.0.0.1:${port}`);
+});

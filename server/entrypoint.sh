@@ -32,10 +32,14 @@ echo "Flask sentiment service started with PID: $FLASK_PID"
 # Test MongoDB connection during startup
 echo "Testing MongoDB connection..."
 cd /app/express
-if [ -f test-mongodb-connection.js ]; then
+if [ -f mongodb-auth-test.js ]; then
+  echo "Running MongoDB authentication diagnostics..."
+  node mongodb-auth-test.js
+elif [ -f test-mongodb-connection.js ]; then
+  echo "Running basic MongoDB connection test..."
   node test-mongodb-connection.js
 else
-  echo "MongoDB connection test script not found, skipping test"
+  echo "MongoDB connection test scripts not found, skipping tests"
 fi
 
 # Start Express API service in background
