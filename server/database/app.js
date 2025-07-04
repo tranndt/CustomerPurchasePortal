@@ -12,34 +12,82 @@ app.use(require('body-parser').urlencoded({ extended: false }));
 const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
 
 // Use environment variable for MongoDB connection if available, fallback to local MongoDB
-const mongoURI = process.env.MONGODB_URI || "mongodb://mongo:27017/purchasePortalDB";
-console.log("Connecting to MongoDB at: " + (process.env.MONGODB_URI ? "[ATLAS URI]" : "mongodb://mongo:27017/purchasePortalDB"));
+let mongoURI = process.env.MONGODB_URI;
 
-// Set up MongoDB connection options with better error handling
+// Check if the URI includes the database name
+if (mongoURI && !mongoURI.split('/').slice(-1)[0]) {
+  // If no database name is provided, add purchasePortalDB
+  mongoURI = `${mongoURI}${mongoURI.endsWith('/') ? '' : '/'}purchasePortalDB`;
+  console.log("Added database name to MongoDB URI");
+}
+
+// Local fallback - try different options based on environment
+const fallbackURIs = [
+  "mongodb://mongo:27017/purchasePortalDB",  // Docker service name
+  "mongodb://localhost:27017/purchasePortalDB", // Local development
+  "mongodb://127.0.0.1:27017/purchasePortalDB"  // Explicit localhost IP
+];
+
+if (!mongoURI) {
+  mongoURI = fallbackURIs[0];
+  console.log("No MongoDB URI provided, using fallback:", mongoURI);
+}
+
+console.log("Connecting to MongoDB at:", mongoURI ? mongoURI.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@') : "undefined");
+
+// Set up MongoDB connection options with better error handling and higher timeouts
 const mongooseOptions = { 
-  serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
-  socketTimeoutMS: 45000,         // How long the MongoDB driver will wait for a socket connection
-  connectTimeoutMS: 30000,        // How long the MongoDB driver will wait to establish a connection
+  serverSelectionTimeoutMS: 60000, // Increase timeout to 60 seconds
+  socketTimeoutMS: 90000,         // How long the MongoDB driver will wait for a socket connection
+  connectTimeoutMS: 60000,        // How long the MongoDB driver will wait to establish a connection
   retryWrites: true,
-  maxPoolSize: 10                 // Maximum number of connections in the connection pool
+  maxPoolSize: 10,                // Maximum number of connections in the connection pool
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 };
 
-// Connect to MongoDB with better error handling
-mongoose.connect(mongoURI, mongooseOptions)
-  .then(() => {
-    // Store db connection for use in routes
-    app.locals.db = mongoose.connection;
-    console.log('MongoDB connected successfully');
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    // Log more details about the error
-    console.error('MongoDB connection error details:', {
-      name: err.name,
-      code: err.code,
-      message: err.message,
-      uri: mongoURI ? mongoURI.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@') : 'undefined'
-    });
+// Connect function with retry logic
+const connectWithRetry = async (uri, options, retries = 3, delay = 5000) => {
+  try {
+    await mongoose.connect(uri, options);
+    console.log('MongoDB connected successfully to:', uri.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@'));
+    return true;
+  } catch (err) {
+    console.error(`MongoDB connection error (attempt ${4-retries}/3):`, err.name, err.message);
+    
+    if (retries <= 1) {
+      // If we're out of retries with the main URI, try fallbacks
+      for (const fallbackURI of fallbackURIs) {
+        if (fallbackURI !== uri) {
+          console.log(`Trying fallback MongoDB URI: ${fallbackURI.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@')}`);
+          try {
+            await mongoose.connect(fallbackURI, options);
+            console.log('MongoDB connected successfully using fallback');
+            return true;
+          } catch (fallbackErr) {
+            console.error('Fallback connection error:', fallbackErr.name, fallbackErr.message);
+          }
+        }
+      }
+      return false;
+    }
+    
+    console.log(`Retrying in ${delay/1000} seconds...`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return connectWithRetry(uri, options, retries - 1, delay);
+  }
+};
+
+// Connect to MongoDB with retry logic
+connectWithRetry(mongoURI, mongooseOptions)
+  .then(success => {
+    if (success) {
+      // Store db connection for use in routes
+      app.locals.db = mongoose.connection;
+      console.log('MongoDB connection established and ready');
+    } else {
+      console.error('All MongoDB connection attempts failed');
+    }
   });
 
 const Reviews = require('./review');
@@ -48,13 +96,40 @@ const productsRoutes = require('./products');
 // Use products routes
 app.use(productsRoutes);
 
-try {
-  Reviews.deleteMany({}).then(()=>{
-    Reviews.insertMany(reviews_data['reviews']);
-  });
-} catch (error) {
-  console.log('Error loading data:', error);
-}
+// Function to load reviews with better error handling
+const loadReviews = async () => {
+  try {
+    // First check if we're connected
+    if (mongoose.connection.readyState !== 1) {
+      console.log('MongoDB not connected, waiting before loading reviews...');
+      setTimeout(loadReviews, 5000); // Try again in 5 seconds
+      return;
+    }
+    
+    console.log('Checking for existing reviews...');
+    const existingCount = await Reviews.countDocuments();
+    
+    if (existingCount > 0) {
+      console.log(`${existingCount} reviews already exist, skipping data load`);
+      return;
+    }
+    
+    console.log('Loading reviews data...');
+    await Reviews.deleteMany({});
+    const result = await Reviews.insertMany(reviews_data['reviews']);
+    console.log(`Successfully loaded ${result.length} reviews`);
+  } catch (error) {
+    console.error('Error loading reviews data:', error);
+    console.log('Will retry loading reviews in 10 seconds...');
+    setTimeout(loadReviews, 10000); // Retry after 10 seconds
+  }
+};
+
+// Wait for MongoDB connection before trying to load reviews
+mongoose.connection.once('connected', () => {
+  console.log('MongoDB connected event fired, loading reviews...');
+  setTimeout(loadReviews, 2000); // Give a little time after connection
+});
 
 // Express route to home
 app.get('/', async (req, res) => {
