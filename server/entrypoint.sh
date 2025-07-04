@@ -24,8 +24,8 @@ echo "MongoDB: [configured]"
 echo "WatsonX: [configured]"
 
 # Start Flask sentiment service in background
-cd /app/sentiment_service
-python sentiment_analyzer.py &
+cd /app/djangoapp/microservices
+python app.py &
 FLASK_PID=$!
 echo "Flask sentiment service started with PID: $FLASK_PID"
 
