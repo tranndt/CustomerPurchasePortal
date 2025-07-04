@@ -29,11 +29,13 @@ python app.py &
 FLASK_PID=$!
 echo "Flask sentiment service started with PID: $FLASK_PID"
 
-# Diagnose MongoDB connection if available
-if [ -f /app/express/mongo-debug.js ]; then
-  echo "Running MongoDB connection diagnostic..."
-  cd /app/express
-  node mongo-debug.js
+# Test MongoDB connection during startup
+echo "Testing MongoDB connection..."
+cd /app/express
+if [ -f test-mongodb-connection.js ]; then
+  node test-mongodb-connection.js
+else
+  echo "MongoDB connection test script not found, skipping test"
 fi
 
 # Start Express API service in background

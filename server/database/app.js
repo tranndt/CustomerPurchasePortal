@@ -28,9 +28,34 @@ const fallbackURIs = [
   "mongodb://127.0.0.1:27017/purchasePortalDB"  // Explicit localhost IP
 ];
 
+// Check if we're running on Render (Render sets this environment variable)
+const isRender = process.env.RENDER === 'true';
+
 if (!mongoURI) {
   mongoURI = fallbackURIs[0];
   console.log("No MongoDB URI provided, using fallback:", mongoURI);
+}
+
+// For MongoDB Atlas connections on Render, ensure we have the right options
+if (mongoURI && mongoURI.includes('mongodb+srv') && isRender) {
+  // Add the following params if they don't exist already:
+  // - authSource=admin (specifies the authentication database)
+  // - retryWrites=true (enables retryable writes)
+  // - w=majority (writes to the majority of the replica set)
+  
+  if (!mongoURI.includes('authSource=')) {
+    mongoURI += (mongoURI.includes('?') ? '&' : '?') + 'authSource=admin';
+  }
+  
+  if (!mongoURI.includes('retryWrites=')) {
+    mongoURI += (mongoURI.includes('?') ? '&' : '?') + 'retryWrites=true';
+  }
+  
+  if (!mongoURI.includes('w=')) {
+    mongoURI += (mongoURI.includes('?') ? '&' : '?') + 'w=majority';
+  }
+  
+  console.log("Enhanced MongoDB Atlas URI for Render deployment");
 }
 
 console.log("Connecting to MongoDB at:", mongoURI ? mongoURI.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@') : "undefined");
