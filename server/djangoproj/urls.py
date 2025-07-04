@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import RedirectView
 from django.http import JsonResponse
+from djangoapp.views import home
 
 # Simple health check view for monitoring
 def health_check(request):
@@ -33,18 +34,47 @@ urlpatterns = [
     path('djangoapp/', include('djangoapp.urls')),
     # Add a health check endpoint
     path('health/', health_check, name='health_check'),
-    # Redirect root to djangoapp
-    path('', RedirectView.as_view(url='/djangoapp/', permanent=False)),
+    # Serve React frontend at root
+    path('', home, name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Serve React static files in production
-if not settings.DEBUG:
-    from django.views.static import serve
-    from django.urls import re_path
-    
-    # Serve React build static files
-    urlpatterns += [
-        re_path(r'^static/(?P<path>.*)$', serve, {
-            'document_root': settings.STATIC_ROOT,
-        }),
-    ]
+# Serve static files and React build assets
+from django.views.static import serve
+
+# Serve React build static files (CSS, JS)
+urlpatterns += [
+    re_path(r'^static/(?P<path>.*)$', serve, {
+        'document_root': settings.STATIC_ROOT,
+    }),
+]
+
+# Serve React build root assets (favicon, manifest, etc.)
+urlpatterns += [
+    re_path(r'^favicon\.ico$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'favicon.ico',
+    }),
+    re_path(r'^logo192\.png$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'logo192.png',
+    }),
+    re_path(r'^logo512\.png$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'logo512.png',
+    }),
+    re_path(r'^manifest\.json$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'manifest.json',
+    }),
+    re_path(r'^robots\.txt$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'robots.txt',
+    }),
+]
+
+# Catch-all pattern for React routing (should be last)
+# This serves index.html for any route that doesn't match above patterns
+# Important: This should be after all API routes
+urlpatterns += [
+    re_path(r'^(?!admin|djangoapp|health|static|favicon|logo|manifest|robots).*$', home, name='react_app'),
+]

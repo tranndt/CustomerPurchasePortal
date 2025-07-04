@@ -32,19 +32,47 @@ def home(request):
     Serve the React frontend application.
     This acts as the main entry point for the web application.
     """
-    # For now, return a simple JSON response to test if Django is working
-    return JsonResponse({
-        'message': 'ElectronicsRetail API is running',
-        'status': 'success',
-        'service': 'django',
-        'endpoints': {
-            'admin': '/admin/',
-            'api': '/djangoapp/api/',
-            'auth': '/djangoapp/login',
-            'health': '/health/'
-        },
-        'note': 'Frontend will be available once React build is properly configured'
-    })
+    from django.conf import settings
+    import os
+    
+    # Path to React build index.html
+    react_index_path = os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html')
+    
+    try:
+        # Try to serve the React index.html file
+        if os.path.exists(react_index_path):
+            with open(react_index_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            return HttpResponse(content, content_type='text/html')
+        else:
+            # Fallback if React build doesn't exist
+            return JsonResponse({
+                'message': 'ElectronicsRetail API is running',
+                'status': 'success',
+                'service': 'django',
+                'error': 'React build not found',
+                'path_checked': react_index_path,
+                'endpoints': {
+                    'admin': '/admin/',
+                    'api': '/djangoapp/api/',
+                    'auth': '/djangoapp/login',
+                    'health': '/health/'
+                }
+            })
+    except Exception as e:
+        # Error fallback
+        return JsonResponse({
+            'message': 'ElectronicsRetail API is running',
+            'status': 'error',
+            'service': 'django',
+            'error': str(e),
+            'endpoints': {
+                'admin': '/admin/',
+                'api': '/djangoapp/api/',
+                'auth': '/djangoapp/login',
+                'health': '/health/'
+            }
+        })
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt

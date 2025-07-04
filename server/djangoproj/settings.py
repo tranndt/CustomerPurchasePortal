@@ -147,16 +147,19 @@ REACT_APP_DIR = os.path.join(BASE_DIR, 'frontend')
 REACT_BUILD_DIR = os.path.join(REACT_APP_DIR, 'build')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/static'),
     os.path.join(BASE_DIR, 'frontend/build/static'),  # React build static files
 ]
+
+# Also ensure the React build directory is included for templates
+if os.path.exists(os.path.join(BASE_DIR, 'frontend/build/static')):
+    pass  # Directory exists, good to go
+else:
+    print("Warning: React build static directory not found")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend/static')]
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
