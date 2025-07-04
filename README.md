@@ -103,8 +103,6 @@ This application can be deployed on [Render](https://render.com) using Docker.
 - Use the Render dashboard to monitor logs
 - Set up health checks for each service
 
-For detailed deployment instructions, see [deploy-render.md](deploy-render.md).
-
 ## 📦 Installation & Setup
 
 ### Prerequisites
@@ -156,22 +154,32 @@ The application uses MongoDB for data storage. Sample data is automatically load
 
 ## 📱 Usage
 
-### User Authentication
+### For All Users
 
-1. Register a new account or login with existing credentials
-2. Navigate through the application as an authenticated user
+- Register and log in to your account
+- Browse the electronics product catalog
+- View product details, specifications, and customer reviews
+- Search for products by name or category
 
-### Browsing Products
+### For Customers
 
-1. View the list of available products
-2. Click on a product to see details and reviews
+- Add products to your shopping cart and manage cart contents
+- Place orders and view your order history
+- Submit shopping experience reviews with ratings
+- Create and track support tickets for help or issues
 
-### Submitting Reviews
+### For Administrators
 
-1. Login to your account
-2. Navigate to a product page
-3. Fill out the review form with review text and rating
-4. Submit the review for automatic sentiment analysis
+- View and manage all customer orders, including processing and refunds
+- Update product inventory, pricing, and categories
+- Moderate product reviews and monitor sentiment trends
+- Oversee all support tickets and assign or resolve as needed
+
+### For Support Staff
+
+- View and manage all customer support tickets
+- Respond to customer inquiries and update ticket statuses
+- Escalate complex issues to administrators
 
 ## 🔄 Key API Endpoints
 
