@@ -23,7 +23,10 @@ echo "Express API service started with PID: $EXPRESS_PID"
 
 # Start Django application in foreground (main process)
 cd /app/django
-echo "Starting Django application..."
+echo "Starting Django application on port 8000 (main port Render will use)..."
 # Add a sleep to ensure other services are ready
 sleep 5
-gunicorn --bind :8000 --workers 3 djangoproj.wsgi
+# Use PORT env variable if set (for Render compatibility), otherwise use 8000
+PORT="${PORT:-8000}"
+echo "Binding to port $PORT"
+gunicorn --bind :$PORT --workers 3 djangoproj.wsgi

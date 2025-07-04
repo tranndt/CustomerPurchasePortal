@@ -15,11 +15,17 @@ const reviews_data = JSON.parse(fs.readFileSync("data/reviews.json", 'utf8'));
 const mongoURI = process.env.MONGODB_URI || "mongodb://mongo:27017/purchasePortalDB";
 console.log("Connecting to MongoDB at: " + (process.env.MONGODB_URI ? "[ATLAS URI]" : "mongodb://mongo:27017/purchasePortalDB"));
 
-mongoose.connect(mongoURI, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 30000 // Increase timeout to 30 seconds
-})
+// Set up MongoDB connection options with better error handling
+const mongooseOptions = { 
+  serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+  socketTimeoutMS: 45000,         // How long the MongoDB driver will wait for a socket connection
+  connectTimeoutMS: 30000,        // How long the MongoDB driver will wait to establish a connection
+  retryWrites: true,
+  maxPoolSize: 10                 // Maximum number of connections in the connection pool
+};
+
+// Connect to MongoDB with better error handling
+mongoose.connect(mongoURI, mongooseOptions)
   .then(() => {
     // Store db connection for use in routes
     app.locals.db = mongoose.connection;
@@ -27,6 +33,13 @@ mongoose.connect(mongoURI, {
   })
   .catch(err => {
     console.error('MongoDB connection error:', err);
+    // Log more details about the error
+    console.error('MongoDB connection error details:', {
+      name: err.name,
+      code: err.code,
+      message: err.message,
+      uri: mongoURI ? mongoURI.replace(/mongodb(\+srv)?:\/\/[^:]+:[^@]+@/, 'mongodb$1://***:***@') : 'undefined'
+    });
   });
 
 const Reviews = require('./review');

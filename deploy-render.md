@@ -124,20 +124,55 @@ Since Render doesn't provide MongoDB hosting, you'll need to set up an external 
 * [x] Environment variables entered (from `.env.example`)
 * [x] App builds and runs on live URL
 
-## 🔐 Handling API Keys Securely
+## 🔐 Handling Sensitive Credentials Securely
 
-When deploying to Render, API keys should **never** be committed to your repository. Instead:
+When deploying to Render, sensitive information should **never** be committed to your repository or exposed in logs. Follow these guidelines:
 
-1. **Remove API keys from your repository**
-   - Add `apikey.json` and other credential files to `.gitignore`
-   - Create example files (like `apikey.example.json`) without real credentials
+### 1. Remove Sensitive Information from Your Repository
 
-2. **Add API keys as environment variables in Render**
-   - In your Render dashboard → Environment tab
-   - Add `WATSONX_API_KEY` with your actual key
-   - Add `WATSONX_PROJECT_ID` with your project ID
+* Add the following to `.gitignore`:
 
-This approach keeps your API keys secure while making them available to your application in production.
+  ```gitignore
+  # API keys and secrets
+  apikey.json
+  *.key
+  *.pem
+  .env
+  .env.*
+  !.env.example
+  credentials/
+  ```
+
+* Move real API keys to the `credentials/` directory for local development
+* Create example files (like `apikey.example.json`, `.env.example`) without real credentials
+
+### 2. Configure Environment Variables in Render
+
+In your Render dashboard:
+
+1. Go to the "Environment" tab of your service
+2. Add the following environment variables:
+   * **MongoDB Connection**:
+     * Key: `MONGODB_URI`
+     * Value: Your full MongoDB connection string
+   * **WatsonX API (if applicable)**:
+     * Key: `WATSONX_API_KEY`
+     * Value: Your actual API key
+     * Key: `WATSONX_PROJECT_ID`
+     * Value: Your project ID
+   * **Django Settings**:
+     * Key: `DJANGO_SECRET_KEY`
+     * Value: Let Render generate this for you
+     * Key: `DEBUG`
+     * Value: false
+
+### 3. Avoid Exposing Credentials in Logs
+
+* Avoid printing connection strings or credentials to logs
+* In your code, sanitize any output that might contain passwords
+* If you need to debug connection issues, log only partial information or mask sensitive parts
+
+This approach keeps your credentials secure while making them available to your application in production.
 
 ---
 

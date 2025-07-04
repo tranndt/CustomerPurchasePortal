@@ -17,8 +17,22 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.generic import RedirectView
+from django.http import JsonResponse
+
+# Simple health check view for monitoring
+def health_check(request):
+    return JsonResponse({
+        "status": "healthy",
+        "service": "django_main",
+        "version": "1.0"
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('djangoapp/', include('djangoapp.urls')),
+    # Add a health check endpoint
+    path('health/', health_check, name='health_check'),
+    # Redirect root to djangoapp
+    path('', RedirectView.as_view(url='/djangoapp/', permanent=False)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

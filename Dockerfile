@@ -50,8 +50,11 @@ COPY --from=frontend-build /app/frontend/build /app/django/frontend/build
 COPY deploy-scripts/start.sh /app/start.sh
 RUN chmod +x /app/start.sh
 
-# Expose ports
+# Expose ports - 8000 is the primary port that Render will use
 EXPOSE 8000 3030 5002
+
+# Set environment variable to ensure the correct port is used
+ENV PORT=8000
 
 # Start all services
 CMD ["/app/start.sh"]
