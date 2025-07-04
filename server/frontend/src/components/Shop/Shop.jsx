@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import { showNotification } from '../Notification/Notification';
 import './Shop.css';
+import API_URLS, { fetchApi } from '../../services/apiConfig';
 
 const Shop = () => {
   const navigate = useNavigate();
@@ -22,13 +23,6 @@ const Shop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const products_url = "http://localhost:8000/djangoapp/api/products";
-  const categories_url = "http://localhost:8000/djangoapp/api/products/categories";
-  const cart_url = "http://localhost:8000/djangoapp/api/cart";
-  const cart_update_url = "http://localhost:8000/djangoapp/api/cart/update";
-  const cart_remove_url = "http://localhost:8000/djangoapp/api/cart/remove";
-  const checkout_url = "http://localhost:8000/djangoapp/api/cart/checkout";
-
   useEffect(() => {
     fetchProducts();
     fetchCategories();
@@ -45,7 +39,7 @@ const Shop = () => {
     
     setCartLoading(true);
     try {
-      const response = await fetch(cart_url, {
+      const response = await fetch(API_URLS.CART, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -82,7 +76,7 @@ const Shop = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(products_url);
+      const response = await fetch(API_URLS.PRODUCTS);
       const data = await response.json();
       if (data.status === 200) {
         setProducts(data.products);
@@ -98,7 +92,7 @@ const Shop = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(categories_url);
+      const response = await fetch(API_URLS.PRODUCT_CATEGORIES);
       const data = await response.json();
       if (data.status === 200) {
         setCategories(data.categories);
@@ -115,7 +109,7 @@ const Shop = () => {
     }
 
     try {
-      const response = await fetch(cart_update_url, {
+      const response = await fetch(API_URLS.CART_UPDATE, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -146,7 +140,7 @@ const Shop = () => {
 
   const removeCartItem = async (cartItemId) => {
     try {
-      const response = await fetch(cart_remove_url, {
+      const response = await fetch(API_URLS.CART_REMOVE, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -188,7 +182,7 @@ const Shop = () => {
     if (!confirmCheckout) return;
 
     try {
-      const response = await fetch(checkout_url, {
+      const response = await fetch(API_URLS.CART_CHECKOUT, {
         method: 'POST',
         credentials: 'include',
         headers: {
