@@ -29,11 +29,21 @@ def health_check(request):
         "version": "1.0"
     })
 
+def debug_test(request):
+    return JsonResponse({
+        "message": "DJANGO IS RESPONDING",
+        "service": "django", 
+        "timestamp": str(__import__('datetime').datetime.now()),
+        "port": "Django on main port"
+    })
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('djangoapp/', include('djangoapp.urls')),
     # Add a health check endpoint
     path('health/', health_check, name='health_check'),
+    # Add a debug test endpoint
+    path('debug-test/', debug_test, name='debug_test'),
     # Serve React frontend at root
     path('', home, name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

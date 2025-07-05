@@ -39,17 +39,26 @@ def home(request):
     from django.conf import settings
     import os
     
+    # Add explicit debug logging
+    print(f"HOME VIEW CALLED - Request path: {request.path}")
+    print(f"HOME VIEW CALLED - Method: {request.method}")
+    print(f"HOME VIEW CALLED - Headers: {dict(request.headers)}")
+    
     # Path to React build index.html
     react_index_path = os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html')
+    print(f"HOME VIEW - Looking for React build at: {react_index_path}")
+    print(f"HOME VIEW - React build exists: {os.path.exists(react_index_path)}")
     
     try:
         # Try to serve the React index.html file
         if os.path.exists(react_index_path):
             with open(react_index_path, 'r', encoding='utf-8') as f:
                 content = f.read()
+            print("HOME VIEW - Successfully serving React build")
             return HttpResponse(content, content_type='text/html')
         else:
             # Fallback if React build doesn't exist
+            print("HOME VIEW - React build not found, serving API response")
             return JsonResponse({
                 'message': 'ElectronicsRetail API is running',
                 'status': 'success',
@@ -65,6 +74,7 @@ def home(request):
             })
     except Exception as e:
         # Error fallback
+        print(f"HOME VIEW - Exception occurred: {e}")
         return JsonResponse({
             'message': 'ElectronicsRetail API is running',
             'status': 'error',

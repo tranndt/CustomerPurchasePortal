@@ -312,6 +312,28 @@ python manage.py collectstatic --noinput --clear
 
 # Add a sleep to ensure other services are ready
 sleep 5
+
+# Check React build status
+echo "================ REACT BUILD CHECK ================"
+echo "Checking React build directory..."
+if [ -d "/app/django/frontend/build" ]; then
+    echo "✅ React build directory exists"
+    echo "React build contents:"
+    ls -la /app/django/frontend/build/ || echo "Failed to list build contents"
+    if [ -f "/app/django/frontend/build/index.html" ]; then
+        echo "✅ React index.html exists"
+        echo "First few lines of index.html:"
+        head -5 /app/django/frontend/build/index.html || echo "Failed to read index.html"
+    else
+        echo "❌ React index.html NOT found"
+    fi
+else
+    echo "❌ React build directory NOT found"
+    echo "Frontend directory contents:"
+    ls -la /app/django/frontend/ || echo "Frontend directory not found"
+fi
+echo "============================================="
+
 # Render automatically assigns PORT environment variable - use it, fallback to 8000
 PORT="${PORT:-8000}"
 echo "================ STARTING GUNICORN ================"
