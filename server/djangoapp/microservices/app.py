@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from sentiment_analyzer import sentiment_analyzer
 
@@ -5,7 +6,8 @@ app = Flask("SentimentAnalyzer")
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Welcome to the Sentiment Analyzer. Use /analyze/text to get the sentiment", "port": 5002})
+    port = os.environ.get("PORT", 5002)
+    return jsonify({"message": "Welcome to the Sentiment Analyzer. Use /analyze/text to get the sentiment", "port": port})
 
 @app.route("/analyze/<text>", methods=["GET"])
 def analyze(text):
@@ -15,5 +17,6 @@ def analyze(text):
     return jsonify(result)
 
 if __name__ == "__main__":
-    print("Starting Flask app on port 5002...")
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    port = int(os.environ.get("PORT", 5002))
+    print(f"Starting Flask app on port {port}...")
+    app.run(host="0.0.0.0", port=port, debug=True)

@@ -24,17 +24,17 @@ echo "SENTIMENT_ANALYZER_URL: $SENTIMENT_ANALYZER_URL"
 echo "MongoDB: [configured]"
 echo "WatsonX: [configured]"
 
-# Start Flask sentiment service in background
+# Start Flask sentiment service in background on internal port
 cd /app/flask
-python app.py &
+PORT=5000 python app.py &
 FLASK_PID=$!
-echo "Flask sentiment service started with PID: $FLASK_PID"
+echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
 
-# Start Express API service in background
+# Start Express API service in background on internal port
 cd /app/express
-node app.js &
+PORT=3000 node app.js &
 EXPRESS_PID=$!
-echo "Express API service started with PID: $EXPRESS_PID"
+echo "Express API service started with PID: $EXPRESS_PID on port 3000"
 
 # Start Django application in foreground (main process)
 cd /app/django
