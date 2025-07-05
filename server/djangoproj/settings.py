@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ccow$tz_=9%dxu
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Parse ALLOWED_HOSTS from environment variable
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 print(f"ALLOWED_HOSTS set to: {ALLOWED_HOSTS}")
 
 # CSRF trusted origins - add render domain and http/https variants

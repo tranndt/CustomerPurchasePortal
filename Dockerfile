@@ -49,6 +49,7 @@ COPY --from=frontend-build /app/frontend/build /app/django/frontend/build
 
 # Copy startup script
 COPY deploy-scripts/start.sh /app/start.sh
+COPY deploy-scripts/emergency_db_setup.py /app/emergency_db_setup.py
 RUN chmod +x /app/start.sh
 
 # Expose ports - 8000 is the primary port that Render will use
