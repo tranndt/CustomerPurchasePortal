@@ -118,16 +118,16 @@ def setup_database():
             if count == 0:
                 print("Product table is empty, need to populate data")
                 try:
-                    from djangoapp.populate import populate_products
+                    from djangoapp.populate import initiate
                     print("Running product data population...")
-                    populate_products()
+                    initiate()
                     
                     # Verify population worked
                     cursor.execute("SELECT COUNT(*) FROM djangoapp_product")
                     new_count = cursor.fetchone()[0]
                     print(f"Products after population: {new_count}")
                     if new_count == 0:
-                        print("WARNING: Failed to populate via populate_products")
+                        print("WARNING: Failed to populate via initiate function")
                         print("Adding emergency test product...")
                         cursor.execute("""
                         INSERT INTO djangoapp_product 

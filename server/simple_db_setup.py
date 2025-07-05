@@ -46,27 +46,88 @@ def create_product_table():
             """)
             print("Table created successfully")
         
-        # Check if we need to add test data
+        # Check if we need to add product data
         cursor.execute("SELECT COUNT(*) FROM djangoapp_product")
         count = cursor.fetchone()[0]
         
         if count == 0:
-            print("Adding test products...")
-            test_products = [
-                ('Test Laptop', 'Electronics', 999.99, 'High-performance laptop for testing', 15, 'https://via.placeholder.com/300', 1),
-                ('Test Phone', 'Electronics', 699.99, 'Latest smartphone for testing', 25, 'https://via.placeholder.com/300', 1),
-                ('Test Headphones', 'Audio', 199.99, 'Premium headphones for testing', 50, 'https://via.placeholder.com/300', 1),
-                ('Test Monitor', 'Electronics', 299.99, '4K monitor for testing', 20, 'https://via.placeholder.com/300', 1),
-                ('Test Keyboard', 'Accessories', 89.99, 'Mechanical keyboard for testing', 30, 'https://via.placeholder.com/300', 1)
-            ]
+            print("Loading real products from CSV...")
+            # Path to the CSV file
+            csv_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                'database', 'data', 'Products.csv'
+            )
             
-            cursor.executemany("""
-            INSERT INTO djangoapp_product 
-            (name, category, price, description, stock_quantity, image_url, is_active, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """, test_products)
-            
-            print(f"Added {len(test_products)} test products")
+            if os.path.exists(csv_path):
+                import csv
+                import random
+                
+                products_added = 0
+                with open(csv_path, 'r', encoding='utf-8') as file:
+                    reader = csv.DictReader(file)
+                    
+                    for row in reader:
+                        # Clean and parse price
+                        price_str = row.get('Price', '0').replace('CA$', '').replace('$', '').replace(',', '').strip()
+                        try:
+                            price = float(price_str)
+                        except ValueError:
+                            price = 0.0
+                        
+                        # Handle BOM in the first column
+                        category = row.get('Category', row.get('\ufeffCategory', '')).strip()
+                        product_name = row.get('Product name', '').strip()
+                        brand = row.get('Brand', '').strip()
+                        subcategory = row.get('Subcategory', '').strip()
+                        subcategory2 = row.get('Subcategory2', '').strip()
+                        
+                        # Create description
+                        description = f"High-quality {brand} {subcategory.lower()} in the {category.lower()} category."
+                        if subcategory2:
+                            description += f" Features {subcategory2.lower()} specifications."
+                        
+                        # Generate realistic stock
+                        stock_quantity = random.randint(10, 500)
+                        
+                        # Insert product
+                        try:
+                            cursor.execute("""
+                            INSERT INTO djangoapp_product 
+                            (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                            """, (
+                                product_name,
+                                category,
+                                price,
+                                description,
+                                stock_quantity,
+                                row.get('Image Url', '').strip(),
+                                1
+                            ))
+                            products_added += 1
+                        except Exception as e:
+                            print(f"Error adding product {product_name}: {e}")
+                            continue
+                
+                print(f"Added {products_added} real products from CSV")
+            else:
+                print(f"CSV file not found at {csv_path}, adding test products instead...")
+                # Fallback to test products if CSV not found
+                test_products = [
+                    ('Test Laptop', 'Electronics', 999.99, 'High-performance laptop for testing', 15, 'https://via.placeholder.com/300', 1),
+                    ('Test Phone', 'Electronics', 699.99, 'Latest smartphone for testing', 25, 'https://via.placeholder.com/300', 1),
+                    ('Test Headphones', 'Audio', 199.99, 'Premium headphones for testing', 50, 'https://via.placeholder.com/300', 1),
+                    ('Test Monitor', 'Electronics', 299.99, '4K monitor for testing', 20, 'https://via.placeholder.com/300', 1),
+                    ('Test Keyboard', 'Accessories', 89.99, 'Mechanical keyboard for testing', 30, 'https://via.placeholder.com/300', 1)
+                ]
+                
+                cursor.executemany("""
+                INSERT INTO djangoapp_product 
+                (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """, test_products)
+                
+                print(f"Added {len(test_products)} test products as fallback")
         
         # Final verification
         cursor.execute("SELECT COUNT(*) FROM djangoapp_product")

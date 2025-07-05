@@ -40,22 +40,75 @@ def emergency_db_setup():
         count = cursor.fetchone()[0]
         
         if count == 0:
-            # Add emergency products
-            emergency_products = [
-                ('Emergency Laptop', 'Electronics', 999.99, 'Emergency laptop for testing', 10, 'https://via.placeholder.com/300', 1),
-                ('Emergency Phone', 'Electronics', 699.99, 'Emergency phone for testing', 15, 'https://via.placeholder.com/300', 1),
-                ('Emergency Headphones', 'Audio', 199.99, 'Emergency headphones for testing', 25, 'https://via.placeholder.com/300', 1),
-                ('Emergency Monitor', 'Electronics', 299.99, 'Emergency monitor for testing', 8, 'https://via.placeholder.com/300', 1),
-                ('Emergency Keyboard', 'Accessories', 89.99, 'Emergency keyboard for testing', 30, 'https://via.placeholder.com/300', 1)
-            ]
+            # Try to load real products from CSV first
+            csv_path = '/app/django/database/data/Products.csv'
+            products_added = 0
             
-            cursor.executemany("""
-            INSERT INTO djangoapp_product 
-            (name, category, price, description, stock_quantity, image_url, is_active, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            """, emergency_products)
+            if os.path.exists(csv_path):
+                import csv
+                import random
+                
+                print("Loading real products from CSV...")
+                with open(csv_path, 'r', encoding='utf-8') as file:
+                    reader = csv.DictReader(file)
+                    
+                    for row in reader:
+                        # Clean and parse price
+                        price_str = row.get('Price', '0').replace('CA$', '').replace('$', '').replace(',', '').strip()
+                        try:
+                            price = float(price_str)
+                        except ValueError:
+                            price = 0.0
+                        
+                        # Handle BOM in the first column
+                        category = row.get('Category', row.get('\ufeffCategory', '')).strip()
+                        product_name = row.get('Product name', '').strip()
+                        brand = row.get('Brand', '').strip()
+                        
+                        # Create basic description
+                        description = f"Quality {brand} {category.lower()} product."
+                        
+                        # Generate realistic stock
+                        stock_quantity = random.randint(10, 100)
+                        
+                        try:
+                            cursor.execute("""
+                            INSERT INTO djangoapp_product 
+                            (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                            """, (
+                                product_name,
+                                category,
+                                price,
+                                description,
+                                stock_quantity,
+                                row.get('Image Url', '').strip(),
+                                1
+                            ))
+                            products_added += 1
+                        except Exception as e:
+                            continue
+                
+                print(f"Added {products_added} real products from CSV")
             
-            print(f"Added {len(emergency_products)} emergency products")
+            if products_added == 0:
+                # Fallback to emergency products if CSV loading failed
+                print("CSV loading failed, using emergency products...")
+                emergency_products = [
+                    ('Emergency Laptop', 'Electronics', 999.99, 'Emergency laptop for testing', 10, 'https://via.placeholder.com/300', 1),
+                    ('Emergency Phone', 'Electronics', 699.99, 'Emergency phone for testing', 15, 'https://via.placeholder.com/300', 1),
+                    ('Emergency Headphones', 'Audio', 199.99, 'Emergency headphones for testing', 25, 'https://via.placeholder.com/300', 1),
+                    ('Emergency Monitor', 'Electronics', 299.99, 'Emergency monitor for testing', 8, 'https://via.placeholder.com/300', 1),
+                    ('Emergency Keyboard', 'Accessories', 89.99, 'Emergency keyboard for testing', 30, 'https://via.placeholder.com/300', 1)
+                ]
+                
+                cursor.executemany("""
+                INSERT INTO djangoapp_product 
+                (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                """, emergency_products)
+                
+                print(f"Added {len(emergency_products)} emergency products")
         else:
             print(f"Table already has {count} products")
         
