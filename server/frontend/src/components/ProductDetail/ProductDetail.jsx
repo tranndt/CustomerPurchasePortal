@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
+import Footer from '../Footer/Footer';
 import { showNotification } from '../Notification/Notification';
 import API_URLS from '../../services/apiConfig';
 import './ProductDetail.css';
@@ -239,6 +240,8 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

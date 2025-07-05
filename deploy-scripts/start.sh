@@ -24,29 +24,26 @@ echo "SENTIMENT_ANALYZER_URL: $SENTIMENT_ANALYZER_URL"
 echo "MongoDB: [configured]"
 echo "WatsonX: [configured]"
 
-# TEMPORARILY DISABLE ALL BACKGROUND SERVICES to test Django routing
-# # Flask sentiment service
-# cd /app/flask
-# unset PORT  # Clear PORT to prevent conflicts
-# python -c "
-# import os
-# os.environ['PORT'] = '5000'
-# exec(open('app.py').read())
-# " &
-# FLASK_PID=$!
-# echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
-echo "Flask sentiment service DISABLED for testing - Django should serve main port"
+# Start Flask sentiment service in background on internal port
+cd /app/flask
+unset PORT  # Clear PORT to prevent conflicts
+python -c "
+import os
+os.environ['PORT'] = '5000'
+exec(open('app.py').read())
+" &
+FLASK_PID=$!
+echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
 
-# TEMPORARILY DISABLE Express API service to test Django routing
-# cd /app/express
-# unset PORT  # Clear PORT to prevent conflicts
-# node -e "
-# process.env.PORT = '3000';
-# require('./app.js');
-# " &
-# EXPRESS_PID=$!
-# echo "Express API service started with PID: $EXPRESS_PID on port 3000"
-echo "Express API service DISABLED for testing - Django should serve main port"
+# Start Express API service in background on internal port
+cd /app/express
+unset PORT  # Clear PORT to prevent conflicts
+node -e "
+process.env.PORT = '3000';
+require('./app.js');
+" &
+EXPRESS_PID=$!
+echo "Express API service started with PID: $EXPRESS_PID on port 3000"
 
 # Start Django application in foreground (main process)
 cd /app/django

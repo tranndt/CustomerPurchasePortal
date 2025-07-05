@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Footer from '../Footer/Footer';
 import './Landing.css';
 
 const Landing = () => {
@@ -178,7 +179,7 @@ const Landing = () => {
             <div className={`footer fade-in delay-6 ${loaded ? 'active' : ''}`}>
               <div>© 2025 ElectronicsRetail Inc. All rights reserved.</div>
               <div className="footer-links">
-                <span className="footer-link">About</span>
+                <span className="footer-link" onClick={() => navigate('/about')}>About</span>
                 <span className="footer-divider">•</span>
                 <span className="footer-link">Privacy</span>
                 <span className="footer-divider">•</span>
@@ -188,6 +189,8 @@ const Landing = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </>
   );
 };

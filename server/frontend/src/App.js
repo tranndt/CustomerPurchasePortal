@@ -22,6 +22,8 @@ import OrderFulfillment from './components/OrderFulfillment/OrderFulfillment';
 import InventoryManagement from './components/InventoryManagement/InventoryManagement';
 import Notification from './components/Notification/Notification';
 import { AlertProvider } from './components/AlertContext/AlertContext';
+import About from './components/About/About';
+import Footer from './components/Footer/Footer';
 
 function App() {
   return (
@@ -31,6 +33,7 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/product/:productId" element={<ProductDetail />} />
+          <Route path="/about" element={<About />} />
 
           <Route path="/admin/home" element={<AdminHome />} />
           <Route path="/support/home" element={<SupportHome />} />

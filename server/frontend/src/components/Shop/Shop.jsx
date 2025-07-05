@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import Footer from '../Footer/Footer';
 import { showNotification } from '../Notification/Notification';
 import './Shop.css';
 import API_URLS, { fetchApi } from '../../services/apiConfig';
@@ -583,6 +584,8 @@ const Shop = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };
