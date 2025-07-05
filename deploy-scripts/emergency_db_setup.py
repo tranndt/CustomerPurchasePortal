@@ -112,6 +112,75 @@ def emergency_db_setup():
         else:
             print(f"Table already has {count} products")
         
+        # Now create user tables and demo users if Django environment is available
+        try:
+            # Set up Django environment
+            import sys
+            sys.path.append('/app/django')
+            os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoproj.settings')
+            
+            import django
+            django.setup()
+            
+            from django.contrib.auth.models import User
+            from django.contrib.auth.hashers import make_password
+            from djangoapp.models import UserProfile
+            
+            demo_users_data = [
+                {
+                    'username': 'demo_customer',
+                    'first_name': 'Demo',
+                    'last_name': 'Customer',
+                    'email': 'demo.customer@portal.com',
+                    'password': 'password123',
+                    'role': 'customer'
+                },
+                {
+                    'username': 'demo_admin',
+                    'first_name': 'Demo',
+                    'last_name': 'Admin',
+                    'email': 'demo.admin@portal.com',
+                    'password': 'password123',
+                    'role': 'admin'
+                },
+                {
+                    'username': 'demo_support',
+                    'first_name': 'Demo',
+                    'last_name': 'Support',
+                    'email': 'demo.support@portal.com',
+                    'password': 'password123',
+                    'role': 'support'
+                }
+            ]
+            
+            users_created = 0
+            for user_data in demo_users_data:
+                if not User.objects.filter(username=user_data['username']).exists():
+                    user = User.objects.create(
+                        username=user_data['username'],
+                        first_name=user_data['first_name'],
+                        last_name=user_data['last_name'],
+                        email=user_data['email'],
+                        password=make_password(user_data['password'])
+                    )
+                    
+                    # Create user profile
+                    UserProfile.objects.create(
+                        user=user,
+                        role=user_data['role']
+                    )
+                    users_created += 1
+                    print(f'Created demo user: {user_data["username"]}')
+                else:
+                    print(f'Demo user already exists: {user_data["username"]}')
+            
+            print(f'Created {users_created} new demo users')
+            print(f'Total demo users: {User.objects.filter(username__startswith="demo_").count()}')
+            
+        except Exception as e:
+            print(f'Error creating demo users in emergency setup: {e}')
+            # Don't fail the entire setup for user creation errors
+        
         conn.commit()
         conn.close()
         print("Emergency database setup completed successfully!")

@@ -48,6 +48,10 @@ python manage.py migrate djangoapp --noinput || echo "migrate djangoapp failed, 
 python manage.py makemigrations --noinput || echo "makemigrations failed, continuing"
 python manage.py migrate --noinput || echo "migrate failed, continuing"
 
+# Run Django-based database setup to populate products and users
+echo "Running Django database setup to populate data..."
+python db_setup.py || echo "Django db_setup.py failed, will use fallback"
+
 # Always run fallback database creation to ensure we have a working table
 echo "Running fallback database creation to ensure Product table exists..."
 python -c "
@@ -227,6 +231,68 @@ try:
         cursor.execute('SELECT COUNT(*) FROM djangoapp_product')
         final_count = cursor.fetchone()[0]
         print(f'Final product count: {final_count}')
+        
+    # Create demo users if they don't exist
+    print('Checking and creating demo users...')
+    try:
+        from django.contrib.auth.models import User
+        from django.contrib.auth.hashers import make_password
+        from djangoapp.models import UserProfile
+        
+        demo_users_data = [
+            {
+                'username': 'demo_customer',
+                'first_name': 'Demo',
+                'last_name': 'Customer',
+                'email': 'demo.customer@portal.com',
+                'password': 'password123',
+                'role': 'customer'
+            },
+            {
+                'username': 'demo_admin',
+                'first_name': 'Demo',
+                'last_name': 'Admin',
+                'email': 'demo.admin@portal.com',
+                'password': 'password123',
+                'role': 'admin'
+            },
+            {
+                'username': 'demo_support',
+                'first_name': 'Demo',
+                'last_name': 'Support',
+                'email': 'demo.support@portal.com',
+                'password': 'password123',
+                'role': 'support'
+            }
+        ]
+        
+        users_created = 0
+        for user_data in demo_users_data:
+            if not User.objects.filter(username=user_data['username']).exists():
+                user = User.objects.create(
+                    username=user_data['username'],
+                    first_name=user_data['first_name'],
+                    last_name=user_data['last_name'],
+                    email=user_data['email'],
+                    password=make_password(user_data['password'])
+                )
+                
+                # Create user profile
+                UserProfile.objects.create(
+                    user=user,
+                    role=user_data['role']
+                )
+                users_created += 1
+                print(f'Created demo user: {user_data[\"username\"]}')
+            else:
+                print(f'Demo user already exists: {user_data[\"username\"]}')
+        
+        print(f'Created {users_created} new demo users')
+        print(f'Total demo users: {User.objects.filter(username__startswith=\"demo_\").count()}')
+        
+    except Exception as e:
+        print(f'Error creating demo users: {e}')
+        print(traceback.format_exc())
         
 except Exception as e:
     print('Error during database setup:', e)
