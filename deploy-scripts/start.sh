@@ -49,6 +49,45 @@ echo "Express API service started with PID: $EXPRESS_PID on port 3000"
 cd /app/django
 echo "Starting Django application on port 8000 (main port Render will use)..."
 
+# Debug: Check React build status
+echo "================ REACT BUILD DEBUG ================"
+echo "Current working directory: $(pwd)"
+echo "Contents of /app/django/:"
+ls -la /app/django/ || echo "Failed to list /app/django/"
+
+echo "Checking for frontend directory..."
+if [ -d "/app/django/frontend" ]; then
+    echo "frontend/ directory exists"
+    echo "Contents of frontend/:"
+    ls -la /app/django/frontend/ || echo "Failed to list frontend/"
+    
+    if [ -d "/app/django/frontend/build" ]; then
+        echo "frontend/build/ directory exists"
+        echo "Contents of frontend/build/:"
+        ls -la /app/django/frontend/build/ || echo "Failed to list frontend/build/"
+        
+        if [ -f "/app/django/frontend/build/index.html" ]; then
+            echo "SUCCESS: React build index.html found!"
+            echo "File size: $(stat -c%s /app/django/frontend/build/index.html 2>/dev/null || echo 'unknown') bytes"
+        else
+            echo "ERROR: React build index.html NOT FOUND!"
+        fi
+    else
+        echo "ERROR: frontend/build/ directory NOT FOUND!"
+    fi
+else
+    echo "ERROR: frontend/ directory NOT FOUND!"
+fi
+
+# Also check the alternate locations in case the build is elsewhere
+echo "Checking alternate React build locations..."
+for path in "/app/frontend/build/index.html" "/app/build/index.html"; do
+    if [ -f "$path" ]; then
+        echo "Found React build at alternate location: $path"
+    fi
+done
+echo "============== END REACT BUILD DEBUG =============="
+
 echo "================ DATABASE SETUP START ================"
 # Always attempt to run migrations, even if they fail
 echo "Running Django migrations directly first..."

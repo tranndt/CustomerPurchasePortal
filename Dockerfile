@@ -7,6 +7,10 @@ RUN npm ci --only=production
 COPY server/frontend/ ./
 RUN npm run build
 
+# Verify React build was created successfully
+RUN ls -la build/ && ls -la build/static/ && \
+    test -f build/index.html || (echo "ERROR: React build failed - index.html not found" && exit 1)
+
 # Build Express API Service
 FROM node:18-bullseye-slim as express-build
 WORKDIR /app/express
@@ -46,6 +50,10 @@ COPY server/ /app/django/
 
 # Copy frontend build
 COPY --from=frontend-build /app/frontend/build /app/django/frontend/build
+
+# Verify React build was copied successfully
+RUN ls -la /app/django/frontend/build/ && \
+    test -f /app/django/frontend/build/index.html || (echo "ERROR: React build copy failed - index.html not found at destination" && exit 1)
 
 # Copy startup script
 COPY deploy-scripts/start.sh /app/start.sh

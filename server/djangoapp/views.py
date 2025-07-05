@@ -39,32 +39,68 @@ def home(request):
     from django.conf import settings
     import os
     
-    # Add explicit debug logging
+    # Add extensive debug logging for production debugging
     print(f"HOME VIEW CALLED - Request path: {request.path}")
     print(f"HOME VIEW CALLED - Method: {request.method}")
-    print(f"HOME VIEW CALLED - Headers: {dict(request.headers)}")
+    print(f"HOME VIEW CALLED - User-Agent: {request.headers.get('User-Agent', 'Unknown')}")
+    print(f"HOME VIEW CALLED - BASE_DIR: {settings.BASE_DIR}")
+    print(f"HOME VIEW CALLED - Current working directory: {os.getcwd()}")
     
-    # Path to React build index.html
-    react_index_path = os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html')
-    print(f"HOME VIEW - Looking for React build at: {react_index_path}")
-    print(f"HOME VIEW - React build exists: {os.path.exists(react_index_path)}")
+    # Multiple possible locations for React build
+    possible_paths = [
+        os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html'),
+        os.path.join('/app', 'django', 'frontend', 'build', 'index.html'),
+        os.path.join('/app', 'frontend', 'build', 'index.html'),
+        os.path.join(os.getcwd(), 'frontend', 'build', 'index.html'),
+        os.path.join(settings.BASE_DIR, 'build', 'index.html'),
+    ]
+    
+    react_index_path = None
+    for path in possible_paths:
+        print(f"HOME VIEW - Checking path: {path}")
+        print(f"HOME VIEW - Path exists: {os.path.exists(path)}")
+        if os.path.exists(path):
+            react_index_path = path
+            break
+    
+    # Log directory contents for debugging
+    try:
+        base_contents = os.listdir(settings.BASE_DIR)
+        print(f"HOME VIEW - BASE_DIR contents: {base_contents}")
+        
+        frontend_dir = os.path.join(settings.BASE_DIR, 'frontend')
+        if os.path.exists(frontend_dir):
+            frontend_contents = os.listdir(frontend_dir)
+            print(f"HOME VIEW - frontend/ contents: {frontend_contents}")
+            
+            build_dir = os.path.join(frontend_dir, 'build')
+            if os.path.exists(build_dir):
+                build_contents = os.listdir(build_dir)
+                print(f"HOME VIEW - frontend/build/ contents: {build_contents}")
+    except Exception as e:
+        print(f"HOME VIEW - Error listing directories: {e}")
     
     try:
         # Try to serve the React index.html file
-        if os.path.exists(react_index_path):
+        if react_index_path and os.path.exists(react_index_path):
             with open(react_index_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            print("HOME VIEW - Successfully serving React build")
+            print(f"HOME VIEW - Successfully serving React build from: {react_index_path}")
             return HttpResponse(content, content_type='text/html')
         else:
-            # Fallback if React build doesn't exist
-            print("HOME VIEW - React build not found, serving API response")
+            # Enhanced fallback with detailed debugging info
+            print("HOME VIEW - React build not found at any location, serving debug API response")
             return JsonResponse({
-                'message': 'ElectronicsRetail API is running',
-                'status': 'success',
+                'message': 'ElectronicsRetail API - React Build Not Found',
+                'status': 'error',
                 'service': 'django',
-                'error': 'React build not found',
-                'path_checked': react_index_path,
+                'error': 'React build index.html not found',
+                'debug_info': {
+                    'base_dir': str(settings.BASE_DIR),
+                    'cwd': os.getcwd(),
+                    'paths_checked': possible_paths,
+                    'base_dir_contents': os.listdir(settings.BASE_DIR) if os.path.exists(settings.BASE_DIR) else 'BASE_DIR not found'
+                },
                 'endpoints': {
                     'admin': '/admin/',
                     'api': '/djangoapp/api/',
@@ -73,13 +109,20 @@ def home(request):
                 }
             })
     except Exception as e:
-        # Error fallback
+        # Enhanced error fallback with debugging
         print(f"HOME VIEW - Exception occurred: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({
-            'message': 'ElectronicsRetail API is running',
+            'message': 'ElectronicsRetail API - Error Serving React',
             'status': 'error',
             'service': 'django',
             'error': str(e),
+            'debug_info': {
+                'base_dir': str(settings.BASE_DIR),
+                'cwd': os.getcwd(),
+                'exception_type': type(e).__name__
+            },
             'endpoints': {
                 'admin': '/admin/',
                 'api': '/djangoapp/api/',
