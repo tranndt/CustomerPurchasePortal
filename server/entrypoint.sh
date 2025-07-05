@@ -54,63 +54,109 @@ echo "Starting Django application on port 8000 (main port Render will use)..."
 
 # Run Django migrations and collect static files
 echo "================ DATABASE SETUP START ================"
-echo "Running comprehensive database setup script..."
+# First run a basic database diagnosis
+echo "Running preliminary database diagnosis..."
+if [ -f ./diagnose_db.sh ]; then
+    bash ./diagnose_db.sh > /app/django/db_initial_diagnosis.log 2>&1
+    echo "Initial diagnosis saved to /app/django/db_initial_diagnosis.log"
+else
+    echo "Diagnosis script not found, continuing with setup"
+fi
 
+echo "Running Django migrations directly first..."
+python manage.py makemigrations djangoapp --noinput
+python manage.py migrate djangoapp --noinput
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
+
+echo "Running comprehensive database setup script..."
 # Run our special database setup script that handles migrations and data population
 python db_setup.py
 
-# If the script fails, create an emergency file with debug info
+# If the script fails, use simpler approaches that don't rely on the db_setup.py script
 if [ $? -ne 0 ]; then
-    echo "Database setup script failed. Running emergency diagnostics..."
+    echo "Database setup script failed. Running manual migrations and setup..."
     
-    # Try direct SQL approach as emergency fallback
-    echo "Attempting emergency table creation and population..."
+    # Run standard Django migrations
+    echo "Running Django migrations directly..."
+    python manage.py makemigrations --noinput
+    python manage.py migrate --noinput
+    
+    # Test if Product table exists and create if needed
+    echo "Checking and creating Product table if needed..."
     python -c "
 import os
-import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoproj.settings')
-django.setup()
+import sys
+import sqlite3
+import traceback
 
-from django.db import connection
-
-# Try to create Product table directly with SQL if it doesn't exist
-with connection.cursor() as cursor:
-    cursor.execute(\"\"\"
-    CREATE TABLE IF NOT EXISTS djangoapp_product (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(100) NOT NULL,
-        category VARCHAR(100) NOT NULL,
-        price DECIMAL(10, 2) NOT NULL,
-        description TEXT NOT NULL,
-        stock_quantity INTEGER NOT NULL,
-        image_url VARCHAR(200) NULL,
-        is_active BOOLEAN NOT NULL,
-        created_at DATETIME NOT NULL
-    )
-    \"\"\")
+try:
+    import django
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoproj.settings')
+    django.setup()
+    from django.db import connection
     
-    # Check if we have any products
-    cursor.execute('SELECT COUNT(*) FROM djangoapp_product')
-    count = cursor.fetchone()[0]
-    print(f'Products after emergency creation: {count}')
+    print('SQLite version:', sqlite3.sqlite_version)
     
-    # Add at least one test product if empty
-    if count == 0:
+    # Check if Product table exists
+    with connection.cursor() as cursor:
         cursor.execute(\"\"\"
-        INSERT INTO djangoapp_product 
-        (name, category, price, description, stock_quantity, is_active, created_at)
-        VALUES 
-        ('Emergency Test Product', 'Test', 9.99, 'Created during emergency recovery', 100, 1, CURRENT_TIMESTAMP)
+        SELECT name FROM sqlite_master WHERE type='table' AND name='djangoapp_product';
         \"\"\")
-        print('Added emergency test product')
-    "
+        if cursor.fetchone():
+            print('Product table exists')
+            cursor.execute('SELECT COUNT(*) FROM djangoapp_product')
+            count = cursor.fetchone()[0]
+            print(f'Products count: {count}')
+            
+            if count == 0:
+                print('Table exists but empty, adding test product')
+                cursor.execute(\"\"\"
+                INSERT INTO djangoapp_product 
+                (name, category, price, description, stock_quantity, is_active, created_at)
+                VALUES 
+                ('Emergency Test Product', 'Test', 9.99, 'Created during recovery', 100, 1, CURRENT_TIMESTAMP)
+                \"\"\")
+                print('Added test product')
+        else:
+            print('Creating Product table directly')
+            cursor.execute(\"\"\"
+            CREATE TABLE djangoapp_product (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR(100) NOT NULL,
+                category VARCHAR(100) NOT NULL,
+                price DECIMAL(10, 2) NOT NULL,
+                description TEXT NOT NULL,
+                stock_quantity INTEGER NOT NULL,
+                image_url VARCHAR(200) NULL,
+                is_active BOOLEAN NOT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            \"\"\")
+            
+            cursor.execute(\"\"\"
+            INSERT INTO djangoapp_product 
+            (name, category, price, description, stock_quantity, is_active, created_at)
+            VALUES 
+            ('First Test Product', 'Test', 9.99, 'Created during setup', 100, 1, CURRENT_TIMESTAMP),
+            ('Second Test Product', 'Electronics', 29.99, 'Another test product', 50, 1, CURRENT_TIMESTAMP)
+            \"\"\")
+            print('Created table and added test products')
+except Exception as e:
+    print('Error during database setup:', e)
+    print(traceback.format_exc())
+    sys.exit(1)
+"
     
-    # Capture complete diagnostic information
-    echo "Collecting emergency diagnostic information..."
+    # Capture diagnostic information regardless of the above script outcome
+    echo "Collecting diagnostic information..."
     python manage.py check > /app/django/db_diagnosis.log 2>&1
     python manage.py showmigrations >> /app/django/db_diagnosis.log 2>&1
-    python manage.py inspectdb >> /app/django/db_diagnosis.log 2>&1
-    echo "Emergency diagnostics saved to /app/django/db_diagnosis.log"
+    
+    echo "Attempting to manually check database structure..."
+    sqlite3 db.sqlite3 ".tables" >> /app/django/db_diagnosis.log 2>&1
+    sqlite3 db.sqlite3 "SELECT * FROM sqlite_master WHERE type='table';" >> /app/django/db_diagnosis.log 2>&1
+    echo "Diagnostics saved to /app/django/db_diagnosis.log"
 fi
 
 echo "================ DATABASE SETUP COMPLETE ================"

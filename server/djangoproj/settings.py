@@ -98,13 +98,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
         'OPTIONS': {
-            # Enable WAL mode for better concurrent access
-            'timeout': 20,  # Increase timeout to 20 seconds
-            'pragmas': {
-                'journal_mode': 'wal',  # Use Write-Ahead Logging
-                'cache_size': -1 * 64000,  # 64MB cache
-                'synchronous': 1  # Normal synchronization mode
-            }
+            # Simple options that work across versions
+            'timeout': 20  # Increase timeout to 20 seconds
         }
     }
 }
