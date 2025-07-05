@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import { useAlert } from '../AlertContext/AlertContext';
 import API_URLS from '../../services/apiConfig';
 import './Cart.css';
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -95,10 +97,10 @@ const Cart = () => {
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Failed to update item');
+        await showAlert(data.message || 'Failed to update item', 'Update Failed', 'error');
       }
     } catch (err) {
-      alert('Error updating item: ' + err.message);
+      await showAlert('Error updating item: ' + err.message, 'Update Error', 'error');
     } finally {
       setUpdatingItems(prev => ({ ...prev, [cartItemId]: false }));
     }
@@ -125,10 +127,10 @@ const Cart = () => {
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       } else {
-        alert(data.message || 'Failed to remove item');
+        await showAlert(data.message || 'Failed to remove item', 'Remove Failed', 'error');
       }
     } catch (err) {
-      alert('Error removing item: ' + err.message);
+      await showAlert('Error removing item: ' + err.message, 'Remove Error', 'error');
     } finally {
       setUpdatingItems(prev => ({ ...prev, [cartItemId]: false }));
     }
@@ -148,7 +150,7 @@ const Cart = () => {
 
       const data = await response.json();
       if (data.status === 200) {
-        alert(`Purchase completed successfully! Transaction ID: ${data.transaction_id}`);
+        await showAlert(`Purchase completed successfully! Transaction ID: ${data.transaction_id}`, 'Purchase Complete', 'success');
         setCartItems([]); // Clear cart
         // Trigger cart update event
         window.dispatchEvent(new CustomEvent('cartUpdated'));
@@ -157,10 +159,10 @@ const Cart = () => {
           navigate('/customer/orders');
         }, 2000);
       } else {
-        alert(data.message || 'Checkout failed');
+        await showAlert(data.message || 'Checkout failed', 'Checkout Failed', 'error');
       }
     } catch (err) {
-      alert('Error during checkout: ' + err.message);
+      await showAlert('Error during checkout: ' + err.message, 'Checkout Error', 'error');
     } finally {
       setCheckingOut(false);
     }

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
+import { useAlert } from '../AlertContext/AlertContext';
 import API_URLS from '../../services/apiConfig';
 
 const TicketDetail = () => {
   const { ticket_id } = useParams();
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [ticket, setTicket] = useState(null);
   const [status, setStatus] = useState("");
   const [resolutionNote, setResolutionNote] = useState("");
@@ -34,12 +36,12 @@ const TicketDetail = () => {
           setStatus(data.ticket.status);
           setResolutionNote(data.ticket.resolution_note || "");
         } else {
-          alert("Failed to load ticket details or unauthorized.");
+          await showAlert("Failed to load ticket details or unauthorized.", 'Access Error', 'error');
           navigate(-1); // Go back to previous page
         }
       } catch (error) {
         console.error("Error fetching ticket details:", error);
-        alert("Error loading ticket details.");
+        await showAlert("Error loading ticket details.", 'Loading Error', 'error');
         navigate(-1);
       } finally {
         setLoading(false);
@@ -70,12 +72,12 @@ const TicketDetail = () => {
         setStatus(data.ticket.status);
         setResolutionNote(data.ticket.resolution_note || "");
       } else {
-        alert("Failed to load ticket details or unauthorized.");
+        await showAlert("Failed to load ticket details or unauthorized.", 'Access Error', 'error');
         navigate(-1); // Go back to previous page
       }
     } catch (error) {
       console.error("Error fetching ticket details:", error);
-      alert("Error loading ticket details.");
+      await showAlert("Error loading ticket details.", 'Loading Error', 'error');
       navigate(-1);
     } finally {
       setLoading(false);
@@ -106,15 +108,15 @@ const TicketDetail = () => {
 
       const result = await res.json();
       if (result.status === 200) {
-        alert("Ticket updated successfully!");
+        await showAlert("Ticket updated successfully!", 'Update Successful', 'success');
         // Refresh ticket data
         fetchTicketDetail();
       } else {
-        alert("Failed to update ticket: " + (result.message || "Unknown error"));
+        await showAlert("Failed to update ticket: " + (result.message || "Unknown error"), 'Update Failed', 'error');
       }
     } catch (error) {
       console.error("Error updating ticket:", error);
-      alert("Error updating ticket.");
+      await showAlert("Error updating ticket.", 'Update Error', 'error');
     }
   };
 
