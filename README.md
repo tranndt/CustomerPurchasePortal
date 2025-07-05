@@ -1,18 +1,44 @@
 # ElectronicsRetail - Full Stack E-Commerce Application
 
+🌟 **[🚀 LIVE DEMO - Click Here to Access the Application](https://electronicsretail-e-commerce.onrender.com/)** 🌟
+
+> ✅ **Ready to Try - No Setup Required!**  
+> 🔐 **Demo Credentials:**
+> - **Customer Account:** `demo_customer` / `password123`
+> - **Admin Account:** `demo_admin` / `password123`
+> - **Support Account:** `demo_support` / `password123`
+
 A comprehensive full-stack web application for electronics retail with product management, customer reviews, sentiment analysis, and user authentication.
 
-## 📊 Accessing the Application
+**🛠️ Tech Stack:** Django + React + Express + Flask + MongoDB + Docker + Render
 
-### Local Development
+## 🎮 Try It Live
 
-- **Main Application:** [http://localhost:8000/djangoapp/](http://localhost:8000/djangoapp/)
+### 🔗 **Production Deployment**
+**Website:** [https://electronicsretail-e-commerce.onrender.com/](https://electronicsretail-e-commerce.onrender.com/)
+
+### 🎯 **Quick Demo Guide**
+1. **Browse Products**: [Shop Page](https://electronicsretail-e-commerce.onrender.com/shop) - View the product catalog
+2. **Customer Experience**: Login with `demo_customer` / `password123` to experience shopping features
+3. **Admin Dashboard**: Login with `demo_admin` / `password123` to access management tools
+4. **Support Portal**: Login with `demo_support` / `password123` to handle customer tickets
+
+### ✨ **Key Features to Try**
+
+- 🛒 **Shopping Cart** - Add products and proceed to checkout
+- 📱 **Responsive Design** - Try on mobile and desktop
+- 🔍 **Product Search** - Browse by categories
+- ⭐ **Review System** - Leave reviews with sentiment analysis
+- 🎫 **Support Tickets** - Customer support system
+- 📊 **Admin Tools** - Inventory and order management
+
+## �️ Development Setup
+
+### Local Development URLs
+
+- **Main Application:** [http://localhost:8000/](http://localhost:8000/)
+- **React Frontend:** [http://localhost:3000](http://localhost:3000)
 - **Admin Interface:** [http://localhost:8000/admin/](http://localhost:8000/admin/)
-
-### Render Deployment
-
-- **Main Application:** [https://electronicsretail-e-commerce.onrender.com/djangoapp/](https://electronicsretail-e-commerce.onrender.com/djangoapp/)
-- **Admin Interface:** [https://electronicsretail-e-commerce.onrender.com/admin/](https://electronicsretail-e-commerce.onrender.com/admin/)
 
 ## 🚀 Quick Start
 
@@ -56,14 +82,6 @@ python app.py
 - **Django API**: <http://localhost:8000>
 - **Express API**: <http://localhost:3030>
 - **Flask Service**: <http://localhost:5002>
-
-## 👤 Demo Users
-
-| Username | Password | Role |
-|----------|----------|------|
-| demo_customer | password123 | Customer |
-| demo_admin | password123 | Admin |
-| demo_support | password123 | Support |
 
 ## 🏗️ Architecture
 
