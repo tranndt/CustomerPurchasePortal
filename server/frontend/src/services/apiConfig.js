@@ -7,7 +7,7 @@
 
 // API base URL - in production this will be a relative path to the current domain
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '' // Empty string means same domain as the frontend
+  ? window.location.origin // Use the current domain and protocol
   : 'http://localhost:8000'; 
 
 // Django API endpoints
@@ -76,3 +76,7 @@ export const fetchApi = async (url, options = {}) => {
 };
 
 export default API_URLS;
+
+// Also export as named export with BASE_URL for backward compatibility
+export { API_BASE_URL as BASE_URL };
+API_URLS.BASE_URL = API_BASE_URL;
