@@ -41,7 +41,7 @@ def emergency_db_setup():
         
         if count == 0:
             # Try to load real products from CSV first
-            csv_path = '/app/django/database/data/Products.csv'
+            csv_path = '/app/server/database/data/Products.csv'
             products_added = 0
             
             if os.path.exists(csv_path):
