@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
+import API_URLS from '../../services/apiConfig';
 
 const TicketDetail = () => {
   const { ticket_id } = useParams();
@@ -16,10 +17,10 @@ const TicketDetail = () => {
       try {
         // Determine the correct endpoint based on user role
         const userRole = sessionStorage.getItem('userRole');
-        let endpoint = `http://localhost:8000/djangoapp/api/admin/tickets/${ticket_id}`;
+        let endpoint = `${API_URLS.BASE_URL}/djangoapp/api/admin/tickets/${ticket_id}`;
         
         if (userRole && userRole.toLowerCase() === 'support') {
-          endpoint = `http://localhost:8000/djangoapp/api/support/tickets/${ticket_id}`;
+          endpoint = `${API_URLS.BASE_URL}/djangoapp/api/support/tickets/${ticket_id}`;
         }
 
         const res = await fetch(endpoint, {
@@ -87,10 +88,10 @@ const TicketDetail = () => {
     try {
       // Determine the correct endpoint based on user role
       const userRole = sessionStorage.getItem('userRole');
-      let endpoint = `http://localhost:8000/djangoapp/api/admin/tickets/${ticket_id}/update`;
+      let endpoint = `${API_URLS.BASE_URL}/djangoapp/api/admin/tickets/${ticket_id}/update`;
       
       if (userRole && userRole.toLowerCase() === 'support') {
-        endpoint = `http://localhost:8000/djangoapp/api/support/tickets/${ticket_id}/update`;
+        endpoint = `${API_URLS.BASE_URL}/djangoapp/api/support/tickets/${ticket_id}/update`;
       }
 
       const res = await fetch(endpoint, {

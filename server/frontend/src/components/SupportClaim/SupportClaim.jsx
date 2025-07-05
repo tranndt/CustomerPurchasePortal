@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 
 const SupportClaim = () => {
   const { transaction_id } = useParams();
@@ -14,7 +15,7 @@ const SupportClaim = () => {
   useEffect(() => {
     // Fetch order by transaction_id to get order details
     const fetchOrder = async () => {
-      const orderRes = await fetch(`http://localhost:8000/djangoapp/api/order-by-transaction/${transaction_id}`, {
+      const orderRes = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/order-by-transaction/${transaction_id}`, {
         credentials: "include"
       });
       const orderData = await orderRes.json();
@@ -39,7 +40,7 @@ const SupportClaim = () => {
       formData.append("attachment", attachment);
     }
 
-    const res = await fetch("http://localhost:8000/djangoapp/api/customer/support/new", {
+    const res = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/support/new`, {
       method: "POST",
       body: formData,
       credentials: "include"

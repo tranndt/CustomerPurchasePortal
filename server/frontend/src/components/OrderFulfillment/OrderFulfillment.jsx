@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
 import { useAlert } from '../AlertContext/AlertContext';
+import API_URLS from '../../services/apiConfig';
 import './OrderFulfillment.css';
 
 const OrderFulfillment = () => {
@@ -12,9 +13,9 @@ const OrderFulfillment = () => {
   const [processingOrders, setProcessingOrders] = useState({});
   const { showAlert, showPrompt } = useAlert();
 
-  const pending_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/pending";
-  const all_orders_url = "http://localhost:8000/djangoapp/api/manager/orders/all";
-  const process_order_url = "http://localhost:8000/djangoapp/api/manager/orders/process";
+  const pending_orders_url = `${API_URLS.BASE_URL}/djangoapp/api/manager/orders/pending`;
+  const all_orders_url = `${API_URLS.BASE_URL}/djangoapp/api/manager/orders/all`;
+  const process_order_url = `${API_URLS.BASE_URL}/djangoapp/api/manager/orders/process`;
 
   const fetchAllData = useCallback(async () => {
     setLoading(true);

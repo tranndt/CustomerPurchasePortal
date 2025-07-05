@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -15,8 +16,8 @@ const ProductDetail = () => {
   const [addingToCart, setAddingToCart] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const product_url = `http://localhost:8000/djangoapp/api/products/${productId}`;
-  const cart_add_url = "http://localhost:8000/djangoapp/api/cart/add";
+  const product_url = `${API_URLS.BASE_URL}/djangoapp/api/products/${productId}`;
+  const cart_add_url = `${API_URLS.BASE_URL}/djangoapp/api/cart/add`;
 
   useEffect(() => {
     const fetchProduct = async () => {

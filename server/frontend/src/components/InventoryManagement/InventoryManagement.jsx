@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
 import { useAlert } from '../AlertContext/AlertContext';
+import API_URLS from '../../services/apiConfig';
 import './InventoryManagement.css';
 import '../../styles/global.css';
 
@@ -16,7 +17,7 @@ const InventoryManagement = () => {
   const [requestQuantities, setRequestQuantities] = useState({});
   const { showAlert } = useAlert();
 
-  const inventory_url = "http://localhost:8000/djangoapp/api/manager/inventory";
+  const inventory_url = `${API_URLS.BASE_URL}/djangoapp/api/manager/inventory`;
 
   const fetchInventory = useCallback(async () => {
     setLoading(true);

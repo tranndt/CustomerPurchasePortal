@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 
 const ProductReview = () => {
   const { transaction_id } = useParams();
@@ -15,7 +16,7 @@ const ProductReview = () => {
   useEffect(() => {
     // Fetch order by transaction_id to get product_id
     const fetchOrderAndProduct = async () => {
-      const orderRes = await fetch(`http://localhost:8000/djangoapp/api/order-by-transaction/${transaction_id}`, {
+      const orderRes = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/order-by-transaction/${transaction_id}`, {
         credentials: "include"
       });
       const orderData = await orderRes.json();
@@ -37,7 +38,7 @@ const ProductReview = () => {
       showNotification("Product not found for this order.", 'error');
       return;
     }
-    const response = await fetch("http://localhost:8000/djangoapp/api/customer/review", {
+    const response = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/review`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

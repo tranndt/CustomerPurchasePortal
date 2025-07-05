@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import '../../styles/global.css';
 import './MyReviews.css';
 
@@ -23,7 +24,7 @@ const MyReviews = () => {
     }
     
     // Fetch user's own reviews
-    fetch(`http://localhost:8000/djangoapp/api/customer/reviews`, {
+    fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/reviews`, {
       credentials: 'include',
     })
       .then(res => res.json())
@@ -60,7 +61,7 @@ const MyReviews = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8000/djangoapp/api/customer/review/experience", {
+      const response = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/review/experience`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

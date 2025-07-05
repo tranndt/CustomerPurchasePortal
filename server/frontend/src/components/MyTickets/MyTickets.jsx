@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
+import API_URLS from '../../services/apiConfig';
 import '../../styles/global.css';
 import './MyTickets.css';
 
@@ -16,7 +17,7 @@ const MyTickets = () => {
       navigate('/');
       return;
     }
-    fetch(`http://localhost:8000/djangoapp/api/customer/tickets`, {
+    fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/tickets`, {
       credentials: 'include',
     })
       .then(res => res.json())

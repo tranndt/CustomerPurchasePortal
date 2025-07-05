@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import "./Register.css";
 
 const Register = () => {
@@ -39,7 +40,7 @@ const Register = () => {
       return;
     }
 
-    const register_url = "http://localhost:8000/djangoapp/register";
+    const register_url = `${API_URLS.BASE_URL}/djangoapp/register`;
 
     try {
       const res = await fetch(register_url, {

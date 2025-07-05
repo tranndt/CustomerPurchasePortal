@@ -1,12 +1,13 @@
 import React from 'react';
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import "../assets/style.css";
 import "../assets/bootstrap.min.css";
 
 const Header = () => {
     const logout = async (e) => {
     e.preventDefault();
-    let logout_url = "http://localhost:8000/djangoapp/logout";
+    let logout_url = `${API_URLS.BASE_URL}/djangoapp/logout`;
     const res = await fetch(logout_url, {
       method: "GET",
       credentials: "include",

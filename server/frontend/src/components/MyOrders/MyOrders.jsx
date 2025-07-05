@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import '../../styles/global.css';
 import './MyOrders.css';
 
@@ -11,7 +12,7 @@ const MyOrders = () => {
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
-    const response = await fetch("http://localhost:8000/djangoapp/api/customer/orders", {
+    const response = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/customer/orders`, {
       method: "GET",
       credentials: "include"
     });

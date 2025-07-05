@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import API_URLS from '../../services/apiConfig';
 
 const AdminHome = () => {
   const navigate = useNavigate();
@@ -15,10 +16,10 @@ const AdminHome = () => {
     try {
       console.log('Fetching badge counts...');
       const [pendingResponse, inventoryResponse, reviewsResponse, ticketsResponse] = await Promise.all([
-        fetch("http://localhost:8000/djangoapp/api/manager/orders/pending", { credentials: 'include' }),
-        fetch("http://localhost:8000/djangoapp/api/manager/inventory", { credentials: 'include' }),
-        fetch("http://localhost:8000/djangoapp/api/manager/reviews", { credentials: 'include' }),
-        fetch("http://localhost:8000/djangoapp/api/manager/tickets", { credentials: 'include' })
+        fetch(`${API_URLS.BASE_URL}/djangoapp/api/manager/orders/pending`, { credentials: 'include' }),
+        fetch(`${API_URLS.BASE_URL}/djangoapp/api/manager/inventory`, { credentials: 'include' }),
+        fetch(`${API_URLS.BASE_URL}/djangoapp/api/manager/reviews`, { credentials: 'include' }),
+        fetch(`${API_URLS.BASE_URL}/djangoapp/api/manager/tickets`, { credentials: 'include' })
       ]);
 
       const [pendingData, inventoryData, reviewsData, ticketsData] = await Promise.all([

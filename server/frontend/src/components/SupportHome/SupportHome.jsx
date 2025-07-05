@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import API_URLS from '../../services/apiConfig';
 
 const SupportHome = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const SupportHome = () => {
   const fetchBadgeCounts = useCallback(async () => {
     try {
       console.log('Fetching support badge counts...');
-      const ticketsResponse = await fetch("http://localhost:8000/djangoapp/api/support/tickets", { credentials: 'include' });
+      const ticketsResponse = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/support/tickets`, { credentials: 'include' });
       const ticketsData = await ticketsResponse.json();
 
       console.log('Support API response:', ticketsData);

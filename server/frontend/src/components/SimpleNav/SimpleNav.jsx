@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URLS from '../../services/apiConfig';
 import '../../styles/global.css';
 import './SimpleNav.css';
 
@@ -63,7 +64,7 @@ const SimpleNav = () => {
   const handleLogout = async () => {
     try {
       // Call logout API
-      const response = await fetch('http://localhost:8000/djangoapp/logout', {
+      const response = await fetch(`${API_URLS.BASE_URL}/djangoapp/logout`, {
         method: 'GET',
         credentials: 'include',
       });

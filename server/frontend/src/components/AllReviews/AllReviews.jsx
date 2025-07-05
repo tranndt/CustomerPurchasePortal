@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import API_URLS from '../../services/apiConfig';
 import './AllReviews.css';
 import BackButton from '../BackButton/BackButton';
 
@@ -14,7 +15,7 @@ const AllReviews = () => {
   const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/djangoapp/api/admin/reviews`, {
+      const response = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/admin/reviews`, {
         credentials: 'include',
       });
       const data = await response.json();

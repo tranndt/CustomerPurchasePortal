@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import API_URLS from '../../services/apiConfig';
 import './Cart.css';
 
 const Cart = () => {
@@ -11,10 +12,10 @@ const Cart = () => {
   const [updatingItems, setUpdatingItems] = useState({});
   const [checkingOut, setCheckingOut] = useState(false);
 
-  const cart_url = "http://localhost:8000/djangoapp/api/cart";
-  const cart_update_url = "http://localhost:8000/djangoapp/api/cart/update";
-  const cart_remove_url = "http://localhost:8000/djangoapp/api/cart/remove";
-  const checkout_url = "http://localhost:8000/djangoapp/api/cart/checkout";
+  const cart_url = `${API_URLS.BASE_URL}/djangoapp/api/cart`;
+  const cart_update_url = `${API_URLS.BASE_URL}/djangoapp/api/cart/update`;
+  const cart_remove_url = `${API_URLS.BASE_URL}/djangoapp/api/cart/remove`;
+  const checkout_url = `${API_URLS.BASE_URL}/djangoapp/api/cart/checkout`;
 
   useEffect(() => {
     fetchCart();

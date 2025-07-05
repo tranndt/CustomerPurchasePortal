@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 
 const AllOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const AllOrders = () => {
 
   const fetchAllOrders = async () => {
     try {
-      const res = await fetch("http://localhost:8000/djangoapp/api/admin/orders", {
+      const res = await fetch(`${API_URLS.BASE_URL}/djangoapp/api/admin/orders`, {
         method: "GET",
         credentials: "include"
       });

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleNav from "../SimpleNav/SimpleNav";
 import BackButton from "../BackButton/BackButton";
+import API_URLS from '../../services/apiConfig';
 import './TicketManager.css';
 
 const TicketManager = () => {
@@ -16,10 +17,10 @@ const TicketManager = () => {
     try {
       // Determine the correct endpoint based on user role
       const userRole = sessionStorage.getItem('userRole');
-      let endpoint = "http://localhost:8000/djangoapp/api/admin/tickets";
+      let endpoint = `${API_URLS.BASE_URL}/djangoapp/api/admin/tickets`;
       
       if (userRole && userRole.toLowerCase() === 'support') {
-        endpoint = "http://localhost:8000/djangoapp/api/support/tickets";
+        endpoint = `${API_URLS.BASE_URL}/djangoapp/api/support/tickets`;
       }
       
       const res = await fetch(endpoint, {

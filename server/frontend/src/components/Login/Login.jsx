@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showNotification } from '../Notification/Notification';
+import API_URLS from '../../services/apiConfig';
 import "./Login.css";
 
 const Login = () => {
@@ -12,8 +13,8 @@ const Login = () => {
   const [loaded, setLoaded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  let login_url = "http://localhost:8000/djangoapp/login";
-  let demo_users_url = "http://localhost:8000/djangoapp/api/demo-users";
+  let login_url = `${API_URLS.BASE_URL}/djangoapp/login`;
+  let demo_users_url = `${API_URLS.BASE_URL}/djangoapp/api/demo-users`;
 
   // Animation effect on component mount and fetch demo users
   useEffect(() => {
