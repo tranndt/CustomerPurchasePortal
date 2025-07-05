@@ -54,8 +54,30 @@ echo "Starting Django application on port 8000 (main port Render will use)..."
 
 # Run Django migrations and collect static files
 echo "Making migrations and migrating the database."
+python manage.py makemigrations djangoapp --noinput
+python manage.py migrate djangoapp --noinput
 python manage.py makemigrations --noinput
 python manage.py migrate --noinput
+
+# Check if Product table exists, if not run populate script
+echo "Checking if products table exists..."
+python -c "
+from django.db import connection
+with connection.cursor() as cursor:
+    tables = connection.introspection.table_names()
+    if 'djangoapp_product' not in tables:
+        print('Product table not found, will populate initial data')
+        import sys
+        sys.exit(1)
+    else:
+        print('Product table exists')
+        sys.exit(0)
+"
+
+if [ $? -ne 0 ]; then
+    echo "Running product data population script..."
+    python manage.py shell -c "from djangoapp.populate import populate_products; populate_products()"
+fi
 
 # Collect static files for production
 echo "Collecting static files..."

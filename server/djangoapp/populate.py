@@ -346,6 +346,19 @@ def initiate():
                         transaction_id=f"TXN{demo_customer.id}{product_idx:03d}{products[product_idx].id:03d}",
                         total_amount=products[product_idx].price
                     )
+def populate_products():
+    """
+    Main function to populate products and other demo data in the database.
+    This function is called from the entrypoint.sh script.
+    """
+    print("Starting product data population...")
+    initiate()
+    print("Product population completed successfully!")
+
+# Make sure the script can be run directly 
+if __name__ == "__main__":
+    print("Running populate script directly...")
+    populate_products()
 
 
 
