@@ -8,12 +8,16 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from django.db import connection
+from django.db.models import Sum
+from django.core.management import call_command
 from datetime import datetime
 import logging
 import json
+import traceback
 
 from .restapis import get_request, analyze_review_sentiments, post_review
-from .models import UserProfile, Product, Order, Review, SupportTicket, CartItem, CartItem
+from .models import UserProfile, Product, Order, Review, SupportTicket, CartItem
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -561,7 +565,29 @@ def update_ticket_detail(request, ticket_id):
 def get_products(request):
     """Get all active products with inventory information"""
     try:
+        # Check if the Product table exists first
+        with connection.cursor() as cursor:
+            tables = connection.introspection.table_names()
+            logger.info(f"Database tables: {tables}")
+            
+            if 'djangoapp_product' not in tables:
+                logger.error("Product table does not exist in the database!")
+                # Try to run migrations on the fly as a recovery step
+                logger.info("Attempting to run migrations on the fly...")
+                call_command('migrate', 'djangoapp', interactive=False)
+                
+                # If table still doesn't exist after migration, return helpful error
+                with connection.cursor() as check_cursor:
+                    if 'djangoapp_product' not in connection.introspection.table_names():
+                        return JsonResponse({
+                            "status": 500, 
+                            "message": "Product table does not exist. Database migration required.",
+                            "tables": tables
+                        })
+        
+        # Try to query products with additional error info
         products = Product.objects.filter(is_active=True).order_by('name')
+        logger.info(f"Found {products.count()} products")
         products_data = []
         
         for product in products:
@@ -579,7 +605,15 @@ def get_products(request):
         
         return JsonResponse({"status": 200, "products": products_data})
     except Exception as e:
-        return JsonResponse({"status": 500, "message": str(e)})
+        error_details = traceback.format_exc()
+        logger.error(f"Error in get_products: {str(e)}\n{error_details}")
+        
+        # Return more detailed error information
+        return JsonResponse({
+            "status": 500, 
+            "message": str(e),
+            "details": "An error occurred while fetching products. Please check server logs."
+        })
 
 @require_GET
 def get_product_categories(request):
@@ -1007,7 +1041,7 @@ def get_inventory_overview(request):
         inventory_data = []
         
         # Calculate pending orders for each product
-        from django.db.models import Sum
+        # Sum already imported at the top of the file
         
         for product in products:
             pending_quantity = Order.objects.filter(
