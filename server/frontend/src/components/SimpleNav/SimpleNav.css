@@ -59,7 +59,7 @@
 }
 
 .nav-link.shop {
-  color: #a259ec; /* Shop purple */
+  color: #a259ec; /* Purple */
 }
 
 .nav-link.shop:hover {
@@ -67,10 +67,18 @@
 }
 
 .nav-link.home {
-  color: #a259ec; /* Orders blue */
+  color: #a259ec; /* Purple */
 }
 
 .nav-link.home:hover {
+  background-color: rgba(162, 89, 236, 0.1);
+}
+
+.nav-link.about {
+  color: #a259ec; /* Purple */
+}
+
+.nav-link.about:hover {
   background-color: rgba(162, 89, 236, 0.1);
 }
 

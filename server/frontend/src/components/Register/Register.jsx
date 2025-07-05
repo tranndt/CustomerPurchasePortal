@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showNotification } from '../Notification/Notification';
+import ShortFooter from '../ShortFooter/ShortFooter';
 import API_URLS from '../../services/apiConfig';
 import "./Register.css";
 
@@ -196,6 +197,7 @@ const Register = () => {
           </div>
         </div>
       </div>
+      <ShortFooter />
     </>
   );
 };

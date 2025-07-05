@@ -4,7 +4,6 @@ import LoginPanel from "./components/Login/Login"
 import Register from "./components/Register/Register"
 import { Routes, Route } from "react-router-dom";
 import MyOrders from './components/MyOrders/MyOrders';
-import ProductReview from './components/ProductReview/ProductReview';
 import SupportClaim from './components/SupportClaim/SupportClaim';
 import TicketManager from './components/TicketManager/TicketManager';
 import TicketDetail from './components/TicketDetail/TicketDetail';
@@ -23,7 +22,6 @@ import InventoryManagement from './components/InventoryManagement/InventoryManag
 import Notification from './components/Notification/Notification';
 import { AlertProvider } from './components/AlertContext/AlertContext';
 import About from './components/About/About';
-import Footer from './components/Footer/Footer';
 
 function App() {
   return (

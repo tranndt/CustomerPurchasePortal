@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import ShortFooter from '../ShortFooter/ShortFooter';
 
 const CustomerHome = () => {
   const navigate = useNavigate();
@@ -220,6 +221,7 @@ const CustomerHome = () => {
           </div>
         </div>
       </div>
+      <ShortFooter />
     </div>
   );
 };

@@ -4,7 +4,7 @@ import SimpleNav from '../SimpleNav/SimpleNav';
 import Footer from '../Footer/Footer';
 import { showNotification } from '../Notification/Notification';
 import './Shop.css';
-import API_URLS, { fetchApi } from '../../services/apiConfig';
+import API_URLS from '../../services/apiConfig';
 
 const Shop = () => {
   const navigate = useNavigate();

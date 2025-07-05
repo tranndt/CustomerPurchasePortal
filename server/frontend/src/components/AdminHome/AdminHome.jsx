@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
+import ShortFooter from '../ShortFooter/ShortFooter';
 import API_URLS from '../../services/apiConfig';
 
 const AdminHome = () => {
@@ -281,6 +282,7 @@ const AdminHome = () => {
           </div>
         </div>
       </div>
+      <ShortFooter />
     </div>
   );
 };

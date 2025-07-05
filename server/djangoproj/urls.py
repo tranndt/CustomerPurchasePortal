@@ -72,6 +72,10 @@ urlpatterns += [
         'document_root': settings.REACT_BUILD_DIR,
         'path': 'logo512.png',
     }),
+    re_path(r'^customer-dashboard\.png$', serve, {
+        'document_root': settings.REACT_BUILD_DIR,
+        'path': 'customer-dashboard.png',
+    }),
     re_path(r'^manifest\.json$', serve, {
         'document_root': settings.REACT_BUILD_DIR,
         'path': 'manifest.json',
@@ -86,5 +90,5 @@ urlpatterns += [
 # This serves index.html for any route that doesn't match above patterns
 # Important: This should be after all API routes
 urlpatterns += [
-    re_path(r'^(?!admin|djangoapp|health|static|favicon|logo|manifest|robots).*$', home, name='react_app'),
+    re_path(r'^(?!admin|djangoapp|health|static|favicon|logo|manifest|robots|customer-dashboard).*$', home, name='react_app'),
 ]

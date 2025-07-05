@@ -1,16 +1,31 @@
 /* ProductDetail Component Styles - Using Design System */
 
+/* Main wrapper to ensure proper footer positioning */
+.product-detail-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .product-detail-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-5);
   font-family: var(--font-family-sans-serif);
+  flex: 1; /* This pushes the footer to the bottom */
+  padding-top: calc(70px + var(--spacing-5)); /* Account for fixed navbar */
 }
 
 .product-detail-loading,
 .product-detail-error {
   text-align: center;
   padding: var(--spacing-10);
+  flex: 1; /* This ensures the footer stays at bottom even for short content */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px; /* Minimum height to prevent footer from being too high */
 }
 
 .product-detail-error .back-btn {
@@ -65,6 +80,7 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-10);
   margin-bottom: var(--spacing-10);
+  min-height: 500px; /* Ensure adequate height for footer positioning */
 }
 
 @media (max-width: 768px) {

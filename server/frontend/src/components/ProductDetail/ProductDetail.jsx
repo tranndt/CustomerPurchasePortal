@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SimpleNav from '../SimpleNav/SimpleNav';
 import BackButton from '../BackButton/BackButton';
-import Footer from '../Footer/Footer';
 import { showNotification } from '../Notification/Notification';
 import API_URLS from '../../services/apiConfig';
 import './ProductDetail.css';
+import ShortFooter from '../ShortFooter/ShortFooter';
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -106,18 +106,19 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div>
+      <div className="product-detail-page">
         <SimpleNav />
         <div className="product-detail-loading">
           <h2>Loading product...</h2>
         </div>
+        <ShortFooter />
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div>
+      <div className="product-detail-page">
         <SimpleNav />
         <div className="product-detail-error">
           <h2>Error</h2>
@@ -126,12 +127,13 @@ const ProductDetail = () => {
             Back to Shop
           </button>
         </div>
+        <ShortFooter />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="product-detail-page">
       <SimpleNav />
       <div className="product-detail-container">
         <BackButton />
@@ -241,7 +243,7 @@ const ProductDetail = () => {
         </div>
       </div>
       
-      <Footer />
+      <ShortFooter />
     </div>
   );
 };
