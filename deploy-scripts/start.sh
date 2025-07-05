@@ -24,16 +24,18 @@ echo "SENTIMENT_ANALYZER_URL: $SENTIMENT_ANALYZER_URL"
 echo "MongoDB: [configured]"
 echo "WatsonX: [configured]"
 
-# Start Flask sentiment service in background on internal port
-cd /app/flask
-unset PORT  # Clear PORT to prevent conflicts
-python -c "
-import os
-os.environ['PORT'] = '5000'
-exec(open('app.py').read())
-" &
-FLASK_PID=$!
-echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
+# TEMPORARILY DISABLE ALL BACKGROUND SERVICES to test Django routing
+# # Flask sentiment service
+# cd /app/flask
+# unset PORT  # Clear PORT to prevent conflicts
+# python -c "
+# import os
+# os.environ['PORT'] = '5000'
+# exec(open('app.py').read())
+# " &
+# FLASK_PID=$!
+# echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
+echo "Flask sentiment service DISABLED for testing - Django should serve main port"
 
 # TEMPORARILY DISABLE Express API service to test Django routing
 # cd /app/express
@@ -345,9 +347,11 @@ fi
 echo "============================================="
 
 # Render automatically assigns PORT environment variable - use it, fallback to 8000
-PORT="${PORT:-8000}"
+# Make sure we use the exact PORT that Render expects
+export DJANGO_PORT="${PORT:-8000}"
 echo "================ STARTING GUNICORN ================"
-echo "Binding to port $PORT"
+echo "Render PORT environment variable: $PORT"
+echo "Django will bind to: $DJANGO_PORT"
 echo "Current directory: $(pwd)"
 echo "Database file status:"
 ls -la db.sqlite3 || echo "db.sqlite3 not found"
@@ -357,4 +361,4 @@ echo "Sample products:"
 sqlite3 db.sqlite3 "SELECT id, name, category, price FROM djangoapp_product LIMIT 3;" || echo "Failed to query sample products"
 echo "================ GUNICORN STARTING ================"
 
-gunicorn --bind 0.0.0.0:$PORT --workers 3 djangoproj.wsgi
+gunicorn --bind 0.0.0.0:$DJANGO_PORT --workers 3 djangoproj.wsgi

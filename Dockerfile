@@ -52,11 +52,8 @@ COPY deploy-scripts/start.sh /app/start.sh
 COPY deploy-scripts/emergency_db_setup.py /app/emergency_db_setup.py
 RUN chmod +x /app/start.sh
 
-# Expose ports - 8000 is the primary port that Render will use
+# Expose ports - main port will be dynamically assigned by Render
 EXPOSE 8000 3030 5002
-
-# Set environment variable to ensure the correct port is used
-ENV PORT=8000
 
 # Create directory for mounted secrets
 RUN mkdir -p /etc/secrets
