@@ -55,6 +55,8 @@ import os
 import sys
 import sqlite3
 import traceback
+import csv
+import random
 
 try:
     import django
@@ -76,20 +78,72 @@ try:
             print(f'Products count: {count}')
             
             if count == 0:
-                print('Table exists but empty, adding test products')
-                cursor.execute(\"\"\"
-                INSERT INTO djangoapp_product 
-                (name, category, price, description, stock_quantity, is_active, created_at)
-                VALUES 
-                ('Emergency Test Product', 'Test', 9.99, 'Created during recovery', 100, 1, CURRENT_TIMESTAMP),
-                ('Sample Electronics', 'Electronics', 199.99, 'Sample electronic device', 25, 1, CURRENT_TIMESTAMP),
-                ('Demo Product', 'Demo', 49.99, 'Demo product for testing', 50, 1, CURRENT_TIMESTAMP),
-                ('Test Laptop', 'Electronics', 899.99, 'High-performance laptop', 10, 1, CURRENT_TIMESTAMP),
-                ('Test Phone', 'Electronics', 599.99, 'Latest smartphone', 20, 1, CURRENT_TIMESTAMP)
-                \"\"\")
-                print('Added test products')
+                print('Table exists but empty, loading real products from CSV')
+                
+                # Try to load real products from CSV
+                csv_path = 'database/data/Products.csv'
+                products_added = 0
+                
+                if os.path.exists(csv_path):
+                    print(f'Loading products from {csv_path}')
+                    with open(csv_path, 'r', encoding='utf-8') as file:
+                        reader = csv.DictReader(file)
+                        
+                        for row in reader:
+                            # Clean and parse price
+                            price_str = row.get('Price', '0').replace('CA\$', '').replace('\$', '').replace(',', '').strip()
+                            try:
+                                price = float(price_str)
+                            except ValueError:
+                                price = 0.0
+                            
+                            # Handle BOM in the first column
+                            category = row.get('Category', row.get('\ufeffCategory', '')).strip()
+                            product_name = row.get('Product name', '').strip()
+                            brand = row.get('Brand', '').strip()
+                            subcategory = row.get('Subcategory', '').strip()
+                            
+                            # Create description
+                            description = f'High-quality {brand} {subcategory.lower()} in the {category.lower()} category.'
+                            
+                            # Generate realistic stock
+                            stock_quantity = random.randint(10, 100)
+                            
+                            try:
+                                cursor.execute(\"\"\"
+                                INSERT INTO djangoapp_product 
+                                (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                                \"\"\", (
+                                    product_name,
+                                    category,
+                                    price,
+                                    description,
+                                    stock_quantity,
+                                    row.get('Image Url', '').strip(),
+                                    1
+                                ))
+                                products_added += 1
+                            except Exception as e:
+                                continue
+                    
+                    print(f'Added {products_added} real products from CSV')
+                
+                if products_added == 0:
+                    print('CSV loading failed, adding fallback test products')
+                    cursor.execute(\"\"\"
+                    INSERT INTO djangoapp_product 
+                    (name, category, price, description, stock_quantity, is_active, created_at)
+                    VALUES 
+                    ('Emergency Test Product', 'Test', 9.99, 'Created during recovery', 100, 1, CURRENT_TIMESTAMP),
+                    ('Sample Electronics', 'Electronics', 199.99, 'Sample electronic device', 25, 1, CURRENT_TIMESTAMP),
+                    ('Demo Product', 'Demo', 49.99, 'Demo product for testing', 50, 1, CURRENT_TIMESTAMP),
+                    ('Test Laptop', 'Electronics', 899.99, 'High-performance laptop', 10, 1, CURRENT_TIMESTAMP),
+                    ('Test Phone', 'Electronics', 599.99, 'Latest smartphone', 20, 1, CURRENT_TIMESTAMP)
+                    \"\"\")
+                    print('Added test products as fallback')
         else:
-            print('Creating Product table directly')
+            print('Creating Product table directly and loading real products')
             cursor.execute(\"\"\"
             CREATE TABLE djangoapp_product (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,20 +158,70 @@ try:
             )
             \"\"\")
             
-            cursor.execute(\"\"\"
-            INSERT INTO djangoapp_product 
-            (name, category, price, description, stock_quantity, is_active, created_at)
-            VALUES 
-            ('First Test Product', 'Test', 9.99, 'Created during setup', 100, 1, CURRENT_TIMESTAMP),
-            ('Second Test Product', 'Electronics', 29.99, 'Another test product', 50, 1, CURRENT_TIMESTAMP),
-            ('Sample Laptop', 'Electronics', 899.99, 'High-performance laptop', 10, 1, CURRENT_TIMESTAMP),
-            ('Demo Phone', 'Electronics', 599.99, 'Latest smartphone', 20, 1, CURRENT_TIMESTAMP),
-            ('Test Accessory', 'Accessories', 19.99, 'Useful accessory', 75, 1, CURRENT_TIMESTAMP),
-            ('Gaming Console', 'Electronics', 499.99, 'Latest gaming console', 15, 1, CURRENT_TIMESTAMP),
-            ('Wireless Earbuds', 'Audio', 129.99, 'Premium wireless earbuds', 40, 1, CURRENT_TIMESTAMP),
-            ('Smart Watch', 'Electronics', 249.99, 'Feature-rich smart watch', 30, 1, CURRENT_TIMESTAMP)
-            \"\"\")
-            print('Created table and added test products')
+            # Try to load real products from CSV
+            csv_path = 'database/data/Products.csv'
+            products_added = 0
+            
+            if os.path.exists(csv_path):
+                print(f'Loading products from {csv_path}')
+                with open(csv_path, 'r', encoding='utf-8') as file:
+                    reader = csv.DictReader(file)
+                    
+                    for row in reader:
+                        # Clean and parse price
+                        price_str = row.get('Price', '0').replace('CA\$', '').replace('\$', '').replace(',', '').strip()
+                        try:
+                            price = float(price_str)
+                        except ValueError:
+                            price = 0.0
+                        
+                        # Handle BOM in the first column
+                        category = row.get('Category', row.get('\ufeffCategory', '')).strip()
+                        product_name = row.get('Product name', '').strip()
+                        brand = row.get('Brand', '').strip()
+                        subcategory = row.get('Subcategory', '').strip()
+                        
+                        # Create description
+                        description = f'High-quality {brand} {subcategory.lower()} in the {category.lower()} category.'
+                        
+                        # Generate realistic stock
+                        stock_quantity = random.randint(10, 100)
+                        
+                        try:
+                            cursor.execute(\"\"\"
+                            INSERT INTO djangoapp_product 
+                            (name, category, price, description, stock_quantity, image_url, is_active, created_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                            \"\"\", (
+                                product_name,
+                                category,
+                                price,
+                                description,
+                                stock_quantity,
+                                row.get('Image Url', '').strip(),
+                                1
+                            ))
+                            products_added += 1
+                        except Exception as e:
+                            continue
+                
+                print(f'Added {products_added} real products from CSV')
+            
+            if products_added == 0:
+                cursor.execute(\"\"\"
+                INSERT INTO djangoapp_product 
+                (name, category, price, description, stock_quantity, is_active, created_at)
+                VALUES 
+                ('First Test Product', 'Test', 9.99, 'Created during setup', 100, 1, CURRENT_TIMESTAMP),
+                ('Second Test Product', 'Electronics', 29.99, 'Another test product', 50, 1, CURRENT_TIMESTAMP),
+                ('Sample Laptop', 'Electronics', 899.99, 'High-performance laptop', 10, 1, CURRENT_TIMESTAMP),
+                ('Demo Phone', 'Electronics', 599.99, 'Latest smartphone', 20, 1, CURRENT_TIMESTAMP),
+                ('Test Accessory', 'Accessories', 19.99, 'Useful accessory', 75, 1, CURRENT_TIMESTAMP),
+                ('Gaming Console', 'Electronics', 499.99, 'Latest gaming console', 15, 1, CURRENT_TIMESTAMP),
+                ('Wireless Earbuds', 'Audio', 129.99, 'Premium wireless earbuds', 40, 1, CURRENT_TIMESTAMP),
+                ('Smart Watch', 'Electronics', 249.99, 'Feature-rich smart watch', 30, 1, CURRENT_TIMESTAMP)
+                \"\"\")
+                print('Created table and added test products as fallback')
         
         # Verify the table was created successfully
         cursor.execute('SELECT COUNT(*) FROM djangoapp_product')
