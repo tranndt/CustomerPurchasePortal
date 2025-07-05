@@ -1417,3 +1417,60 @@ def get_demo_reviews():
             'is_product_review': True
         }
     ]
+
+# Debug view for production troubleshooting
+def debug_filesystem(request):
+    """
+    Debug endpoint to check file system status in production.
+    Returns information about React build and directory structure.
+    """
+    from django.conf import settings
+    import os
+    
+    debug_info = {
+        'status': 'debug',
+        'base_dir': str(settings.BASE_DIR),
+        'cwd': os.getcwd(),
+        'directories': {},
+        'react_build_status': {}
+    }
+    
+    # Check various directories
+    dirs_to_check = [
+        str(settings.BASE_DIR),
+        os.path.join(str(settings.BASE_DIR), 'frontend'),
+        os.path.join(str(settings.BASE_DIR), 'frontend', 'build'),
+        '/app',
+        '/app/django',
+        '/app/django/frontend',
+        '/app/django/frontend/build'
+    ]
+    
+    for dir_path in dirs_to_check:
+        try:
+            if os.path.exists(dir_path):
+                contents = os.listdir(dir_path)
+                debug_info['directories'][dir_path] = {
+                    'exists': True,
+                    'contents': contents[:20],  # Limit to first 20 items
+                    'total_items': len(contents)
+                }
+            else:
+                debug_info['directories'][dir_path] = {'exists': False}
+        except Exception as e:
+            debug_info['directories'][dir_path] = {'error': str(e)}
+    
+    # Check React build specifically
+    react_paths = [
+        os.path.join(str(settings.BASE_DIR), 'frontend', 'build', 'index.html'),
+        '/app/django/frontend/build/index.html',
+        '/app/frontend/build/index.html'
+    ]
+    
+    for path in react_paths:
+        debug_info['react_build_status'][path] = {
+            'exists': os.path.exists(path),
+            'size': os.path.getsize(path) if os.path.exists(path) else 0
+        }
+    
+    return JsonResponse(debug_info, indent=2)

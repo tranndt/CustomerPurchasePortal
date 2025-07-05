@@ -11,6 +11,9 @@ urlpatterns = [
     
     # Health check endpoint
     path(route='health-check', view=views.health_check, name='health_check'),
+    
+    # Debug endpoint for production troubleshooting
+    path(route='debug-filesystem', view=views.debug_filesystem, name='debug_filesystem'),
 
     # path for registration
     # path(route='register', view=views.registration, name='register'),

@@ -44,6 +44,8 @@ urlpatterns = [
     path('health/', health_check, name='health_check'),
     # Add a debug test endpoint
     path('debug-test/', debug_test, name='debug_test'),
+    # Add a debug filesystem endpoint
+    path('debug-filesystem/', lambda request: __import__('djangoapp.views', fromlist=['debug_filesystem']).debug_filesystem(request), name='debug_filesystem'),
     # Serve React frontend at root
     path('', home, name='home'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
