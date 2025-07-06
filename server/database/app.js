@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const cors = require('cors')
 const app = express()
-const port = process.env.PORT || 3030;
+const port = 3000;  // Fixed port to avoid conflicts with Render's main PORT
 
 app.use(cors())
 app.use(require('body-parser').urlencoded({ extended: false }));

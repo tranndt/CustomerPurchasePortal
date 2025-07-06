@@ -37,11 +37,8 @@ echo "Flask sentiment service started with PID: $FLASK_PID on port 5000"
 
 # Start Express API service in background on internal port
 cd /app/express
-unset PORT  # Clear PORT to prevent conflicts
-node -e "
-process.env.PORT = '3000';
-require('./app.js');
-" &
+echo "Starting Express on fixed port 3000..."
+node app.js &
 EXPRESS_PID=$!
 echo "Express API service started with PID: $EXPRESS_PID on port 3000"
 

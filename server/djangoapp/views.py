@@ -37,17 +37,59 @@ def home(request):
     Serve the React frontend application.
     This acts as the main entry point for the web application.
     """
-    print("=== HOME VIEW CALLED ===")
-    print(f"Request path: {request.path}")
-    print(f"Request method: {request.method}")
+    from django.conf import settings
     
-    # Temporary test - just return a simple HTML response to verify this view is being called
-    return HttpResponse(
-        "<h1>DJANGO HOME VIEW TEST</h1>"
-        "<p>If you see this, the Django home view is working!</p>"
-        "<p>Next step: serve React build</p>",
-        content_type='text/html'
-    )
+    # Add explicit debug logging for production debugging
+    print("=== HOME VIEW CALLED ===")
+    print(f"HOME VIEW CALLED - Request path: {request.path}")
+    print(f"HOME VIEW CALLED - Method: {request.method}")
+    print(f"HOME VIEW CALLED - User-Agent: {request.headers.get('User-Agent', 'Unknown')}")
+    print(f"HOME VIEW CALLED - BASE_DIR: {settings.BASE_DIR}")
+    print(f"HOME VIEW CALLED - Current working directory: {os.getcwd()}")
+    
+    # Path to React build index.html
+    react_index_path = os.path.join(settings.BASE_DIR, 'frontend', 'build', 'index.html')
+    print(f"HOME VIEW - Looking for React build at: {react_index_path}")
+    print(f"HOME VIEW - React build exists: {os.path.exists(react_index_path)}")
+    
+    try:
+        # Try to serve the React index.html file
+        if os.path.exists(react_index_path):
+            with open(react_index_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            print("HOME VIEW - Successfully serving React build")
+            return HttpResponse(content, content_type='text/html')
+        else:
+            # Fallback if React build doesn't exist
+            print("HOME VIEW - React build not found, serving API response")
+            return JsonResponse({
+                'message': 'ElectronicsRetail API is running',
+                'status': 'success',
+                'service': 'django',
+                'error': 'React build not found',
+                'path_checked': react_index_path,
+                'endpoints': {
+                    'admin': '/admin/',
+                    'api': '/djangoapp/api/',
+                    'auth': '/djangoapp/login',
+                    'health': '/health/'
+                }
+            })
+    except Exception as e:
+        # Error fallback
+        print(f"HOME VIEW - Exception occurred: {e}")
+        return JsonResponse({
+            'message': 'ElectronicsRetail API is running',
+            'status': 'error',
+            'service': 'django',
+            'error': str(e),
+            'endpoints': {
+                'admin': '/admin/',
+                'api': '/djangoapp/api/',
+                'auth': '/djangoapp/login',
+                'health': '/health/'
+            }
+        })
 
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
